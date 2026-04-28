@@ -1,0 +1,32 @@
+name: Update One Piece TCG
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'  # daily at midnight UTC
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install -r one-piece-tcg/requirements.txt
+
+      - name: Run fetch script
+        run: python one-piece-tcg/fetch_top_cards.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add one-piece-tcg/index.html one-piece-tcg/cache/
+          git diff --cached --quiet || git commit -m "chore: update one-piece-tcg index.html"
+          git push
