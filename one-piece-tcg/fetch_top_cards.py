@@ -5,7 +5,7 @@ import os
 # Set slugs are loaded from sets.json (kebab-case, e.g. "adventure-on-kamis-island")
 _sets_path = os.path.join(os.path.dirname(__file__), "sets.json")
 with open(_sets_path) as _f:
-    SETS = json.load(_f)
+    SETS = set(json.load(_f))
 
 PRODUCT_LINE = "one-piece-card-game"
 
