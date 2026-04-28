@@ -1,0 +1,3643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TCG Top Cards</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f0f13;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar nav ── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #17171f;
+      border-right: 1px solid #2a2a3a;
+      overflow-y: auto;
+      padding: 1.5rem 0;
+      z-index: 100;
+    }
+    .sidebar h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #a78bfa;
+      padding: 0 1.2rem 1rem;
+      border-bottom: 1px solid #2a2a3a;
+      margin-bottom: .8rem;
+    }
+    .sidebar ul { list-style: none; }
+    .sidebar li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .1rem .4rem .1rem 1.2rem;
+    }
+    .sidebar a {
+      color: #c4c4d4;
+      text-decoration: none;
+      font-size: .85rem;
+      flex: 1;
+      padding: .35rem 0;
+    }
+    .sidebar a:hover { color: #a78bfa; }
+    .nav-total {
+      font-size: .75rem;
+      color: #6b6b8a;
+      white-space: nowrap;
+    }
+    .grand-total {
+      margin: 1rem 1.2rem 0;
+      padding-top: .8rem;
+      border-top: 1px solid #2a2a3a;
+      font-size: .8rem;
+      color: #a78bfa;
+    }
+
+    /* ── Main content ── */
+    .main {
+      margin-left: 240px;
+      padding: 2rem 2rem 4rem;
+    }
+
+    /* ── Set section ── */
+    .set-section {
+      margin-bottom: 3.5rem;
+      scroll-margin-top: 1.5rem;
+    }
+    .set-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.2rem;
+      padding-bottom: .6rem;
+      border-bottom: 2px solid #2a2a3a;
+    }
+    .set-header h2 {
+      font-size: 1.3rem;
+      color: #a78bfa;
+    }
+    .set-stats {
+      display: flex;
+      gap: 1rem;
+      font-size: .82rem;
+      color: #6b6b8a;
+    }
+    .set-total, .set-avg { color: #c4c4d4; }
+
+    /* ── Price buckets ── */
+    .price-buckets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: .8rem;
+    }
+    .bucket {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #1c1c28;
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      padding: .4rem .8rem;
+      min-width: 72px;
+    }
+    .bucket-empty { opacity: .35; }
+    .bucket-label {
+      font-size: .65rem;
+      color: #6b6b8a;
+      white-space: nowrap;
+    }
+    .bucket-count {
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    /* ── Collapsible chart ── */
+    .chart-details {
+      margin-bottom: 1.2rem;
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .chart-toggle {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .55rem 1rem;
+      background: #1c1c28;
+      cursor: pointer;
+      font-size: .8rem;
+      color: #a78bfa;
+      user-select: none;
+      list-style: none;
+    }
+    .chart-toggle::-webkit-details-marker { display: none; }
+    .chart-toggle::before {
+      content: "▶";
+      font-size: .6rem;
+      transition: transform .2s;
+    }
+    .chart-details[open] .chart-toggle::before { transform: rotate(90deg); }
+    .chart-toggle:hover { background: #22222e; }
+
+    .chart {
+      padding: 1.2rem 1rem 1rem;
+      background: #17171f;
+    }
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: .75rem;
+      height: 140px;
+    }
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      height: 100%;
+    }
+    .bar-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 1;
+      width: 100%;
+      gap: 4px;
+    }
+    .bar {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      min-height: 3px;
+      transition: opacity .15s;
+    }
+    .bar:hover { opacity: .75; }
+    .bar-val {
+      font-size: .7rem;
+      font-weight: 700;
+      color: #c4c4d4;
+    }
+    .bar-label {
+      font-size: .62rem;
+      color: #6b6b8a;
+      margin-top: .35rem;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    /* ── Cards grid ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+
+    .card {
+      background: #1c1c28;
+      border: 1px solid #2a2a3a;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform .15s, border-color .15s;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: #a78bfa;
+    }
+
+    .card-rank {
+      position: absolute;
+      top: 6px; left: 6px;
+      background: rgba(0,0,0,.65);
+      color: #a78bfa;
+      font-size: .7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .card-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: contain;
+      background: #111118;
+      display: block;
+    }
+
+    .card-body {
+      padding: .6rem .7rem .75rem;
+      display: flex;
+      flex-direction: column;
+      gap: .35rem;
+    }
+
+    .card-name {
+      font-size: .78rem;
+      font-weight: 600;
+      color: #e0e0e0;
+      line-height: 1.3;
+    }
+
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .3rem;
+      align-items: center;
+    }
+
+    .badge {
+      background: #2a2a3a;
+      color: #a0a0c0;
+      font-size: .65rem;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .rarity { background: #2e1f4a; color: #c084fc; }
+    .rarity-name { font-size: .65rem; color: #6b6b8a; }
+
+    .card-id { font-size: .62rem; color: #44445a; }
+
+    .card-price {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-top: .1rem;
+    }
+    .price-high { color: #f87171; }
+    .price-mid  { color: #fbbf24; }
+    .price-low  { color: #34d399; }
+
+    @media (max-width: 640px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 1rem; }
+    }
+
+    /* ── Booster box input banner ── */
+    .box-price-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: #17171f;
+      border-bottom: 1px solid #2a2a3a;
+      padding: .6rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      font-size: .85rem;
+      color: #c4c4d4;
+    }
+    .box-price-bar label { color: #a78bfa; font-weight: 600; }
+    .box-price-input {
+      background: #0f0f13;
+      border: 1px solid #3a3a5a;
+      border-radius: 6px;
+      color: #e0e0e0;
+      font-size: .9rem;
+      padding: .3rem .6rem;
+      width: 100px;
+      outline: none;
+    }
+    .box-price-input:focus { border-color: #a78bfa; }
+
+    /* ── Breakeven panel ── */
+    .breakeven-details { margin-top: .5rem; }
+    .breakeven-panel {
+      padding: 1.2rem;
+      background: #17171f;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .be-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: .6rem;
+    }
+    .be-stat {
+      background: #1c1c28;
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      padding: .5rem .8rem;
+      display: flex;
+      flex-direction: column;
+      gap: .15rem;
+    }
+    .be-label { font-size: .65rem; color: #6b6b8a; }
+    .be-value { font-size: .95rem; font-weight: 700; color: #c4c4d4; }
+    .be-ev    { color: #a78bfa; }
+
+    .be-result-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+    }
+    .be-result-box {
+      flex: 1;
+      min-width: 120px;
+      background: #1c1c28;
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      padding: .6rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
+      text-align: center;
+    }
+    .be-result-label { font-size: .65rem; color: #6b6b8a; }
+    .be-result-value { font-size: 1.1rem; font-weight: 700; color: #e0e0e0; }
+    .be-ev-display   { color: #a78bfa; }
+    .be-profit  { border-color: #34d399 !important; }
+    .be-profit .be-result-value { color: #34d399; }
+    .be-loss    { border-color: #f87171 !important; }
+    .be-loss .be-result-value   { color: #f87171; }
+
+    .be-hit-title { font-size: .7rem; color: #6b6b8a; margin-bottom: .4rem; }
+    .be-hit-cards { display: flex; flex-wrap: wrap; gap: .35rem; }
+    .be-hit-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .3rem;
+      border-radius: 5px;
+      font-size: .68rem;
+      padding: 2px 7px;
+      color: #c4c4d4;
+      background: #2a2a3a;
+    }
+    .be-hit-type {
+      font-style: normal;
+      font-size: .58rem;
+      font-weight: 700;
+      padding: 1px 4px;
+      border-radius: 3px;
+      background: #3a3a50;
+      color: #888;
+    }
+    .be-hit-price { color: #a78bfa; font-style: normal; }
+    .be-type-sp            { background: #1e2a3a; }
+    .be-type-sp            .be-hit-type { background: #1e3a5a; color: #60a5fa; }
+    .be-type-sec           { background: #2a1e3a; }
+    .be-type-sec           .be-hit-type { background: #3a1e5a; color: #c084fc; }
+    .be-type-alt-art       { background: #1e2e2a; }
+    .be-type-alt-art       .be-hit-type { background: #1a3a30; color: #34d399; }
+    .be-type-manga         { background: #2e1f4a; border: 1px solid #7c3aed; }
+    .be-type-manga         .be-hit-type { background: #4a1e7a; color: #e879f9; }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <h1>TCG Top Cards</h1>
+    <ul>
+      <li><a href="#adventure-on-kamis-island">Adventure on Kami's Island</a><span class="nav-total">$5642.33</span></li>
+<li><a href="#the-azure-seas-seven">The Azure Sea's Seven</a><span class="nav-total">$7977.56</span></li>
+<li><a href="#extra-booster-one-piece-heroines-edition">Extra Booster: One Piece Heroines Edition</a><span class="nav-total">$6204.08</span></li>
+    </ul>
+    <div class="grand-total">Grand total: $19823.97</div>
+  </nav>
+
+  <main class="main">
+    <div class="box-price-bar">
+      <label for="box-price-global">Booster box price:</label>
+      <input id="box-price-global" class="box-price-input" type="number" min="0" step="0.01" value="350" />
+      <span id="box-price-hint" style="font-size:.75rem;color:#6b6b8a;">Updating all sets…</span>
+    </div>
+    
+  <section class="set-section" id="adventure-on-kamis-island">
+    <div class="set-header">
+      <h2>Adventure on Kami's Island</h2>
+      <div class="set-stats">
+        <span>Top 50 cards</span>
+        <span class="set-total">Total: $5642.33</span>
+        <span class="set-avg">Avg: $112.85</span>
+      </div>
+    </div>
+    <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">4</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">23</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">10</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">8</span></div><div class="bucket"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#f87171">3</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">2</span></div></div>
+    <details class="chart-details">
+      <summary class="chart-toggle">Price distribution chart</summary>
+      <div class="chart">
+        <div class="chart-bars">
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">4</span>
+                  <div class="bar" style="height:17%;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">$0–10</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">23</span>
+                  <div class="bar" style="height:100%;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">$10–50</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">10</span>
+                  <div class="bar" style="height:43%;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">$50–100</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">8</span>
+                  <div class="bar" style="height:35%;background:#fb923c;"></div>
+                </div>
+                <div class="bar-label">$100–250</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">3</span>
+                  <div class="bar" style="height:13%;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">$250–500</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">2</span>
+                  <div class="bar" style="height:9%;background:#c084fc;"></div>
+                </div>
+                <div class="bar-label">$500+</div>
+              </div>
+        </div>
+      </div>
+    </details>
+    <details class="chart-details breakeven-details" data-ev="354.3163">
+      <summary class="chart-toggle">Booster box break-even calculator</summary>
+      <div class="breakeven-panel">
+        <div class="be-grid">
+          <div class="be-stat">
+            <span class="be-label">SP hits (9)</span>
+            <span class="be-value">$235.67 avg</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">Alternate Art hits (32)</span>
+            <span class="be-value">$42.22 avg</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">SEC hits (3)</span>
+            <span class="be-value">$23.25 avg</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">Manga hits (2, 1-in-5 boxes)</span>
+            <span class="be-value">$966.62 avg</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">Avg normal hit value</span>
+            <span class="be-value">$80.50</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">Expected value / box</span>
+            <span class="be-value be-ev">$354.32</span>
+          </div>
+        </div>
+        <div class="be-result-row">
+          <div class="be-result-box">
+            <span class="be-result-label">Box cost</span>
+            <span class="be-result-value" id="be-cost-adventure-on-kamis-island">$350.00</span>
+          </div>
+          <div class="be-result-box">
+            <span class="be-result-label">Expected value</span>
+            <span class="be-result-value be-ev-display" id="be-ev-adventure-on-kamis-island">$354.32</span>
+          </div>
+          <div class="be-result-box be-outcome-box" id="be-outcome-adventure-on-kamis-island">
+            <span class="be-result-label">Outcome</span>
+            <span class="be-result-value" id="be-outcome-val-adventure-on-kamis-island">—</span>
+          </div>
+          <div class="be-result-box">
+            <span class="be-result-label">Boxes to break even</span>
+            <span class="be-result-value" id="be-boxes-adventure-on-kamis-island">—</span>
+          </div>
+        </div>
+      </div>
+    </details>
+    <div class="cards-grid">
+      
+        <div class="card">
+          <div class="card-rank">#1</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685479_in_400x400.jpg"
+            alt="Enel (OP15-118) (Manga)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Enel (OP15-118) (Manga)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-118</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 685479</div>
+            <div class="card-price price-high">$1159.50</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#2</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685313_in_400x400.jpg"
+            alt="Koby (EB04-044) (Manga)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Koby (EB04-044) (Manga)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-044</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685313</div>
+            <div class="card-price price-high">$773.74</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#3</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685009_in_400x400.jpg"
+            alt="Zeus (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Zeus (SP)</div>
+            <div class="card-meta">
+              <span class="badge">OP11-106</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 685009</div>
+            <div class="card-price price-high">$387.02</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#4</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685194_in_400x400.jpg"
+            alt="Monkey.D.Luffy (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Monkey.D.Luffy (SP)</div>
+            <div class="card-meta">
+              <span class="badge">ST26-005</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685194</div>
+            <div class="card-price price-high">$377.63</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#5</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685011_in_400x400.jpg"
+            alt="Boa Hancock (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Boa Hancock (SP)</div>
+            <div class="card-meta">
+              <span class="badge">OP12-014</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685011</div>
+            <div class="card-price price-high">$352.49</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#6</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685019_in_400x400.jpg"
+            alt="Edward.Newgate (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Edward.Newgate (SP)</div>
+            <div class="card-meta">
+              <span class="badge">OP13-042</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685019</div>
+            <div class="card-price price-high">$209.28</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#7</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685017_in_400x400.jpg"
+            alt="Trafalgar Law (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Trafalgar Law (SP)</div>
+            <div class="card-meta">
+              <span class="badge">OP13-031</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 685017</div>
+            <div class="card-price price-high">$192.95</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#8</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685008_in_400x400.jpg"
+            alt="Enel (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Enel (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB02-052</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685008</div>
+            <div class="card-price price-high">$177.38</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#9</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685032_in_400x400.jpg"
+            alt="Sabo (PRB02-014) (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Sabo (PRB02-014) (SP)</div>
+            <div class="card-meta">
+              <span class="badge">PRB02-014</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685032</div>
+            <div class="card-price price-high">$166.53</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#10</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685482_in_400x400.jpg"
+            alt="Smoker & Tashigi (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Smoker & Tashigi (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-003</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 685482</div>
+            <div class="card-price price-high">$136.85</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#11</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685335_in_400x400.jpg"
+            alt="Roronoa Zoro (OP13-037)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Roronoa Zoro (OP13-037)</div>
+            <div class="card-meta">
+              <span class="badge">OP13-037</span>
+              <span class="badge rarity">TR</span>
+              <span class="rarity-name">Treasure Rare</span>
+            </div>
+            <div class="card-id">ID: 685335</div>
+            <div class="card-price price-high">$122.48</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#12</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685031_in_400x400.jpg"
+            alt="Sabo (P-105) (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Sabo (P-105) (SP)</div>
+            <div class="card-meta">
+              <span class="badge">P-105</span>
+              <span class="badge rarity">PR</span>
+              <span class="rarity-name">Promo</span>
+            </div>
+            <div class="card-id">ID: 685031</div>
+            <div class="card-price price-high">$120.92</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#13</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685428_in_400x400.jpg"
+            alt="Lightning Dragon (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Lightning Dragon (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-077</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 685428</div>
+            <div class="card-price price-high">$117.90</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#14</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685481_in_400x400.jpg"
+            alt="Monkey.D.Luffy (OP15-119) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Monkey.D.Luffy (OP15-119) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-119</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 685481</div>
+            <div class="card-price price-high">$95.67</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#15</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685475_in_400x400.jpg"
+            alt="Gum-Gum Golden Rifle (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Gum-Gum Golden Rifle (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-116</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 685475</div>
+            <div class="card-price price-high">$91.24</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#16</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685304_in_400x400.jpg"
+            alt="Roronoa Zoro (EB04-007) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Roronoa Zoro (EB04-007) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-007</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685304</div>
+            <div class="card-price price-high">$86.07</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#17</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685330_in_400x400.jpg"
+            alt="Borsalino (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Borsalino (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-058</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685330</div>
+            <div class="card-price price-high">$82.07</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#18</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685363_in_400x400.jpg"
+            alt="Brook (OP15-022) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Brook (OP15-022) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-022</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 685363</div>
+            <div class="card-price price-high">$67.82</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#19</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685453_in_400x400.jpg"
+            alt="Monkey.D.Luffy (OP15-098) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Monkey.D.Luffy (OP15-098) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-098</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 685453</div>
+            <div class="card-price price-high">$66.45</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#20</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685478_in_400x400.jpg"
+            alt="Enel (OP15-118) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Enel (OP15-118) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-118</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 685478</div>
+            <div class="card-price price-high">$64.69</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#21</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685296_in_400x400.jpg"
+            alt="Jewelry Bonney (EB04-001) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Jewelry Bonney (EB04-001) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-001</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 685296</div>
+            <div class="card-price price-high">$61.82</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#22</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685439_in_400x400.jpg"
+            alt="Nami (OP15-086) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nami (OP15-086) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-086</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685439</div>
+            <div class="card-price price-high">$61.37</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#23</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685406_in_400x400.jpg"
+            alt="Enel (OP15-058) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Enel (OP15-058) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-058</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 685406</div>
+            <div class="card-price price-high">$57.14</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#24</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685334_in_400x400.jpg"
+            alt="Monkey.D.Luffy (EB04-061) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Monkey.D.Luffy (EB04-061) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-061</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 685334</div>
+            <div class="card-price price-mid">$48.54</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#25</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685339_in_400x400.jpg"
+            alt="Lucy (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Lucy (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-002</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 685339</div>
+            <div class="card-price price-mid">$45.94</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#26</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685430_in_400x400.jpg"
+            alt="Mamaragan (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Mamaragan (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-078</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685430</div>
+            <div class="card-price price-mid">$40.88</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#27</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685470_in_400x400.jpg"
+            alt="Roronoa Zoro (OP15-113) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Roronoa Zoro (OP15-113) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-113</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685470</div>
+            <div class="card-price price-mid">$38.45</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#28</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685400_in_400x400.jpg"
+            alt="Rebecca (OP15-053) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Rebecca (OP15-053) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-053</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685400</div>
+            <div class="card-price price-mid">$35.14</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#29</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685375_in_400x400.jpg"
+            alt="Brook (OP15-032) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Brook (OP15-032) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-032</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685375</div>
+            <div class="card-price price-mid">$33.89</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#30</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685446_in_400x400.jpg"
+            alt="Monkey.D.Luffy (OP15-092) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Monkey.D.Luffy (OP15-092) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-092</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 685446</div>
+            <div class="card-price price-mid">$31.24</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#31</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685477_in_400x400.jpg"
+            alt="Enel (OP15-118)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Enel (OP15-118)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-118</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 685477</div>
+            <div class="card-price price-mid">$28.97</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#32</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685480_in_400x400.jpg"
+            alt="Monkey.D.Luffy (OP15-119)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Monkey.D.Luffy (OP15-119)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-119</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 685480</div>
+            <div class="card-price price-mid">$28.02</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#33</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685312_in_400x400.jpg"
+            alt="Koby (EB04-044) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Koby (EB04-044) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-044</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685312</div>
+            <div class="card-price price-mid">$26.91</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#34</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685298_in_400x400.jpg"
+            alt="Jewelry Bonney (EB04-002) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Jewelry Bonney (EB04-002) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-002</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 685298</div>
+            <div class="card-price price-mid">$25.70</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#35</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685465_in_400x400.jpg"
+            alt="Nico Robin (OP15-109) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nico Robin (OP15-109) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-109</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 685465</div>
+            <div class="card-price price-mid">$22.98</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#36</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685383_in_400x400.jpg"
+            alt="Rebecca (OP15-039) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Rebecca (OP15-039) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-039</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 685383</div>
+            <div class="card-price price-mid">$20.01</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#37</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685329_in_400x400.jpg"
+            alt="Borsalino"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Borsalino</div>
+            <div class="card-meta">
+              <span class="badge">EB04-058</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685329</div>
+            <div class="card-price price-mid">$18.97</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#38</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685337_in_400x400.jpg"
+            alt="Krieg (OP15-001) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Krieg (OP15-001) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-001</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 685337</div>
+            <div class="card-price price-mid">$17.72</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#39</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685391_in_400x400.jpg"
+            alt="Sabo (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Sabo (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-046</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685391</div>
+            <div class="card-price price-mid">$17.49</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#40</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685303_in_400x400.jpg"
+            alt="Roronoa Zoro (EB04-007)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Roronoa Zoro (EB04-007)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-007</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685303</div>
+            <div class="card-price price-mid">$17.30</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#41</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685409_in_400x400.jpg"
+            alt="Enel (OP15-060) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Enel (OP15-060) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-060</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685409</div>
+            <div class="card-price price-mid">$15.42</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#42</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685393_in_400x400.jpg"
+            alt="Sanji (OP15-047) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Sanji (OP15-047) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-047</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 685393</div>
+            <div class="card-price price-mid">$14.70</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#43</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685323_in_400x400.jpg"
+            alt="Sanji (EB04-052) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Sanji (EB04-052) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-052</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 685323</div>
+            <div class="card-price price-mid">$13.36</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#44</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685411_in_400x400.jpg"
+            alt="Ohm (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Ohm (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-061</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 685411</div>
+            <div class="card-price price-mid">$13.29</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#45</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685333_in_400x400.jpg"
+            alt="Monkey.D.Luffy (EB04-061)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Monkey.D.Luffy (EB04-061)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-061</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 685333</div>
+            <div class="card-price price-mid">$12.76</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#46</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685348_in_400x400.jpg"
+            alt="Krieg (OP15-008) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Krieg (OP15-008) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-008</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685348</div>
+            <div class="card-price price-mid">$10.87</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#47</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685472_in_400x400.jpg"
+            alt="Wyper (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Wyper (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-114</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685472</div>
+            <div class="card-price price-low">$9.84</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#48</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/686651_in_400x400.jpg"
+            alt="DON!! Card (Luffy) (Gold)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">DON!! Card (Luffy) (Gold)</div>
+            <div class="card-meta">
+              <span class="badge">—</span>
+              <span class="badge rarity">DON!!</span>
+              <span class="rarity-name">DON!!</span>
+            </div>
+            <div class="card-id">ID: 686651</div>
+            <div class="card-price price-low">$8.51</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#49</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685341_in_400x400.jpg"
+            alt="Alvida (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Alvida (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP15-003</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 685341</div>
+            <div class="card-price price-low">$8.26</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#50</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/685318_in_400x400.jpg"
+            alt="Rob Lucci (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Rob Lucci (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-048</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 685318</div>
+            <div class="card-price price-low">$8.16</div>
+          </div>
+        </div>
+    </div>
+  </section>
+  <section class="set-section" id="the-azure-seas-seven">
+    <div class="set-header">
+      <h2>The Azure Sea's Seven</h2>
+      <div class="set-stats">
+        <span>Top 50 cards</span>
+        <span class="set-total">Total: $7977.56</span>
+        <span class="set-avg">Avg: $159.55</span>
+      </div>
+    </div>
+    <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">7</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">27</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">5</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">6</span></div><div class="bucket bucket-empty"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#44445a">0</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">5</span></div></div>
+    <details class="chart-details">
+      <summary class="chart-toggle">Price distribution chart</summary>
+      <div class="chart">
+        <div class="chart-bars">
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">7</span>
+                  <div class="bar" style="height:26%;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">$0–10</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">27</span>
+                  <div class="bar" style="height:100%;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">$10–50</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">5</span>
+                  <div class="bar" style="height:19%;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">$50–100</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">6</span>
+                  <div class="bar" style="height:22%;background:#fb923c;"></div>
+                </div>
+                <div class="bar-label">$100–250</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">0</span>
+                  <div class="bar" style="height:0%;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">$250–500</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">5</span>
+                  <div class="bar" style="height:19%;background:#c084fc;"></div>
+                </div>
+                <div class="bar-label">$500+</div>
+              </div>
+        </div>
+      </div>
+    </details>
+    <details class="chart-details breakeven-details" data-ev="486.7868">
+      <summary class="chart-toggle">Booster box break-even calculator</summary>
+      <div class="breakeven-panel">
+        <div class="be-grid">
+          <div class="be-stat">
+            <span class="be-label">SP hits (11)</span>
+            <span class="be-value">$541.09 avg</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">Alternate Art hits (32)</span>
+            <span class="be-value">$35.28 avg</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">SEC hits (1)</span>
+            <span class="be-value">$7.20 avg</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">Manga hits (1, 1-in-5 boxes)</span>
+            <span class="be-value">$822.97 avg</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">Avg normal hit value</span>
+            <span class="be-value">$161.10</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">Expected value / box</span>
+            <span class="be-value be-ev">$486.79</span>
+          </div>
+        </div>
+        <div class="be-result-row">
+          <div class="be-result-box">
+            <span class="be-result-label">Box cost</span>
+            <span class="be-result-value" id="be-cost-the-azure-seas-seven">$350.00</span>
+          </div>
+          <div class="be-result-box">
+            <span class="be-result-label">Expected value</span>
+            <span class="be-result-value be-ev-display" id="be-ev-the-azure-seas-seven">$486.79</span>
+          </div>
+          <div class="be-result-box be-outcome-box" id="be-outcome-the-azure-seas-seven">
+            <span class="be-result-label">Outcome</span>
+            <span class="be-result-value" id="be-outcome-val-the-azure-seas-seven">—</span>
+          </div>
+          <div class="be-result-box">
+            <span class="be-result-label">Boxes to break even</span>
+            <span class="be-result-value" id="be-boxes-the-azure-seas-seven">—</span>
+          </div>
+        </div>
+      </div>
+    </details>
+    <div class="cards-grid">
+      
+        <div class="card">
+          <div class="card-rank">#1</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/671453_in_400x400.jpg"
+            alt="Buggy - OP09-051 (SP) (Gold)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Buggy - OP09-051 (SP) (Gold)</div>
+            <div class="card-meta">
+              <span class="badge">OP09-051</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 671453</div>
+            <div class="card-price price-high">$2413.22</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#2</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/671454_in_400x400.jpg"
+            alt="Buggy - OP09-051 (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Buggy - OP09-051 (SP)</div>
+            <div class="card-meta">
+              <span class="badge">OP09-051</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 671454</div>
+            <div class="card-price price-high">$1252.40</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#3</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670642_in_400x400.jpg"
+            alt="Roronoa Zoro - PRB02-006 (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Roronoa Zoro - PRB02-006 (SP)</div>
+            <div class="card-meta">
+              <span class="badge">PRB02-006</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 670642</div>
+            <div class="card-price price-high">$947.61</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#4</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/671448_in_400x400.jpg"
+            alt="Dracule Mihawk (Manga)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Dracule Mihawk (Manga)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-119</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 671448</div>
+            <div class="card-price price-high">$822.97</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#5</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/671457_in_400x400.jpg"
+            alt="Boa Hancock - OP14-112 (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Boa Hancock - OP14-112 (SP)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-112</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 671457</div>
+            <div class="card-price price-high">$604.85</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#6</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/671455_in_400x400.jpg"
+            alt="Sugar - OP10-065 (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Sugar - OP10-065 (SP)</div>
+            <div class="card-meta">
+              <span class="badge">OP10-065</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 671455</div>
+            <div class="card-price price-high">$163.32</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#7</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/671451_in_400x400.jpg"
+            alt="Perona - OP06-093 (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Perona - OP06-093 (SP)</div>
+            <div class="card-meta">
+              <span class="badge">OP06-093</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 671451</div>
+            <div class="card-price price-high">$147.55</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#8</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670875_in_400x400.jpg"
+            alt="You'll Frighten Me... (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">You'll Frighten Me... (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-118</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 670875</div>
+            <div class="card-price price-high">$138.00</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#9</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/671456_in_400x400.jpg"
+            alt="Dracule Mihawk - OP12-030 (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Dracule Mihawk - OP12-030 (SP)</div>
+            <div class="card-meta">
+              <span class="badge">OP12-030</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 671456</div>
+            <div class="card-price price-high">$137.14</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#10</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670874_in_400x400.jpg"
+            alt="Ground Death (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Ground Death (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-096</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 670874</div>
+            <div class="card-price price-high">$112.12</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#11</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/668335_in_400x400.jpg"
+            alt="Boa Hancock - OP14-041 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Boa Hancock - OP14-041 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-041</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 668335</div>
+            <div class="card-price price-high">$102.04</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#12</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/668343_in_400x400.jpg"
+            alt="Boa Hancock - OP14-112 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Boa Hancock - OP14-112 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-112</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 668343</div>
+            <div class="card-price price-high">$90.57</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#13</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/671450_in_400x400.jpg"
+            alt="Eustass"Captain"Kid - EB04-039 (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Eustass"Captain"Kid - EB04-039 (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-039</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 671450</div>
+            <div class="card-price price-high">$87.98</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#14</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/671449_in_400x400.jpg"
+            alt="Kid & Killer - EB01-003 (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Kid & Killer - EB01-003 (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB01-003</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 671449</div>
+            <div class="card-price price-high">$87.04</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#15</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670254_in_400x400.jpg"
+            alt="Nami (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nami (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-031</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 670254</div>
+            <div class="card-price price-high">$71.42</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#16</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/671452_in_400x400.jpg"
+            alt="Sengoku - OP07-046 (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Sengoku - OP07-046 (SP)</div>
+            <div class="card-meta">
+              <span class="badge">OP07-046</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 671452</div>
+            <div class="card-price price-high">$63.74</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#17</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/666913_in_400x400.jpg"
+            alt="Ms. All Sunday (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Ms. All Sunday (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-084</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 666913</div>
+            <div class="card-price price-mid">$49.56</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#18</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/666575_in_400x400.jpg"
+            alt="Gecko Moria - OP14-104 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Gecko Moria - OP14-104 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-104</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 666575</div>
+            <div class="card-price price-mid">$48.20</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#19</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670645_in_400x400.jpg"
+            alt="Edward Weevil - EB01-023 (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Edward Weevil - EB01-023 (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB01-023</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 670645</div>
+            <div class="card-price price-mid">$47.10</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#20</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/668642_in_400x400.jpg"
+            alt="Crocodile - OP14-120 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Crocodile - OP14-120 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-120</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 668642</div>
+            <div class="card-price price-mid">$46.82</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#21</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/666762_in_400x400.jpg"
+            alt="Crocodile - OP14-079 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Crocodile - OP14-079 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-079</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 666762</div>
+            <div class="card-price price-mid">$39.56</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#22</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670596_in_400x400.jpg"
+            alt="Perona - OP14-111 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Perona - OP14-111 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-111</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 670596</div>
+            <div class="card-price price-mid">$38.07</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#23</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/669240_in_400x400.jpg"
+            alt="Rosinante & Law (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Rosinante & Law (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-038</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 669240</div>
+            <div class="card-price price-mid">$34.82</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#24</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/666529_in_400x400.jpg"
+            alt="Donquixote Doflamingo - OP14-060 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Donquixote Doflamingo - OP14-060 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-060</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 666529</div>
+            <div class="card-price price-mid">$31.52</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#25</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/666525_in_400x400.jpg"
+            alt="Dracule Mihawk - OP14-020 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Dracule Mihawk - OP14-020 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-020</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 666525</div>
+            <div class="card-price price-mid">$31.47</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#26</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/666527_in_400x400.jpg"
+            alt="Perona - OP14-033 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Perona - OP14-033 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-033</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 666527</div>
+            <div class="card-price price-mid">$29.67</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#27</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/668671_in_400x400.jpg"
+            alt="Nefeltari Vivi (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nefeltari Vivi (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-025</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 668671</div>
+            <div class="card-price price-mid">$27.96</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#28</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670876_in_400x400.jpg"
+            alt="Donquixote Rosinante - OP12-108"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Donquixote Rosinante - OP12-108</div>
+            <div class="card-meta">
+              <span class="badge">OP12-108</span>
+              <span class="badge rarity">TR</span>
+              <span class="rarity-name">Treasure Rare</span>
+            </div>
+            <div class="card-id">ID: 670876</div>
+            <div class="card-price price-mid">$27.43</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#29</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/668643_in_400x400.jpg"
+            alt="Dracule Mihawk - OP14-119 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Dracule Mihawk - OP14-119 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-119</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 668643</div>
+            <div class="card-price price-mid">$24.90</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#30</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/666573_in_400x400.jpg"
+            alt="Gecko Moria - OP14-080 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Gecko Moria - OP14-080 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-080</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 666573</div>
+            <div class="card-price price-mid">$20.95</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#31</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670640_in_400x400.jpg"
+            alt="Mr.2.Bon.Kurei (Bentham) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Mr.2.Bon.Kurei (Bentham) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-091</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 670640</div>
+            <div class="card-price price-mid">$20.14</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#32</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/666519_in_400x400.jpg"
+            alt="Trafalgar Law - OP14-001 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Trafalgar Law - OP14-001 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-001</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 666519</div>
+            <div class="card-price price-mid">$19.07</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#33</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/666532_in_400x400.jpg"
+            alt="Megalo (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Megalo (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-018</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 666532</div>
+            <div class="card-price price-mid">$17.53</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#34</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/668569_in_400x400.jpg"
+            alt="Jinbe - OP14-040 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Jinbe - OP14-040 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-040</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 668569</div>
+            <div class="card-price price-mid">$17.23</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#35</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670255_in_400x400.jpg"
+            alt="Shanks (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Shanks (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-027</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 670255</div>
+            <div class="card-price price-mid">$16.91</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#36</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672186_in_400x400.jpg"
+            alt="DON!! Card (Dracule Mihawk) (Gold)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">DON!! Card (Dracule Mihawk) (Gold)</div>
+            <div class="card-meta">
+              <span class="badge">—</span>
+              <span class="badge rarity">DON!!</span>
+              <span class="rarity-name">DON!!</span>
+            </div>
+            <div class="card-id">ID: 672186</div>
+            <div class="card-price price-mid">$12.44</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#37</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/668637_in_400x400.jpg"
+            alt="Trafalgar Law - OP14-009 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Trafalgar Law - OP14-009 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-009</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 668637</div>
+            <div class="card-price price-mid">$12.29</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#38</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672190_in_400x400.jpg"
+            alt="DON!! Card (Egghead) (Gold)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">DON!! Card (Egghead) (Gold)</div>
+            <div class="card-meta">
+              <span class="badge">—</span>
+              <span class="badge rarity">DON!!</span>
+              <span class="rarity-name">DON!!</span>
+            </div>
+            <div class="card-id">ID: 672190</div>
+            <div class="card-price price-mid">$12.03</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#39</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/666521_in_400x400.jpg"
+            alt="Monkey.D.Luffy - OP14-013 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Monkey.D.Luffy - OP14-013 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-013</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 666521</div>
+            <div class="card-price price-mid">$11.98</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#40</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/668571_in_400x400.jpg"
+            alt="Jinbe - OP14-049 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Jinbe - OP14-049 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-049</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 668571</div>
+            <div class="card-price price-mid">$11.93</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#41</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/668639_in_400x400.jpg"
+            alt="Donquixote Doflamingo - OP14-069 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Donquixote Doflamingo - OP14-069 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-069</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 668639</div>
+            <div class="card-price price-mid">$11.57</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#42</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670630_in_400x400.jpg"
+            alt="Mr.1 (Daz.Bonez) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Mr.1 (Daz.Bonez) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-090</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 670630</div>
+            <div class="card-price price-mid">$10.29</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#43</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/668659_in_400x400.jpg"
+            alt="Carrot (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Carrot (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-013</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 668659</div>
+            <div class="card-price price-mid">$10.17</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#44</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/666537_in_400x400.jpg"
+            alt="Issho - EB04-022 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Issho - EB04-022 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-022</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 666537</div>
+            <div class="card-price price-low">$9.13</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#45</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670251_in_400x400.jpg"
+            alt="Vergo (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Vergo (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-061</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 670251</div>
+            <div class="card-price price-low">$8.82</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#46</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670250_in_400x400.jpg"
+            alt="Roronoa Zoro - OP14-015 (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Roronoa Zoro - OP14-015 (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-015</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 670250</div>
+            <div class="card-price price-low">$8.29</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#47</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/666574_in_400x400.jpg"
+            alt="Gecko Moria - OP14-104"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Gecko Moria - OP14-104</div>
+            <div class="card-meta">
+              <span class="badge">OP14-104</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 666574</div>
+            <div class="card-price price-low">$8.26</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#48</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/668640_in_400x400.jpg"
+            alt="Crocodile - OP14-120"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Crocodile - OP14-120</div>
+            <div class="card-meta">
+              <span class="badge">OP14-120</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 668640</div>
+            <div class="card-price price-low">$7.20</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#49</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/670252_in_400x400.jpg"
+            alt="Nami"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nami</div>
+            <div class="card-meta">
+              <span class="badge">OP14-031</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 670252</div>
+            <div class="card-price price-low">$6.19</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#50</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/668752_in_400x400.jpg"
+            alt="Foxy (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Foxy (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB04-036</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 668752</div>
+            <div class="card-price price-low">$6.09</div>
+          </div>
+        </div>
+    </div>
+  </section>
+  <section class="set-section" id="extra-booster-one-piece-heroines-edition">
+    <div class="set-header">
+      <h2>Extra Booster: One Piece Heroines Edition</h2>
+      <div class="set-stats">
+        <span>Top 50 cards</span>
+        <span class="set-total">Total: $6204.08</span>
+        <span class="set-avg">Avg: $124.08</span>
+      </div>
+    </div>
+    <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">20</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">15</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">4</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">4</span></div><div class="bucket"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#f87171">3</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">4</span></div></div>
+    <details class="chart-details">
+      <summary class="chart-toggle">Price distribution chart</summary>
+      <div class="chart">
+        <div class="chart-bars">
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">20</span>
+                  <div class="bar" style="height:100%;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">$0–10</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">15</span>
+                  <div class="bar" style="height:75%;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">$10–50</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">4</span>
+                  <div class="bar" style="height:20%;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">$50–100</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">4</span>
+                  <div class="bar" style="height:20%;background:#fb923c;"></div>
+                </div>
+                <div class="bar-label">$100–250</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">3</span>
+                  <div class="bar" style="height:15%;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">$250–500</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">4</span>
+                  <div class="bar" style="height:20%;background:#c084fc;"></div>
+                </div>
+                <div class="bar-label">$500+</div>
+              </div>
+        </div>
+      </div>
+    </details>
+    <details class="chart-details breakeven-details" data-ev="576.8512">
+      <summary class="chart-toggle">Booster box break-even calculator</summary>
+      <div class="breakeven-panel">
+        <div class="be-grid">
+          <div class="be-stat">
+            <span class="be-label">SP hits (9)</span>
+            <span class="be-value">$461.35 avg</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">Alternate Art hits (18)</span>
+            <span class="be-value">$23.18 avg</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">SEC hits (2)</span>
+            <span class="be-value">$9.44 avg</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">Manga hits (1, 1-in-5 boxes)</span>
+            <span class="be-value">$1302.07 avg</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">Avg normal hit value</span>
+            <span class="be-value">$158.22</span>
+          </div>
+          <div class="be-stat">
+            <span class="be-label">Expected value / box</span>
+            <span class="be-value be-ev">$576.85</span>
+          </div>
+        </div>
+        <div class="be-result-row">
+          <div class="be-result-box">
+            <span class="be-result-label">Box cost</span>
+            <span class="be-result-value" id="be-cost-extra-booster-one-piece-heroines-edition">$350.00</span>
+          </div>
+          <div class="be-result-box">
+            <span class="be-result-label">Expected value</span>
+            <span class="be-result-value be-ev-display" id="be-ev-extra-booster-one-piece-heroines-edition">$576.85</span>
+          </div>
+          <div class="be-result-box be-outcome-box" id="be-outcome-extra-booster-one-piece-heroines-edition">
+            <span class="be-result-label">Outcome</span>
+            <span class="be-result-value" id="be-outcome-val-extra-booster-one-piece-heroines-edition">—</span>
+          </div>
+          <div class="be-result-box">
+            <span class="be-result-label">Boxes to break even</span>
+            <span class="be-result-value" id="be-boxes-extra-booster-one-piece-heroines-edition">—</span>
+          </div>
+        </div>
+      </div>
+    </details>
+    <div class="cards-grid">
+      
+        <div class="card">
+          <div class="card-rank">#1</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672817_in_400x400.jpg"
+            alt="Uta (061) (Manga)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Uta (061) (Manga)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-061</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 672817</div>
+            <div class="card-price price-high">$1302.07</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#2</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672827_in_400x400.jpg"
+            alt="Nami (053) (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nami (053) (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-053</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672827</div>
+            <div class="card-price price-high">$1117.62</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#3</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672828_in_400x400.jpg"
+            alt="Nico Robin (055) (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nico Robin (055) (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-055</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672828</div>
+            <div class="card-price price-high">$969.19</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#4</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672823_in_400x400.jpg"
+            alt="Boa Hancock (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Boa Hancock (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-026</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672823</div>
+            <div class="card-price price-high">$704.19</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#5</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672822_in_400x400.jpg"
+            alt="Nefeltari Vivi (024) (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nefeltari Vivi (024) (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-024</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672822</div>
+            <div class="card-price price-high">$327.64</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#6</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672820_in_400x400.jpg"
+            alt="Uta (003) (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Uta (003) (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-003</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672820</div>
+            <div class="card-price price-high">$300.66</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#7</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672826_in_400x400.jpg"
+            alt="Perona (045) (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Perona (045) (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-045</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672826</div>
+            <div class="card-price price-high">$295.97</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#8</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672824_in_400x400.jpg"
+            alt="Vinsmoke Reiju (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Vinsmoke Reiju (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-031</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672824</div>
+            <div class="card-price price-high">$192.77</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#9</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672825_in_400x400.jpg"
+            alt="Koala (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Koala (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-042</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672825</div>
+            <div class="card-price price-high">$125.17</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#10</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672821_in_400x400.jpg"
+            alt="Tashigi (SP)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Tashigi (SP)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-018</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672821</div>
+            <div class="card-price price-high">$118.98</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#11</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672805_in_400x400.jpg"
+            alt="Nami (053) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nami (053) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-053</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672805</div>
+            <div class="card-price price-high">$103.00</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#12</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672808_in_400x400.jpg"
+            alt="Nico Robin (055) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nico Robin (055) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-055</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672808</div>
+            <div class="card-price price-high">$75.69</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#13</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/677559_in_400x400.jpg"
+            alt="DON!! Card (Nami) (Gold)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">DON!! Card (Nami) (Gold)</div>
+            <div class="card-meta">
+              <span class="badge">—</span>
+              <span class="badge rarity">DON!!</span>
+              <span class="rarity-name">DON!!</span>
+            </div>
+            <div class="card-id">ID: 677559</div>
+            <div class="card-price price-high">$72.70</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#14</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/677569_in_400x400.jpg"
+            alt="DON!! Card (Nico Robin) (Gold)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">DON!! Card (Nico Robin) (Gold)</div>
+            <div class="card-meta">
+              <span class="badge">—</span>
+              <span class="badge rarity">DON!!</span>
+              <span class="rarity-name">DON!!</span>
+            </div>
+            <div class="card-id">ID: 677569</div>
+            <div class="card-price price-high">$58.31</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#15</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/677571_in_400x400.jpg"
+            alt="DON!! Card (Boa Hancock) (Gold)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">DON!! Card (Boa Hancock) (Gold)</div>
+            <div class="card-meta">
+              <span class="badge">—</span>
+              <span class="badge rarity">DON!!</span>
+              <span class="rarity-name">DON!!</span>
+            </div>
+            <div class="card-id">ID: 677571</div>
+            <div class="card-price price-high">$50.63</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#16</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672772_in_400x400.jpg"
+            alt="Boa Hancock (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Boa Hancock (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-026</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672772</div>
+            <div class="card-price price-mid">$38.01</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#17</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/677567_in_400x400.jpg"
+            alt="DON!! Card (Uta) (Gold)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">DON!! Card (Uta) (Gold)</div>
+            <div class="card-meta">
+              <span class="badge">—</span>
+              <span class="badge rarity">DON!!</span>
+              <span class="rarity-name">DON!!</span>
+            </div>
+            <div class="card-id">ID: 677567</div>
+            <div class="card-price price-mid">$36.10</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#18</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672804_in_400x400.jpg"
+            alt="Nami (053)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nami (053)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-053</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672804</div>
+            <div class="card-price price-mid">$34.66</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#19</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672768_in_400x400.jpg"
+            alt="Nefeltari Vivi (024) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nefeltari Vivi (024) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-024</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672768</div>
+            <div class="card-price price-mid">$28.87</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#20</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672819_in_400x400.jpg"
+            alt="Trafalgar Law (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Trafalgar Law (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-062</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 672819</div>
+            <div class="card-price price-mid">$28.35</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#21</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672796_in_400x400.jpg"
+            alt="Perona (045) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Perona (045) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-045</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672796</div>
+            <div class="card-price price-mid">$18.78</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#22</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672807_in_400x400.jpg"
+            alt="Nico Robin (055)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nico Robin (055)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-055</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672807</div>
+            <div class="card-price price-mid">$18.20</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#23</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672816_in_400x400.jpg"
+            alt="Uta (061) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Uta (061) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-061</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 672816</div>
+            <div class="card-price price-mid">$16.20</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#24</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672811_in_400x400.jpg"
+            alt="Yamato (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Yamato (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-057</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 672811</div>
+            <div class="card-price price-mid">$13.31</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#25</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672818_in_400x400.jpg"
+            alt="Trafalgar Law"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Trafalgar Law</div>
+            <div class="card-meta">
+              <span class="badge">EB03-062</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 672818</div>
+            <div class="card-price price-mid">$12.75</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#26</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672790_in_400x400.jpg"
+            alt="Kujyaku (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Kujyaku (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-041</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 672790</div>
+            <div class="card-price price-mid">$12.60</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#27</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672749_in_400x400.jpg"
+            alt="Hibari (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Hibari (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-008</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 672749</div>
+            <div class="card-price price-mid">$11.79</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#28</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672782_in_400x400.jpg"
+            alt="Charlotte Linlin (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Charlotte Linlin (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-034</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 672782</div>
+            <div class="card-price price-mid">$11.57</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#29</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672778_in_400x400.jpg"
+            alt="Vinsmoke Reiju (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Vinsmoke Reiju (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-031</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672778</div>
+            <div class="card-price price-mid">$11.29</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#30</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672792_in_400x400.jpg"
+            alt="Koala (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Koala (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-042</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672792</div>
+            <div class="card-price price-mid">$10.34</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#31</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672743_in_400x400.jpg"
+            alt="Uta (003) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Uta (003) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-003</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672743</div>
+            <div class="card-price price-low">$9.74</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#32</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/675745_in_400x400.jpg"
+            alt="Nefeltari Vivi - EB02-026"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nefeltari Vivi - EB02-026</div>
+            <div class="card-meta">
+              <span class="badge">EB02-026</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 675745</div>
+            <div class="card-price price-low">$9.71</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#33</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672740_in_400x400.jpg"
+            alt="Nefeltari Vivi (001) (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nefeltari Vivi (001) (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-001</span>
+              <span class="badge rarity">L</span>
+              <span class="rarity-name">Leader</span>
+            </div>
+            <div class="card-id">ID: 672740</div>
+            <div class="card-price price-low">$9.69</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#34</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672761_in_400x400.jpg"
+            alt="Tashigi (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Tashigi (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-018</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672761</div>
+            <div class="card-price price-low">$7.12</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#35</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/675748_in_400x400.jpg"
+            alt="O-Nami - ST18-002 (Dash Pack)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">O-Nami - ST18-002 (Dash Pack)</div>
+            <div class="card-meta">
+              <span class="badge">ST18-002</span>
+              <span class="badge rarity">C</span>
+              <span class="rarity-name">Common</span>
+            </div>
+            <div class="card-id">ID: 675748</div>
+            <div class="card-price price-low">$6.93</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#36</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672755_in_400x400.jpg"
+            alt="Carrot (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Carrot (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-013</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 672755</div>
+            <div class="card-price price-low">$6.84</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#37</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/675746_in_400x400.jpg"
+            alt="Koala - OP05-006"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Koala - OP05-006</div>
+            <div class="card-meta">
+              <span class="badge">OP05-006</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 675746</div>
+            <div class="card-price price-low">$6.84</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#38</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672815_in_400x400.jpg"
+            alt="Uta (061)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Uta (061)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-061</span>
+              <span class="badge rarity">SEC</span>
+              <span class="rarity-name">Secret Rare</span>
+            </div>
+            <div class="card-id">ID: 672815</div>
+            <div class="card-price price-low">$6.12</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#39</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672770_in_400x400.jpg"
+            alt="Hina (Alternate Art)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Hina (Alternate Art)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-025</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 672770</div>
+            <div class="card-price price-low">$4.09</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#40</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/675747_in_400x400.jpg"
+            alt="Perona - OP09-034"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Perona - OP09-034</div>
+            <div class="card-meta">
+              <span class="badge">OP09-034</span>
+              <span class="badge rarity">R</span>
+              <span class="rarity-name">Rare</span>
+            </div>
+            <div class="card-id">ID: 675747</div>
+            <div class="card-price price-low">$3.46</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#41</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672767_in_400x400.jpg"
+            alt="Nefeltari Vivi (024)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Nefeltari Vivi (024)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-024</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672767</div>
+            <div class="card-price price-low">$3.24</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#42</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/677560_in_400x400.jpg"
+            alt="DON!! Card (Nami)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">DON!! Card (Nami)</div>
+            <div class="card-meta">
+              <span class="badge">—</span>
+              <span class="badge rarity">DON!!</span>
+              <span class="rarity-name">DON!!</span>
+            </div>
+            <div class="card-id">ID: 677560</div>
+            <div class="card-price price-low">$2.48</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#43</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/677568_in_400x400.jpg"
+            alt="DON!! Card (Nico Robin)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">DON!! Card (Nico Robin)</div>
+            <div class="card-meta">
+              <span class="badge">—</span>
+              <span class="badge rarity">DON!!</span>
+              <span class="rarity-name">DON!!</span>
+            </div>
+            <div class="card-id">ID: 677568</div>
+            <div class="card-price price-low">$2.24</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#44</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/677570_in_400x400.jpg"
+            alt="DON!! Card (Boa Hancock)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">DON!! Card (Boa Hancock)</div>
+            <div class="card-meta">
+              <span class="badge">—</span>
+              <span class="badge rarity">DON!!</span>
+              <span class="rarity-name">DON!!</span>
+            </div>
+            <div class="card-id">ID: 677570</div>
+            <div class="card-price price-low">$2.21</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#45</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672777_in_400x400.jpg"
+            alt="Vinsmoke Reiju"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Vinsmoke Reiju</div>
+            <div class="card-meta">
+              <span class="badge">EB03-031</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672777</div>
+            <div class="card-price price-low">$1.24</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#46</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672791_in_400x400.jpg"
+            alt="Koala"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Koala</div>
+            <div class="card-meta">
+              <span class="badge">EB03-042</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672791</div>
+            <div class="card-price price-low">$1.07</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#47</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672795_in_400x400.jpg"
+            alt="Perona (045)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Perona (045)</div>
+            <div class="card-meta">
+              <span class="badge">EB03-045</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672795</div>
+            <div class="card-price price-low">$1.04</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#48</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/677566_in_400x400.jpg"
+            alt="DON!! Card (Uta)"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">DON!! Card (Uta)</div>
+            <div class="card-meta">
+              <span class="badge">—</span>
+              <span class="badge rarity">DON!!</span>
+              <span class="rarity-name">DON!!</span>
+            </div>
+            <div class="card-id">ID: 677566</div>
+            <div class="card-price price-low">$0.94</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#49</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672771_in_400x400.jpg"
+            alt="Boa Hancock"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Boa Hancock</div>
+            <div class="card-meta">
+              <span class="badge">EB03-026</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672771</div>
+            <div class="card-price price-low">$0.86</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-rank">#50</div>
+          <img
+            class="card-img"
+            src="https://tcgplayer-cdn.tcgplayer.com/product/672760_in_400x400.jpg"
+            alt="Tashigi"
+            loading="lazy"
+          />
+          <div class="card-body">
+            <div class="card-name">Tashigi</div>
+            <div class="card-meta">
+              <span class="badge">EB03-018</span>
+              <span class="badge rarity">SR</span>
+              <span class="rarity-name">Super Rare</span>
+            </div>
+            <div class="card-id">ID: 672760</div>
+            <div class="card-price price-low">$0.81</div>
+          </div>
+        </div>
+    </div>
+  </section>
+  </main>
+
+  <script>
+    const input = document.getElementById('box-price-global');
+    const hint  = document.getElementById('box-price-hint');
+
+    function updateAll() {
+      const boxCost = parseFloat(input.value) || 0;
+      hint.textContent = '';
+
+      document.querySelectorAll('.breakeven-details').forEach(el => {
+        const slug = el.querySelector('[id^="be-cost-"]')?.id.replace('be-cost-', '');
+        if (!slug) return;
+        const ev = parseFloat(el.dataset.ev) || 0;
+
+        document.getElementById('be-cost-' + slug).textContent = '$' + boxCost.toFixed(2);
+
+        const diff    = ev - boxCost;
+        const outcome = document.getElementById('be-outcome-' + slug);
+        const outVal  = document.getElementById('be-outcome-val-' + slug);
+        const boxesEl = document.getElementById('be-boxes-' + slug);
+
+        outcome.classList.remove('be-profit', 'be-loss');
+        if (diff >= 0) {
+          outcome.classList.add('be-profit');
+          outVal.textContent = '+$' + diff.toFixed(2) + ' profit';
+          boxesEl.textContent = '1 box';
+        } else {
+          outcome.classList.add('be-loss');
+          outVal.textContent = '-$' + Math.abs(diff).toFixed(2) + ' loss';
+          const boxes = ev > 0 ? Math.ceil(boxCost / ev) : '∞';
+          boxesEl.textContent = boxes + (boxes !== '∞' ? ' boxes' : '');
+        }
+      });
+    }
+
+    input.addEventListener('input', updateAll);
+    updateAll();
+  </script>
+</body>
+</html>
