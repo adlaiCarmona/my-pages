@@ -2,12 +2,10 @@ import requests
 import json
 import os
 
-# Add set names to this array (use kebab-case slugs, e.g. "adventure-on-kamis-island")
-SETS = [
-    "adventure-on-kamis-island",
-    "the-azure-seas-seven",
-    "extra-booster-one-piece-heroines-edition",
-]
+# Set slugs are loaded from sets.json (kebab-case, e.g. "adventure-on-kamis-island")
+_sets_path = os.path.join(os.path.dirname(__file__), "sets.json")
+with open(_sets_path) as _f:
+    SETS = json.load(_f)
 
 PRODUCT_LINE = "one-piece-card-game"
 
