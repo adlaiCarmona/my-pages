@@ -245,6 +245,10 @@ def build_html(sets_data: list[dict]) -> str:
     <details class="chart-details breakeven-details" data-ev="{ev_per_box:.4f}">
       <summary class="chart-toggle">Booster box break-even calculator</summary>
       <div class="breakeven-panel">
+        <div class="box-price-row">
+          <label for="box-price-{s['slug']}">Booster box price:</label>
+          <input id="box-price-{s['slug']}" class="box-price-input" type="number" min="0" step="0.01" value="350" />
+        </div>
         <div class="be-grid">
           <div class="be-stat">
             <span class="be-label">SP hits ({len(sp_hits)})</span>
@@ -272,10 +276,6 @@ def build_html(sets_data: list[dict]) -> str:
           </div>
         </div>
         <div class="be-result-row">
-          <div class="be-result-box">
-            <span class="be-result-label">Box cost</span>
-            <span class="be-result-value" id="be-cost-{s['slug']}">$350.00</span>
-          </div>
           <div class="be-result-box">
             <span class="be-result-label">Expected value</span>
             <span class="be-result-value be-ev-display" id="be-ev-{s['slug']}">${ev_per_box:.2f}</span>
@@ -374,12 +374,16 @@ def build_html(sets_data: list[dict]) -> str:
       scroll-margin-top: 1.5rem;
     }}
     .set-header {{
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: #0f0f13;
       display: flex;
       align-items: baseline;
       gap: 1.5rem;
       flex-wrap: wrap;
       margin-bottom: 1.2rem;
-      padding-bottom: .6rem;
+      padding: .6rem 0;
       border-bottom: 2px solid #2a2a3a;
     }}
     .set-header h2 {{
@@ -585,21 +589,18 @@ def build_html(sets_data: list[dict]) -> str:
       .main {{ margin-left: 0; padding: 1rem; }}
     }}
 
-    /* ── Booster box input banner ── */
-    .box-price-bar {{
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: #17171f;
-      border-bottom: 1px solid #2a2a3a;
-      padding: .6rem 2rem;
+    /* ── Breakeven panel ── */
+    .breakeven-details {{ margin-top: .5rem; }}
+    .box-price-row {{
       display: flex;
       align-items: center;
       gap: .75rem;
       font-size: .85rem;
       color: #c4c4d4;
+      padding-bottom: .6rem;
+      border-bottom: 1px solid #2a2a3a;
     }}
-    .box-price-bar label {{ color: #a78bfa; font-weight: 600; }}
+    .box-price-row label {{ color: #a78bfa; font-weight: 600; }}
     .box-price-input {{
       background: #0f0f13;
       border: 1px solid #3a3a5a;
@@ -611,8 +612,6 @@ def build_html(sets_data: list[dict]) -> str:
       outline: none;
     }}
     .box-price-input:focus {{ border-color: #a78bfa; }}
-
-    /* ── Breakeven panel ── */
     .breakeven-details {{ margin-top: .5rem; }}
     .breakeven-panel {{
       padding: 1.2rem;
@@ -706,50 +705,38 @@ def build_html(sets_data: list[dict]) -> str:
   </nav>
 
   <main class="main">
-    <div class="box-price-bar">
-      <label for="box-price-global">Booster box price:</label>
-      <input id="box-price-global" class="box-price-input" type="number" min="0" step="0.01" value="350" />
-      <span id="box-price-hint" style="font-size:.75rem;color:#6b6b8a;">Updating all sets…</span>
-    </div>
     {set_sections}
   </main>
 
   <script>
-    const input = document.getElementById('box-price-global');
-    const hint  = document.getElementById('box-price-hint');
+    function updateSection(el) {{
+      const slug = el.id.replace('box-price-', '');
+      const boxCost = parseFloat(el.value) || 0;
+      const details = el.closest('.breakeven-details');
+      const ev = parseFloat(details.dataset.ev) || 0;
 
-    function updateAll() {{
-      const boxCost = parseFloat(input.value) || 0;
-      hint.textContent = '';
+      const diff    = ev - boxCost;
+      const outcome = document.getElementById('be-outcome-' + slug);
+      const outVal  = document.getElementById('be-outcome-val-' + slug);
+      const boxesEl = document.getElementById('be-boxes-' + slug);
 
-      document.querySelectorAll('.breakeven-details').forEach(el => {{
-        const slug = el.querySelector('[id^="be-cost-"]')?.id.replace('be-cost-', '');
-        if (!slug) return;
-        const ev = parseFloat(el.dataset.ev) || 0;
-
-        document.getElementById('be-cost-' + slug).textContent = '$' + boxCost.toFixed(2);
-
-        const diff    = ev - boxCost;
-        const outcome = document.getElementById('be-outcome-' + slug);
-        const outVal  = document.getElementById('be-outcome-val-' + slug);
-        const boxesEl = document.getElementById('be-boxes-' + slug);
-
-        outcome.classList.remove('be-profit', 'be-loss');
-        if (diff >= 0) {{
-          outcome.classList.add('be-profit');
-          outVal.textContent = '+$' + diff.toFixed(2) + ' profit';
-          boxesEl.textContent = '1 box';
-        }} else {{
-          outcome.classList.add('be-loss');
-          outVal.textContent = '-$' + Math.abs(diff).toFixed(2) + ' loss';
-          const boxes = ev > 0 ? Math.ceil(boxCost / ev) : '∞';
-          boxesEl.textContent = boxes + (boxes !== '∞' ? ' boxes' : '');
-        }}
-      }});
+      outcome.classList.remove('be-profit', 'be-loss');
+      if (diff >= 0) {{
+        outcome.classList.add('be-profit');
+        outVal.textContent = '+$' + diff.toFixed(2) + ' profit';
+        boxesEl.textContent = '1 box';
+      }} else {{
+        outcome.classList.add('be-loss');
+        outVal.textContent = '-$' + Math.abs(diff).toFixed(2) + ' loss';
+        const boxes = ev > 0 ? Math.ceil(boxCost / ev) : '∞';
+        boxesEl.textContent = boxes + (boxes !== '∞' ? ' boxes' : '');
+      }}
     }}
 
-    input.addEventListener('input', updateAll);
-    updateAll();
+    document.querySelectorAll('.box-price-input').forEach(input => {{
+      input.addEventListener('input', () => updateSection(input));
+      updateSection(input);
+    }});
   </script>
 </body>
 </html>"""
