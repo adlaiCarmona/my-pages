@@ -1,0 +1,69 @@
+name: Update Index
+
+on:
+  workflow_dispatch:
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Regenerate index.html
+        run: |
+          # Collect subdirectories, excluding hidden ones
+          dirs=()
+          for d in */; do
+            name="${d%/}"
+            dirs+=("$name")
+          done
+
+          # Build list items
+          items=""
+          for name in "${dirs[@]}"; do
+            items+="    <li><a href=\"${name}/\">${name}</a></li>\n"
+          done
+
+          cat > index.html <<EOF
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>Index</title>
+            <style>
+              body {
+                font-family: sans-serif;
+                max-width: 600px;
+                margin: 60px auto;
+                padding: 0 20px;
+              }
+              h1 { margin-bottom: 24px; }
+              ul { list-style: none; padding: 0; }
+              li { margin: 10px 0; }
+              a {
+                text-decoration: none;
+                color: #0070f3;
+                font-size: 1.1rem;
+              }
+              a:hover { text-decoration: underline; }
+            </style>
+          </head>
+          <body>
+            <h1>Pages</h1>
+            <ul>
+          $(for name in "${dirs[@]}"; do echo "    <li><a href=\"${name}/\">${name}</a></li>"; done)
+            </ul>
+          </body>
+          </html>
+          EOF
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "chore: update index.html with current subdirectories"
+          git push
