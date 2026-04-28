@@ -20,45 +20,17 @@ jobs:
             dirs+=("$name")
           done
 
-          # Build list items
-          items=""
+          # Build card elements to replace the <!-- CARDS --> placeholder
+          cards=""
           for name in "${dirs[@]}"; do
-            items+="    <li><a href=\"${name}/\">${name}</a></li>\n"
+            cards+="    <a class=\"card\" href=\"${name}/\">\n"
+            cards+="      <span class=\"card-icon\">📁</span>\n"
+            cards+="      <span class=\"card-name\">${name}<\/span>\n"
+            cards+="      <span class=\"card-arrow\">Open →<\/span>\n"
+            cards+="    <\/a>"
           done
 
-          cat > index.html <<EOF
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Index</title>
-            <style>
-              body {
-                font-family: sans-serif;
-                max-width: 600px;
-                margin: 60px auto;
-                padding: 0 20px;
-              }
-              h1 { margin-bottom: 24px; }
-              ul { list-style: none; padding: 0; }
-              li { margin: 10px 0; }
-              a {
-                text-decoration: none;
-                color: #0070f3;
-                font-size: 1.1rem;
-              }
-              a:hover { text-decoration: underline; }
-            </style>
-          </head>
-          <body>
-            <h1>Pages</h1>
-            <ul>
-          $(for name in "${dirs[@]}"; do echo "    <li><a href=\"${name}/\">${name}</a></li>"; done)
-            </ul>
-          </body>
-          </html>
-          EOF
+          sed "s|    <!-- CARDS -->|${cards}|" index.template.html > index.html
 
       - name: Commit if changed
         run: |
