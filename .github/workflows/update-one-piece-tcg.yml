@@ -21,7 +21,8 @@ jobs:
         run: pip install -r one-piece-tcg/requirements.txt
 
       - name: Run fetch script
-        run: python one-piece-tcg/fetch_top_cards.py
+        run: python fetch_top_cards.py
+        working-directory: one-piece-tcg
 
       - name: Commit and push
         run: |
