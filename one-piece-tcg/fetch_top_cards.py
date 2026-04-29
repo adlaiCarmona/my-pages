@@ -86,11 +86,26 @@ def get_price(result: dict) -> float:
 
 def get_card_info(result: dict) -> dict:
     custom = result.get("customAttributes", {})
+
+    def join_list(val):
+        if isinstance(val, list):
+            return ", ".join(str(v) for v in val if v)
+        return val or ""
+
     return {
         "productId":    result.get("productId"),
         "rarityName":   result.get("rarityName"),
         "number":       custom.get("number"),
         "rarityDbName": custom.get("rarityDbName"),
+        "cardType":     join_list(custom.get("cardType")),
+        "life":         custom.get("life") or "",
+        "counter":      custom.get("counter") or "",
+        "power":        custom.get("power") or "",
+        "cost":         custom.get("cost") or "",
+        "subtypes":     join_list(custom.get("subtypes")),
+        "attribute":    join_list(custom.get("attribute")),
+        "color":        join_list(custom.get("color")),
+        "description":  custom.get("description") or "",
     }
 
 
@@ -137,8 +152,27 @@ def build_html(sets_data: list[dict]) -> str:
         cards_html = ""
         for i, card in enumerate(s["cards"], start=1):
             price_cls = "price-high" if card["price"] >= 50 else ("price-mid" if card["price"] >= 10 else "price-low")
+            import html as _html
+            desc_escaped = _html.escape(card['description'], quote=True)
             cards_html += f"""
-        <div class="card">
+        <div class="card" role="button" tabindex="0"
+          data-name="{_html.escape(card['name'], quote=True)}"
+          data-price="${card['price']:.2f}"
+          data-image="{card['image_url']}"
+          data-number="{card['number'] or ''}"
+          data-rarity-db="{card['rarity_db'] or ''}"
+          data-rarity-name="{_html.escape(card['rarity_name'] or '', quote=True)}"
+          data-card-type="{_html.escape(card['card_type'], quote=True)}"
+          data-life="{card['life']}"
+          data-counter="{card['counter']}"
+          data-power="{card['power']}"
+          data-cost="{card['cost']}"
+          data-subtypes="{_html.escape(card['subtypes'], quote=True)}"
+          data-attribute="{_html.escape(card['attribute'], quote=True)}"
+          data-color="{_html.escape(card['color'], quote=True)}"
+          data-description="{desc_escaped}"
+          data-product-id="{int(card['product_id']) if card['product_id'] else ''}"
+        >
           <div class="card-rank">#{i}</div>
           <img
             class="card-img"
@@ -517,6 +551,7 @@ def build_html(sets_data: list[dict]) -> str:
       flex-direction: column;
       transition: transform .15s, border-color .15s;
       position: relative;
+      cursor: pointer;
     }}
     .card:hover {{
       transform: translateY(-3px);
@@ -587,6 +622,116 @@ def build_html(sets_data: list[dict]) -> str:
     @media (max-width: 640px) {{
       .sidebar {{ display: none; }}
       .main {{ margin-left: 0; padding: 1rem; }}
+    }}
+
+    /* ── Card overlay ── */
+    .overlay-backdrop {{
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.75);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }}
+    .overlay-backdrop.open {{ display: flex; }}
+    .overlay {{
+      background: #17171f;
+      border: 1px solid #2a2a3a;
+      border-radius: 14px;
+      max-width: 780px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      display: flex;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      position: relative;
+    }}
+    .overlay-img-col {{
+      flex: 0 0 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }}
+    .overlay-img {{
+      width: 300px;
+      border-radius: 10px;
+      display: block;
+    }}
+    .overlay-price {{
+      font-size: 1.4rem;
+      font-weight: 700;
+    }}
+    .overlay-info-col {{
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: .8rem;
+      min-width: 0;
+    }}
+    .overlay-name {{
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }}
+    .overlay-badges {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: .35rem;
+    }}
+    .overlay-stats {{
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: .5rem;
+    }}
+    .overlay-stat {{
+      background: #1c1c28;
+      border: 1px solid #2a2a3a;
+      border-radius: 7px;
+      padding: .4rem .7rem;
+      display: flex;
+      flex-direction: column;
+      gap: .1rem;
+    }}
+    .overlay-stat-label {{
+      font-size: .6rem;
+      color: #6b6b8a;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }}
+    .overlay-stat-value {{
+      font-size: .9rem;
+      font-weight: 600;
+      color: #e0e0e0;
+    }}
+    .overlay-desc {{
+      font-size: .8rem;
+      color: #b0b0c8;
+      line-height: 1.6;
+      border-top: 1px solid #2a2a3a;
+      padding-top: .7rem;
+    }}
+    .overlay-close {{
+      position: absolute;
+      top: .8rem;
+      right: .9rem;
+      background: none;
+      border: none;
+      color: #6b6b8a;
+      font-size: 1.3rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }}
+    .overlay-close:hover {{ color: #e0e0e0; background: #2a2a3a; }}
+    @media (max-width: 560px) {{
+      .overlay {{ flex-direction: column; }}
+      .overlay-img-col {{ flex: none; align-self: center; }}
     }}
 
     /* ── Breakeven panel ── */
@@ -708,6 +853,23 @@ def build_html(sets_data: list[dict]) -> str:
     {set_sections}
   </main>
 
+  <!-- Card detail overlay -->
+  <div class="overlay-backdrop" id="overlay-backdrop" role="dialog" aria-modal="true">
+    <div class="overlay" id="overlay">
+      <button class="overlay-close" id="overlay-close" aria-label="Close">✕</button>
+      <div class="overlay-img-col">
+        <img class="overlay-img" id="ov-img" src="" alt="" />
+        <div class="overlay-price price-high" id="ov-price"></div>
+      </div>
+      <div class="overlay-info-col">
+        <div class="overlay-name" id="ov-name"></div>
+        <div class="overlay-badges" id="ov-badges"></div>
+        <div class="overlay-stats" id="ov-stats"></div>
+        <div class="overlay-desc" id="ov-desc"></div>
+      </div>
+    </div>
+  </div>
+
   <script>
     function updateSection(el) {{
       const slug = el.id.replace('box-price-', '');
@@ -737,6 +899,78 @@ def build_html(sets_data: list[dict]) -> str:
       input.addEventListener('input', () => updateSection(input));
       updateSection(input);
     }});
+
+    /* ── Card overlay ── */
+    const backdrop = document.getElementById('overlay-backdrop');
+    const ovClose  = document.getElementById('overlay-close');
+
+    function openOverlay(card) {{
+      const d = card.dataset;
+
+      document.getElementById('ov-img').src = d.image;
+      document.getElementById('ov-img').alt = d.name;
+      document.getElementById('ov-name').textContent = d.name;
+
+      const price = d.price || '';
+      const priceEl = document.getElementById('ov-price');
+      priceEl.textContent = price;
+      const p = parseFloat(price.replace('$',''));
+      priceEl.className = 'overlay-price ' + (p >= 50 ? 'price-high' : p >= 10 ? 'price-mid' : 'price-low');
+
+      // Badges
+      const badges = document.getElementById('ov-badges');
+      badges.innerHTML = '';
+      if (d.number)    badges.innerHTML += `<span class="badge">${{d.number}}</span>`;
+      if (d.rarityDb)  badges.innerHTML += `<span class="badge rarity">${{d.rarityDb}}</span>`;
+      if (d.rarityName) badges.innerHTML += `<span class="rarity-name">${{d.rarityName}}</span>`;
+      if (d.color)     badges.innerHTML += `<span class="badge" style="background:#1e2a3a;color:#60a5fa">${{d.color}}</span>`;
+      if (d.cardType)  badges.innerHTML += `<span class="badge" style="background:#2a1e3a;color:#c084fc">${{d.cardType}}</span>`;
+
+      // Stats grid
+      const stats = [
+        ['Cost',      d.cost],
+        ['Power',     d.power],
+        ['Counter',   d.counter],
+        ['Life',      d.life],
+        ['Attribute', d.attribute],
+        ['Subtypes',  d.subtypes],
+      ];
+      const statsEl = document.getElementById('ov-stats');
+      statsEl.innerHTML = stats
+        .filter(([, v]) => v)
+        .map(([label, val]) =>
+          `<div class="overlay-stat">
+            <span class="overlay-stat-label">${{label}}</span>
+            <span class="overlay-stat-value">${{val}}</span>
+          </div>`
+        ).join('');
+
+      // Description (may contain HTML tags from TCGPlayer)
+      const descEl = document.getElementById('ov-desc');
+      if (d.description) {{
+        descEl.innerHTML = d.description;
+        descEl.style.display = '';
+      }} else {{
+        descEl.style.display = 'none';
+      }}
+
+      backdrop.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }}
+
+    function closeOverlay() {{
+      backdrop.classList.remove('open');
+      document.body.style.overflow = '';
+    }}
+
+    document.querySelectorAll('.card').forEach(card => {{
+      card.addEventListener('click', () => openOverlay(card));
+      card.addEventListener('keydown', e => {{ if (e.key === 'Enter' || e.key === ' ') openOverlay(card); }});
+    }});
+
+    ovClose.addEventListener('click', closeOverlay);
+    backdrop.addEventListener('click', e => {{ if (e.target === backdrop) closeOverlay(); }});
+    document.addEventListener('keydown', e => {{ if (e.key === 'Escape') closeOverlay(); }});
   </script>
 </body>
 </html>"""
@@ -792,6 +1026,15 @@ def main():
                 "rarity_db":   info["rarityDbName"],
                 "rarity_name": info["rarityName"],
                 "image_url":   card_image_url(info["productId"]),
+                "card_type":   info["cardType"],
+                "life":        info["life"],
+                "counter":     info["counter"],
+                "power":       info["power"],
+                "cost":        info["cost"],
+                "subtypes":    info["subtypes"],
+                "attribute":   info["attribute"],
+                "color":       info["color"],
+                "description": info["description"],
             })
 
         avg = total / len(card_rows) if card_rows else 0.0
