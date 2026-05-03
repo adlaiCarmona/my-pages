@@ -20,6 +20,8 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
+from card_info import get_card_info
+
 BASE_URL = "https://onepiece.limitlesstcg.com"
 CDN_BASE = "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece"
 CACHE_DIR = Path(__file__).parent / "cache"
@@ -203,6 +205,26 @@ def aggregate_stats(all_decklists: list[dict]) -> dict:
         cards_list.sort(key=lambda c: (-c["usage_pct"], -c["avg_copies_when_played"]))
         output[card_type] = cards_list
 
+    # ── Enrich every unique card with API metadata ────────────────────────────
+    seen_ids: set[str] = set()
+    for cards_list in output.values():
+        for card in cards_list:
+            cid = card["card_id"]
+            if cid in seen_ids:
+                continue
+            seen_ids.add(cid)
+            info = get_card_info(cid)
+            if info:
+                card.update(info)
+            else:
+                # Ensure keys always exist so templates don't need to guard
+                for field in (
+                    "market_price", "rarity", "card_text", "card_color",
+                    "card_type", "card_cost", "card_power", "sub_types",
+                    "counter_amount", "attribute",
+                ):
+                    card.setdefault(field, None)
+
     return output
 
 
@@ -253,6 +275,13 @@ def process_leader(leader_id: str) -> None:
                 f"    {card['usage_pct']:5.1f}%  x{card['avg_copies_when_played']:.1f}  "
                 f"{card['card_name']} ({card['card_id']})"
             )
+
+
+def _da(value) -> str:
+    """Render a data-attribute value: empty string when None."""
+    if value is None:
+        return ""
+    return html_module.escape(str(value), quote=True)
 
 
 def slug(text: str) -> str:
@@ -312,7 +341,17 @@ def build_html(all_results: list[dict]) -> str:
            data-usage="100"
            data-avg="1.0"
            data-decks="{total_decks}"
-           data-total="{total_decks}">
+           data-total="{total_decks}"
+           data-market-price="{_da(leader.get('market_price'))}"
+           data-rarity="{_da(leader.get('rarity'))}"
+           data-card-text="{_da(leader.get('card_text'))}"
+           data-card-color="{_da(leader.get('card_color'))}"
+           data-card-type="{_da(leader.get('card_type'))}"
+           data-card-cost="{_da(leader.get('card_cost'))}"
+           data-card-power="{_da(leader.get('card_power'))}"
+           data-sub-types="{_da(leader.get('sub_types'))}"
+           data-counter-amount="{_da(leader.get('counter_amount'))}"
+           data-attribute="{_da(leader.get('attribute'))}">
       <div class="leader-meta">
         <h2>{html_module.escape(leader['card_name'])}</h2>
         <span class="badge">{leader_id}</span>
@@ -351,7 +390,6 @@ def build_html(all_results: list[dict]) -> str:
             card_items = ""
             for rank, c in enumerate(cards, 1):
                 colour = pct_color(c["usage_pct"])
-                # Pill: x copies avg
                 avg_label = f"×{c['avg_copies_when_played']:.1f} avg"
                 card_items += f"""
         <div class="card" role="button" tabindex="0"
@@ -362,6 +400,16 @@ def build_html(all_results: list[dict]) -> str:
           data-avg="{c['avg_copies_when_played']}"
           data-decks="{c['decks_with_card']}"
           data-total="{total_decks}"
+          data-market-price="{_da(c.get('market_price'))}"
+          data-rarity="{_da(c.get('rarity'))}"
+          data-card-text="{_da(c.get('card_text'))}"
+          data-card-color="{_da(c.get('card_color'))}"
+          data-card-type="{_da(c.get('card_type'))}"
+          data-card-cost="{_da(c.get('card_cost'))}"
+          data-card-power="{_da(c.get('card_power'))}"
+          data-sub-types="{_da(c.get('sub_types'))}"
+          data-counter-amount="{_da(c.get('counter_amount'))}"
+          data-attribute="{_da(c.get('attribute'))}"
         >
           <div class="card-rank">#{rank}</div>
           <img class="card-img" src="{c['image_url']}"
@@ -415,6 +463,7 @@ def build_html(all_results: list[dict]) -> str:
         <div class="overlay-name" id="overlay-name"></div>
         <div class="overlay-badges" id="overlay-badges"></div>
         <div class="overlay-stats" id="overlay-stats"></div>
+        <div class="overlay-card-text" id="overlay-card-text"></div>
       </div>
     </div>
   </div>"""
@@ -687,6 +736,7 @@ def build_html(all_results: list[dict]) -> str:
       border-radius: 4px;
     }}
     .avg-badge {{ background: #1e2a3a; color: #60a5fa; }}
+    .rarity-badge {{ background: #2e1f4a; color: #c084fc; }}
     .usage-bar-wrap {{
       height: 4px;
       background: #2a2a3a;
@@ -720,7 +770,7 @@ def build_html(all_results: list[dict]) -> str:
       background: #17171f;
       border: 1px solid #2a2a3a;
       border-radius: 14px;
-      max-width: 680px;
+      max-width: 780px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
@@ -787,6 +837,15 @@ def build_html(all_results: list[dict]) -> str:
       border-radius: 4px;
     }}
     .overlay-close:hover {{ color: #e0e0e0; background: #2a2a3a; }}
+    .overlay-card-text {{
+      font-size: .8rem;
+      color: #b0b0c8;
+      line-height: 1.6;
+      border-top: 1px solid #2a2a3a;
+      padding-top: .7rem;
+      white-space: pre-wrap;
+    }}
+    .overlay-card-text:empty {{ display: none; }}
 
     @media (max-width: 640px) {{
       .sidebar {{ display: none; }}
@@ -811,39 +870,64 @@ def build_html(all_results: list[dict]) -> str:
 
   <script>
     // ── Card / leader click → overlay ────────────────────────────────────
-    const backdrop = document.getElementById('overlay');
-    const oImg     = document.getElementById('overlay-img');
-    const oName    = document.getElementById('overlay-name');
-    const oBadges  = document.getElementById('overlay-badges');
-    const oStats   = document.getElementById('overlay-stats');
+    const backdrop  = document.getElementById('overlay');
+    const oImg      = document.getElementById('overlay-img');
+    const oName     = document.getElementById('overlay-name');
+    const oBadges   = document.getElementById('overlay-badges');
+    const oStats    = document.getElementById('overlay-stats');
+    const oCardText = document.getElementById('overlay-card-text');
+
+    const RARITY_LABELS = {{
+      L:'Leader', C:'Common', UC:'Uncommon', R:'Rare',
+      SR:'Super Rare', SEC:'Secret Rare', SP:'Special',
+    }};
+
+    function stat(label, value, style='') {{
+      if (value === null || value === undefined || value === '') return '';
+      return `<div class="overlay-stat">
+        <div class="overlay-stat-label">${{label}}</div>
+        <div class="overlay-stat-value"${{style ? ` style="${{style}}"` : ''}}>${{value}}</div>
+      </div>`;
+    }}
 
     function openOverlay(el) {{
       const d = el.dataset;
-      oImg.src     = d.image;
-      oImg.alt     = d.name;
+      oImg.src = d.image;
+      oImg.alt = d.name;
       oName.textContent = d.name;
 
+      // ── Badges: card ID + rarity ──────────────────────────────────────
+      const rarityLabel = d.rarity ? (RARITY_LABELS[d.rarity] || d.rarity) : '';
       oBadges.innerHTML =
-        `<span class="badge">${{d.id}}</span>`;
+        `<span class="badge">${{d.id}}</span>` +
+        (d.rarity ? `<span class="badge rarity-badge">${{d.rarity}} — ${{rarityLabel}}</span>` : '');
 
-      const usagePct  = parseFloat(d.usage);
+      // ── Usage colour ─────────────────────────────────────────────────
+      const usagePct = parseFloat(d.usage);
       const col = usagePct >= 80 ? '#34d399'
                 : usagePct >= 50 ? '#a3e635'
                 : usagePct >= 25 ? '#fbbf24' : '#f87171';
 
-      oStats.innerHTML = `
-        <div class="overlay-stat">
-          <div class="overlay-stat-label">Usage</div>
-          <div class="overlay-stat-value" style="color:${{col}}">${{d.usage}}%</div>
-        </div>
-        <div class="overlay-stat">
-          <div class="overlay-stat-label">Decks with card</div>
-          <div class="overlay-stat-value">${{d.decks}} / ${{d.total}}</div>
-        </div>
-        <div class="overlay-stat">
-          <div class="overlay-stat-label">Avg copies</div>
-          <div class="overlay-stat-value">${{parseFloat(d.avg).toFixed(1)}}</div>
-        </div>`;
+      // ── Market price formatting ───────────────────────────────────────
+      const priceStr = d.marketPrice && d.marketPrice !== ''
+        ? `$${{parseFloat(d.marketPrice).toFixed(2)}}` : '';
+
+      // ── Stats grid ───────────────────────────────────────────────────
+      oStats.innerHTML =
+        stat('Usage',           `${{d.usage}}%`,                col ? `color:${{col}}` : '') +
+        stat('Decks with card', `${{d.decks}} / ${{d.total}}`) +
+        stat('Avg copies',      parseFloat(d.avg).toFixed(1)) +
+        stat('Market price',    priceStr,                       'color:#a78bfa') +
+        stat('Color',           d.cardColor) +
+        stat('Type',            d.cardType) +
+        stat('Power',           d.cardPower) +
+        (d.cardCost && d.cardCost !== '' ? stat('Cost', d.cardCost) : '') +
+        stat('Counter',         d.counterAmount) +
+        stat('Attribute',       d.attribute) +
+        stat('Sub-types',       d.subTypes);
+
+      // ── Card text ────────────────────────────────────────────────────
+      oCardText.textContent = d.cardText || '';
 
       backdrop.classList.add('open');
     }}
