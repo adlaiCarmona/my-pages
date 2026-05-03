@@ -265,6 +265,7 @@
       border-radius: 4px;
     }
     .avg-badge { background: #1e2a3a; color: #60a5fa; }
+    .rarity-badge { background: #2e1f4a; color: #c084fc; }
     .usage-bar-wrap {
       height: 4px;
       background: #2a2a3a;
@@ -298,7 +299,7 @@
       background: #17171f;
       border: 1px solid #2a2a3a;
       border-radius: 14px;
-      max-width: 680px;
+      max-width: 780px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
@@ -365,6 +366,15 @@
       border-radius: 4px;
     }
     .overlay-close:hover { color: #e0e0e0; background: #2a2a3a; }
+    .overlay-card-text {
+      font-size: .8rem;
+      color: #b0b0c8;
+      line-height: 1.6;
+      border-top: 1px solid #2a2a3a;
+      padding-top: .7rem;
+      white-space: pre-wrap;
+    }
+    .overlay-card-text:empty { display: none; }
 
     @media (max-width: 640px) {
       .sidebar { display: none; }
@@ -401,7 +411,18 @@
            data-usage="100"
            data-avg="1.0"
            data-decks="48"
-           data-total="48">
+           data-total="48"
+           data-market-price="0.15"
+           data-rarity="L"
+           data-card-text="[Double Attack] (This card deals 2 damage.)
+[Activate:Main] [Once Per Turn] If your opponent has 3 or less Life cards, give up to 2 rested DON!! cards to 1 of your Characters."
+           data-card-color="Green Yellow"
+           data-card-type="Leader"
+           data-card-cost=""
+           data-card-power="5000"
+           data-sub-types="Land of Wano"
+           data-counter-amount=""
+           data-attribute="Strike">
       <div class="leader-meta">
         <h2>Yamato</h2>
         <span class="badge">OP06-022</span>
@@ -533,6 +554,16 @@
           data-avg="3.96"
           data-decks="48"
           data-total="48"
+          data-market-price="0.31"
+          data-rarity="UC"
+          data-card-text="[On Play] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less.  This card has been officially errata&#x27;d."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="3000"
+          data-sub-types="Former Whitebeard Pirates Land of Wano"
+          data-counter-amount="2000"
+          data-attribute="Ranged"
         >
           <div class="card-rank">#1</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-033_EN.webp"
@@ -557,6 +588,17 @@
           data-avg="3.85"
           data-decks="47"
           data-total="48"
+          data-market-price="3.58"
+          data-rarity="SR"
+          data-card-text="[Rush] (This card can attack on the turn in which it is played.)
+[On Play] Rest up to a total of 2 of your opponent&#x27;s Characters or DON!! cards. Then, add 1 card from the top of your Life cards to your hand."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="7"
+          data-card-power="8000"
+          data-sub-types="Fish-Man New Fish-Man Pirates"
+          data-counter-amount="0"
+          data-attribute="Strike"
         >
           <div class="card-rank">#2</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-035_EN.webp"
@@ -581,6 +623,16 @@
           data-avg="3.91"
           data-decks="44"
           data-total="48"
+          data-market-price="1.12"
+          data-rarity="R"
+          data-card-text="[On Play] Up to 1 of your Leader or Character cards gains [Banish] during this turn. (When this card deals damage, the target card is trashed without activating its Trigger.) [Trigger] K.O. up to 1 of your opponent&#x27;s Characters with a cost of 5 or less."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="3000"
+          data-sub-types="Straw Hat Crew"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#3</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-101_EN.webp"
@@ -605,6 +657,17 @@
           data-avg="3.84"
           data-decks="31"
           data-total="48"
+          data-market-price="1.86"
+          data-rarity="R"
+          data-card-text="[On K.O.] If your opponent has 3 or less Life cards, add up to 1 card from the top of your deck to the top of your Life cards.
+[Trigger] If your opponent has 3 or less Life cards, play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="6000"
+          data-sub-types="Land of Wano The Akazaya Nine"
+          data-counter-amount="0"
+          data-attribute="Slash"
         >
           <div class="card-rank">#4</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-104_EN.webp"
@@ -629,6 +692,17 @@
           data-avg="3.11"
           data-decks="27"
           data-total="48"
+          data-market-price="0.28"
+          data-rarity="SR"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)
+[On Play] Add up to 1 of your &quot;Land of Wano&quot; type Characters other than [Kouzuki Momonosuke] to the top or bottom of the owner&#x27;s Life cards face-up."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="6000"
+          data-sub-types="Land of Wano Kouzuki Clan"
+          data-counter-amount="0"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#5</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-107_EN.webp"
@@ -653,6 +727,16 @@
           data-avg="3.72"
           data-decks="25"
           data-total="48"
+          data-market-price="0.25"
+          data-rarity="R"
+          data-card-text="[Trigger] You may trash 1 card from your hand: Play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="5000"
+          data-sub-types="Sky Island Vassals"
+          data-counter-amount="2000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#6</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-105_EN.webp"
@@ -677,6 +761,16 @@
           data-avg="3.55"
           data-decks="22"
           data-total="48"
+          data-market-price="2.35"
+          data-rarity="SR"
+          data-card-text="[On Play] You may add 1 card from the top or bottom of your Life cards to your hand: Add up to 1 card from your hand to the top of your Life cards."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="0"
+          data-sub-types="Land of Wano Kouzuki Clan"
+          data-counter-amount="2000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#7</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-106_EN.webp"
@@ -701,6 +795,16 @@
           data-avg="3.89"
           data-decks="19"
           data-total="48"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#8</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST12/ST12-003_EN.webp"
@@ -725,6 +829,17 @@
           data-avg="3.53"
           data-decks="19"
           data-total="48"
+          data-market-price="0.06"
+          data-rarity="UC"
+          data-card-text="[DON!! x2] This Character can also attack your opponent&#x27;s active Characters.
+[Trigger] If your opponent has 3 or less Life cards, play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="Land of Wano Minks The Akazaya Nine"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#9</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-110_EN.webp"
@@ -749,6 +864,16 @@
           data-avg="3.27"
           data-decks="15"
           data-total="48"
+          data-market-price="0.23"
+          data-rarity="R"
+          data-card-text="[Activate:Main] (1) (You may rest the specified number of DON!! cards in your cost area) You may rest this Character: Look at 5 cards from the top of your deck; reveal up to 1 &quot;Land of Wano&quot; type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.  This card has been officially errata&#x27;d."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="0"
+          data-sub-types="Land of Wano Kouzuki Clan"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#10</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-041_EN.webp"
@@ -773,6 +898,16 @@
           data-avg="4.0"
           data-decks="14"
           data-total="48"
+          data-market-price="0.11"
+          data-rarity="C"
+          data-card-text="NULL"
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="5000"
+          data-sub-types="Animal Sky Island"
+          data-counter-amount="1000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#11</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-110_EN.webp"
@@ -797,6 +932,16 @@
           data-avg="4.0"
           data-decks="14"
           data-total="48"
+          data-market-price="0.34"
+          data-rarity="R"
+          data-card-text="If you have 2 or less Life cards, this Character gains +1000 power. [On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Holly] and add it to your hand. Then, place the rest at the bottom of your deck in any order and play up to 1 [Holly] from your hand."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="Sky Island Vassals"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#12</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-101_EN.webp"
@@ -821,6 +966,16 @@
           data-avg="3.93"
           data-decks="14"
           data-total="48"
+          data-market-price="1.04"
+          data-rarity="SR"
+          data-card-text="[DON!! x1] [Opponent&#x27;s Turn] If this Character is rested, your opponent cannot attack any card other than the Character [Eustass&quot;Captain&quot;Kid]. [Activate:Main] [Once Per Turn] You may rest this Character: Play up to 1 Character card with a cost of 3 or less from your hand.  This card has been officially errata&#x27;d."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="8"
+          data-card-power="8000"
+          data-sub-types="Kid Pirates Supernovas"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#13</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-051_EN.webp"
@@ -845,6 +1000,16 @@
           data-avg="3.86"
           data-decks="14"
           data-total="48"
+          data-market-price="0.24"
+          data-rarity="R"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [Opponent&#x27;s Turn] If your rested Character would be K.O.&#x27;d, you may trash this Character instead."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="1000"
+          data-sub-types="Donquixote Pirates Navy"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#14</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-030_EN.webp"
@@ -869,6 +1034,16 @@
           data-avg="2.79"
           data-decks="14"
           data-total="48"
+          data-market-price="0.28"
+          data-rarity="SR"
+          data-card-text="[DON!! x1] If you have less Life cards than your opponent, this Character gains [Double Attack] and +1000 power. (This card deals 2 damage.) [Trigger] You may trash 1 card from your hand: Play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="Big Mom Pirates"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#15</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP03/OP03-108_EN.webp"
@@ -893,6 +1068,16 @@
           data-avg="3.85"
           data-decks="13"
           data-total="48"
+          data-market-price="1.31"
+          data-rarity="R"
+          data-card-text="[On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Sky Island] type card other than [Shura] and add it to your hand. Then, place the rest at the bottom of your deck in any order. [Trigger] Play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="2000"
+          data-sub-types="Sky Island Vassals"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#16</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-106_EN.webp"
@@ -917,6 +1102,16 @@
           data-avg="3.0"
           data-decks="12"
           data-total="48"
+          data-market-price="0.09"
+          data-rarity="C"
+          data-card-text="[Activate:Main] You may trash this Character: Up to 1 of your [Land of Wano] type Leader or Character cards gains +3000 power during this turn."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="2000"
+          data-sub-types="Land of Wano"
+          data-counter-amount="1000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#17</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-109_EN.webp"
@@ -941,6 +1136,16 @@
           data-avg="3.27"
           data-decks="11"
           data-total="48"
+          data-market-price="132.66"
+          data-rarity="SR"
+          data-card-text="[On Play] If you have 2 or less Life cards, this Character gains [Rush].(This card can attack on the turn in which it is played.)"
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="7000"
+          data-sub-types="Whitebeard Pirates"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#18</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST13/ST13-011_EN.webp"
@@ -965,6 +1170,16 @@
           data-avg="2.82"
           data-decks="11"
           data-total="48"
+          data-market-price="0.55"
+          data-rarity="SR"
+          data-card-text="[Opponent&#x27;s Turn] [Once Per Turn] When your opponent plays a Character, if your Leader has the [Donquixote Pirates] type, rest up to 1 of your opponent&#x27;s Characters. Then, rest this Character. [On Play] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="0"
+          data-sub-types="Donquixote Pirates"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#19</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-024_EN.webp"
@@ -989,6 +1204,17 @@
           data-avg="3.56"
           data-decks="9"
           data-total="48"
+          data-market-price="0.06"
+          data-rarity="UC"
+          data-card-text="[DON!! x2][When Attacking] You may trash 1 card from your hand: K.O. up to 1 of your opponent&#x27;s Characters with a cost equal to or less than the number of your opponent&#x27;s Life cards.
+[Trigger] If your opponent has 3 or less Life cards, play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="Land of Wano Minks The Akazaya Nine"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#20</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-100_EN.webp"
@@ -1013,6 +1239,16 @@
           data-avg="4.0"
           data-decks="8"
           data-total="48"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#21</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-005_EN.webp"
@@ -1037,6 +1273,16 @@
           data-avg="3.62"
           data-decks="8"
           data-total="48"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#22</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-002_EN.webp"
@@ -1061,6 +1307,16 @@
           data-avg="3.5"
           data-decks="8"
           data-total="48"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#23</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-001_EN.webp"
@@ -1085,6 +1341,16 @@
           data-avg="4.0"
           data-decks="7"
           data-total="48"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#24</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-003_EN.webp"
@@ -1109,6 +1375,16 @@
           data-avg="4.0"
           data-decks="7"
           data-total="48"
+          data-market-price="0.35"
+          data-rarity="C"
+          data-card-text="[Activate: Main] (1) (You may rest the specified number of DON!! cards in your cost area.) You may rest this Character: Look at 5 cards from the top of your deck; reveal up to 1 {Supernovas} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="1000"
+          data-sub-types="Bonney Pirates Supernovas"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#25</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST02/ST02-007_EN.webp"
@@ -1133,6 +1409,16 @@
           data-avg="3.86"
           data-decks="7"
           data-total="48"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#26</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST02/ST02-008_EN.webp"
@@ -1157,6 +1443,16 @@
           data-avg="3.71"
           data-decks="7"
           data-total="48"
+          data-market-price="0.14"
+          data-rarity="R"
+          data-card-text="[Activate:Main] (1) (You may rest the specified number of DON!! cards in your cost area.) You may rest this Character: Look at 5 cards from the top of your deck; reveal up to 1 [Donquixote Pirates] type card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="1000"
+          data-sub-types="Donquixote Pirates"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#27</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-034_EN.webp"
@@ -1181,6 +1477,16 @@
           data-avg="3.14"
           data-decks="7"
           data-total="48"
+          data-market-price="0.07"
+          data-rarity="UC"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [On Block] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="1000"
+          data-sub-types="Donquixote Pirates"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#28</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-036_EN.webp"
@@ -1205,6 +1511,16 @@
           data-avg="2.71"
           data-decks="7"
           data-total="48"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#29</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-004_EN.webp"
@@ -1229,6 +1545,16 @@
           data-avg="2.43"
           data-decks="7"
           data-total="48"
+          data-market-price="0.1"
+          data-rarity="UC"
+          data-card-text="[End of Your Turn] You may trash this Character: Set up to 2 of your DON!! cards as active."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="1000"
+          data-sub-types="Donquixote Pirates"
+          data-counter-amount="2000"
+          data-attribute="Special"
         >
           <div class="card-rank">#30</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-032_EN.webp"
@@ -1253,6 +1579,16 @@
           data-avg="2.14"
           data-decks="7"
           data-total="48"
+          data-market-price="0.21"
+          data-rarity="R"
+          data-card-text="[On Play] K.O. up to 1 of your opponent&#x27;s Characters with a cost equal to or less than the number of your opponent&#x27;s Life cards."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="6000"
+          data-sub-types="Sky Island Vassals"
+          data-counter-amount="1000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#31</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-102_EN.webp"
@@ -1277,6 +1613,16 @@
           data-avg="4.0"
           data-decks="6"
           data-total="48"
+          data-market-price="0.11"
+          data-rarity="UC"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [DON!! x1] [On Block] If you have 3 or more Characters, draw 1 card."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="2000"
+          data-sub-types="Kid Pirates Supernovas"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#32</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-039_EN.webp"
@@ -1301,6 +1647,16 @@
           data-avg="3.33"
           data-decks="6"
           data-total="48"
+          data-market-price="0.69"
+          data-rarity="R"
+          data-card-text="[Trigger] Up to 1 of your opponent&#x27;s Leader or Character cards cannot attack during this turn."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="3000"
+          data-sub-types="Firetank Pirates"
+          data-counter-amount="2000"
+          data-attribute="Ranged"
         >
           <div class="card-rank">#33</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-100_EN.webp"
@@ -1325,6 +1681,16 @@
           data-avg="1.83"
           data-decks="6"
           data-total="48"
+          data-market-price="0.68"
+          data-rarity="SR"
+          data-card-text="[Rush] [Once Per Turn] If this Character would leave the field, you may trash 1 card from the top of your Life cards instead. If there is a [Monkey.D.Luffy] Character, this effect is negated."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="7"
+          data-card-power="7000"
+          data-sub-types="Sky Island"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#34</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-100_EN.webp"
@@ -1349,6 +1715,16 @@
           data-avg="3.4"
           data-decks="5"
           data-total="48"
+          data-market-price="0.91"
+          data-rarity="SR"
+          data-card-text="[On Play] Up to a total of 3 of your opponent&#x27;s rested Leader and Character cards will not become active in your opponent&#x27;s next Refresh Phase."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="10"
+          data-card-power="10000"
+          data-sub-types="Donquixote Pirates The Seven Warlords of the Sea"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#35</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-031_EN.webp"
@@ -1373,6 +1749,16 @@
           data-avg="4.0"
           data-decks="4"
           data-total="48"
+          data-market-price="0.22"
+          data-rarity="R"
+          data-card-text="[On Play] Look at 5 cards from the top of your deck; reveal up to 1 green [Land of Wano] type card other than [Otama] and add it to your hand. Then, place the rest at the bottom of your deck in any order."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="0"
+          data-sub-types="Land of Wano"
+          data-counter-amount="2000"
+          data-attribute="Special"
         >
           <div class="card-rank">#36</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-022_EN.webp"
@@ -1397,6 +1783,17 @@
           data-avg="3.75"
           data-decks="4"
           data-total="48"
+          data-market-price="0.24"
+          data-rarity="R"
+          data-card-text="[On K.O.] Trash up to 1 card from the top of your opponent&#x27;s Life cards.
+[Trigger] Draw 2 cards and trash 1 card from your hand."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="Hawkins Pirates Supernovas"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#37</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-109_EN.webp"
@@ -1421,6 +1818,16 @@
           data-avg="3.25"
           data-decks="4"
           data-total="48"
+          data-market-price="3.19"
+          data-rarity="R"
+          data-card-text="[Activate:Main] You may trash this Character: Play up to 1 [Land of Wano] type Character card with a cost of 5 or less other than [Kouzuki Hiyori] from your hand. Then, draw 1 card."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="0"
+          data-sub-types="Land of Wano Kouzuki Clan"
+          data-counter-amount="1000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#38</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB01/EB01-013_EN.webp"
@@ -1445,6 +1852,16 @@
           data-avg="2.5"
           data-decks="4"
           data-total="48"
+          data-market-price="2.74"
+          data-rarity="SR"
+          data-card-text="[On Play] You may trash 1 card with a [Trigger] from your hand: K.O. up to 1 of your opponent&#x27;s Characters with a cost of 5 or less. Then, if you have 3 or less cards in your hand, draw 1 card. [Trigger] Activate this card&#x27;s [On Play] effect."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="5000"
+          data-sub-types="Straw Hat Crew Egghead"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#39</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP08/OP08-106_EN.webp"
@@ -1469,6 +1886,16 @@
           data-avg="2.0"
           data-decks="4"
           data-total="48"
+          data-market-price="0.06"
+          data-rarity="C"
+          data-card-text="[On Play] Look at up to 1 card from the top of your or your opponent&#x27;s Life cards and place it at the top or bottom of the Life cards."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="0"
+          data-sub-types="Sky Island"
+          data-counter-amount="2000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#40</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-099_EN.webp"
@@ -1493,6 +1920,16 @@
           data-avg="4.0"
           data-decks="3"
           data-total="48"
+          data-market-price="0.24"
+          data-rarity="R"
+          data-card-text="[Trigger] Draw 1 card. Then, if you have 1 or less Life cards, play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="Straw Hat Crew Egghead"
+          data-counter-amount="2000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#41</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-107_EN.webp"
@@ -1517,6 +1954,17 @@
           data-avg="3.67"
           data-decks="3"
           data-total="48"
+          data-market-price="0.12"
+          data-rarity="R"
+          data-card-text="[On Play] You may trash 1 card from your hand: Up to 1 of your opponent&#x27;s rested Leader cannot attack until the end of your opponent&#x27;s next turn.
+[Trigger] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="6000"
+          data-sub-types="Fish-Man Arlong Pirates East Blue"
+          data-counter-amount="0"
+          data-attribute="Slash"
         >
           <div class="card-rank">#42</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-023_EN.webp"
@@ -1541,6 +1989,16 @@
           data-avg="2.33"
           data-decks="3"
           data-total="48"
+          data-market-price="0.59"
+          data-rarity="SR"
+          data-card-text="[On Play] K.O. up to 1 of your opponent&#x27;s Characters with a cost equal to or less than the total of your and your opponent&#x27;s Life cards. Then, if you have 1 or less Life cards, add up to 1 card from the top of your deck to the top of your Life cards."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="9"
+          data-card-power="9000"
+          data-sub-types="Land of Wano"
+          data-counter-amount="0"
+          data-attribute="Strike"
         >
           <div class="card-rank">#43</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-112_EN.webp"
@@ -1565,6 +2023,16 @@
           data-avg="2.33"
           data-decks="3"
           data-total="48"
+          data-market-price="0.1"
+          data-rarity="UC"
+          data-card-text="[On Play] Draw 3 cards and trash 2 cards from your hand. [Trigger] Play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="0"
+          data-sub-types="Merfolk"
+          data-counter-amount="1000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#44</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP03/OP03-116_EN.webp"
@@ -1589,6 +2057,17 @@
           data-avg="4.0"
           data-decks="2"
           data-total="48"
+          data-market-price="19.69"
+          data-rarity="SEC"
+          data-card-text="[On Play] You may trash 1 card from your hand: Add up to 1 card from the top of your deck to the top of your Life cards. Then, this Character gains +2 cost until the end of your opponent&#x27;s next End Phase.
+[Opponent&#x27;s Turn] [On K.O.] Add up to 1 card from the top of your deck to the top of your Life cards."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="6"
+          data-card-power="7000"
+          data-sub-types="Revolutionary Army The Seven Warlords of the Sea"
+          data-counter-amount="1000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#45</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-119_EN.webp"
@@ -1613,6 +2092,16 @@
           data-avg="4.0"
           data-decks="2"
           data-total="48"
+          data-market-price="0.36"
+          data-rarity="C"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)[Trigger] Play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="1000"
+          data-sub-types="Big Mom Pirates"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#46</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST07/ST07-007_EN.webp"
@@ -1637,6 +2126,16 @@
           data-avg="3.0"
           data-decks="2"
           data-total="48"
+          data-market-price="0.13"
+          data-rarity="R"
+          data-card-text="[On Play] / [On K.O.] K.O. up to 1 of your opponent&#x27;s rested Characters with a cost of 4 or less."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="6000"
+          data-sub-types="Land of Wano Thriller Bark Pirates"
+          data-counter-amount="0"
+          data-attribute="Slash"
         >
           <div class="card-rank">#47</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-036_EN.webp"
@@ -1661,6 +2160,16 @@
           data-avg="3.0"
           data-decks="2"
           data-total="48"
+          data-market-price="0.14"
+          data-rarity="UC"
+          data-card-text="[On Play] Up to 1 of your [Land of Wano] type Leader or Character cards gains +1000 power during this turn. [Trigger] Play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="0"
+          data-sub-types="Land of Wano Kouzuki Clan"
+          data-counter-amount="2000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#48</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-103_EN.webp"
@@ -1685,6 +2194,16 @@
           data-avg="2.5"
           data-decks="2"
           data-total="48"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#49</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST07/ST07-010_EN.webp"
@@ -1709,6 +2228,16 @@
           data-avg="2.5"
           data-decks="2"
           data-total="48"
+          data-market-price="0.5"
+          data-rarity="SR"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [On Play] You may return 1 Character to your hand: Play up to 1 Character card with a cost of 3 or less from your hand.  This card has been officially errata&#x27;d."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="6000"
+          data-sub-types="Heart Pirates Supernovas"
+          data-counter-amount="0"
+          data-attribute="Slash"
         >
           <div class="card-rank">#50</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-047_EN.webp"
@@ -1733,6 +2262,16 @@
           data-avg="2.0"
           data-decks="2"
           data-total="48"
+          data-market-price="0.19"
+          data-rarity="R"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)[On Play] If your opponent has 1 or less Life cards, K.O. up to 1 of your opponent&#x27;s Characters with a cost of 3 or less."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="4000"
+          data-sub-types="Sky Island"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#51</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB01/EB01-054_EN.webp"
@@ -1757,6 +2296,17 @@
           data-avg="1.5"
           data-decks="2"
           data-total="48"
+          data-market-price="4.53"
+          data-rarity="SEC"
+          data-card-text="[When Attacking][Once Per Turn](1)(You may rest the specified number of DON!! cards in your cost area.): Set this Character as active.
+[Activate:Main][Once Per Turn](2)(You may rest the specified number of DON!! cards in your cost area.): Set this Character as active."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="9"
+          data-card-power="9000"
+          data-sub-types="Straw Hat Crew"
+          data-counter-amount="0"
+          data-attribute="Slash"
         >
           <div class="card-rank">#52</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-118_EN.webp"
@@ -1781,6 +2331,16 @@
           data-avg="4.0"
           data-decks="1"
           data-total="48"
+          data-market-price="0.13"
+          data-rarity="UC"
+          data-card-text="[On Play] Rest up to 1 of your opponent&#x27;s Characters with a cost of 2 or less. Then, K.O. up to 1 of your opponent&#x27;s rested Characters with a base cost of 1 or less."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="2000"
+          data-sub-types="Land of Wano East Blue Frost Moon Village"
+          data-counter-amount="2000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#53</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-029_EN.webp"
@@ -1805,6 +2365,16 @@
           data-avg="4.0"
           data-decks="1"
           data-total="48"
+          data-market-price="0.33"
+          data-rarity="SR"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [Trigger] You may trash 1 card from your hand: Play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="5000"
+          data-sub-types="The Vinsmoke Family"
+          data-counter-amount="1000"
+          data-attribute="Ranged"
         >
           <div class="card-rank">#54</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-104_EN.webp"
@@ -1829,6 +2399,16 @@
           data-avg="4.0"
           data-decks="1"
           data-total="48"
+          data-market-price="0.13"
+          data-rarity="R"
+          data-card-text="Also treat this card&#x27;s name as [Charlotte Linlin] according to the rules. [Trigger] If you have 1 or less Life cards, play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="7"
+          data-card-power="7000"
+          data-sub-types="Land of Wano The Four Emperors Big Mom Pirates"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#55</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-099_EN.webp"
@@ -1853,6 +2433,17 @@
           data-avg="3.0"
           data-decks="1"
           data-total="48"
+          data-market-price="1.54"
+          data-rarity="SR"
+          data-card-text="[Blocker]
+[On Play] Set up to 4 of your DON!! cards as active. Then, you cannot play Character cards with a base cost of 7 or more during this turn."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="8"
+          data-card-power="8000"
+          data-sub-types="The Seven Warlords of the Sea Muggy Kingdom"
+          data-counter-amount="0"
+          data-attribute="Slash"
         >
           <div class="card-rank">#56</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-030_EN.webp"
@@ -1877,6 +2468,17 @@
           data-avg="2.0"
           data-decks="1"
           data-total="48"
+          data-market-price="0.81"
+          data-rarity="SR"
+          data-card-text="[On Play] You may rest this Character: Trash up to 1 card from the top of your opponent&#x27;s Life cards.
+[End of Your Turn] If your opponent has 2 or less Life cards, draw 1 card and trash 1 card from your hand."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="8"
+          data-card-power="9000"
+          data-sub-types="Kid Pirates Supernovas"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#57</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-112_EN.webp"
@@ -1901,6 +2503,16 @@
           data-avg="2.0"
           data-decks="1"
           data-total="48"
+          data-market-price="1.53"
+          data-rarity="R"
+          data-card-text="[On Play] You may add 1 card from the top or bottom of your Life cards to your hand: K.O. up to 1 of your opponent&#x27;s Characters with a cost of 5 or less."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="2000"
+          data-sub-types="Big Mom Pirates Homies"
+          data-counter-amount="2000"
+          data-attribute="Special"
         >
           <div class="card-rank">#58</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP11/OP11-106_EN.webp"
@@ -1925,6 +2537,16 @@
           data-avg="2.0"
           data-decks="1"
           data-total="48"
+          data-market-price="0.07"
+          data-rarity="UC"
+          data-card-text="[Activate: Main] You may place this Character and 1 [Kin&#x27;emon] with 1000 power from your trash at the bottom of your deck in any order: Play up to 1 [Kin&#x27;emon] with a cost of 6 from your hand."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="0"
+          data-sub-types="Land of Wano The Akazaya Nine Punk Hazard"
+          data-counter-amount="2000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#59</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-027_EN.webp"
@@ -1949,6 +2571,17 @@
           data-avg="2.0"
           data-decks="1"
           data-total="48"
+          data-market-price="1.39"
+          data-rarity="R"
+          data-card-text="[On Play] If your opponent has 3 or more Life cards, trash up to 1 card from the top of your opponent&#x27;s Life cards.
+[Trigger] Play up to 1 yellow Character card with a cost of 3 or less from your hand."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="6"
+          data-card-power="6000"
+          data-sub-types="Straw Hat Crew"
+          data-counter-amount="1000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#60</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP09/OP09-107_EN.webp"
@@ -1973,6 +2606,16 @@
           data-avg="2.0"
           data-decks="1"
           data-total="48"
+          data-market-price="0.1"
+          data-rarity="C"
+          data-card-text="[On Your Opponent&#x27;s Attack] (2) (You may rest the specified number of DON!! cards in your cost area.): Rest up to 1 of your opponent&#x27;s DON!! cards."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="3000"
+          data-sub-types="Donquixote Pirates"
+          data-counter-amount="2000"
+          data-attribute="Special"
         >
           <div class="card-rank">#61</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-021_EN.webp"
@@ -1997,6 +2640,16 @@
           data-avg="2.0"
           data-decks="1"
           data-total="48"
+          data-market-price="0.1"
+          data-rarity="UC"
+          data-card-text="[On Play] You may place 1 of your Stages at the bottom of your deck: Draw 1 card and trash 1 card from your hand."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="0"
+          data-sub-types="Sky Island"
+          data-counter-amount="2000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#62</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-104_EN.webp"
@@ -2021,6 +2674,16 @@
           data-avg="1.0"
           data-decks="1"
           data-total="48"
+          data-market-price="1.85"
+          data-rarity="SR"
+          data-card-text="[On Play]/[When Attacking] Up to 1 of your opponent&#x27;s rested Characters with a cost of 7 or less will not become active in your opponent&#x27;s next Refresh Phase."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="6000"
+          data-sub-types="Minks"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#63</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP08/OP08-023_EN.webp"
@@ -2045,6 +2708,16 @@
           data-avg="1.0"
           data-decks="1"
           data-total="48"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#64</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST07/ST07-003_EN.webp"
@@ -2069,6 +2742,16 @@
           data-avg="1.0"
           data-decks="1"
           data-total="48"
+          data-market-price="0.36"
+          data-rarity="R"
+          data-card-text="Also treat this card&#x27;s name as [Kouzuki Oden] according to the rules. [On Play] Rest up to 1 of your opponent&#x27;s Characters with a cost of 6 or less."
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="6000"
+          data-sub-types="Land of Wano"
+          data-counter-amount="0"
+          data-attribute="Strike"
         >
           <div class="card-rank">#65</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP02/OP02-042_EN.webp"
@@ -2093,6 +2776,16 @@
           data-avg="1.0"
           data-decks="1"
           data-total="48"
+          data-market-price="2.97"
+          data-rarity="SEC"
+          data-card-text="Also treat this card&#x27;s name as [Kouzuki Oden] according to the rules. [Double Attack] (This card deals 2 damage.) [Banish] (When this card deals damage, the target card is trashed without activating its Trigger.)"
+          data-card-color="Green"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="5000"
+          data-sub-types="Land of Wano"
+          data-counter-amount="1000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#66</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-121_EN.webp"
@@ -2234,6 +2927,17 @@
           data-avg="2.57"
           data-decks="35"
           data-total="48"
+          data-market-price="1.32"
+          data-rarity="R"
+          data-card-text="[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +3000 power during this battle.
+[Trigger] If you have 0 Life cards, you may add up to 1 card from the top of your deck to the top of your Life cards. Then, trash 1 card from your hand."
+          data-card-color="Yellow"
+          data-card-type="Event"
+          data-card-cost="0"
+          data-card-power=""
+          data-sub-types="Sky Island"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#1</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-115_EN.webp"
@@ -2258,6 +2962,16 @@
           data-avg="2.92"
           data-decks="24"
           data-total="48"
+          data-market-price="0.17"
+          data-rarity="R"
+          data-card-text="[Main] Up to 1 of your Leader or Character cards gains +3000 power during this turn. Then, if you have 1 or less Life cards, rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less. [Trigger] You may trash 2 cards from your hand: Add up to 1 card from the top of your deck to the top of your Life cards."
+          data-card-color="Yellow"
+          data-card-type="Event"
+          data-card-cost="2"
+          data-card-power=""
+          data-sub-types="Sky Island"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#2</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-115_EN.webp"
@@ -2282,6 +2996,16 @@
           data-avg="2.45"
           data-decks="11"
           data-total="48"
+          data-market-price="0.25"
+          data-rarity="R"
+          data-card-text="[Main] / [Counter] Up to 1 of your Leader or Character cards gains +1000 power during this turn. Then, if your opponent has 2 or less Life cards, rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less. [Trigger] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less."
+          data-card-color="Yellow"
+          data-card-type="Event"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Land of Wano The Akazaya Nine"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#3</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-116_EN.webp"
@@ -2306,6 +3030,16 @@
           data-avg="2.8"
           data-decks="10"
           data-total="48"
+          data-market-price="0.25"
+          data-rarity="R"
+          data-card-text="[Main] Up to 1 of your Leader or Character cards gains +3000 power during this turn. Then, you may rest 1 of your Characters with a cost of 3 or more. If you do, rest up to 1 of your opponent&#x27;s Characters with a cost of 5 or less. [Trigger] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less."
+          data-card-color="Green"
+          data-card-type="Event"
+          data-card-cost="2"
+          data-card-power=""
+          data-sub-types="Straw Hat Crew Supernovas"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#4</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-036_EN.webp"
@@ -2330,6 +3064,16 @@
           data-avg="2.38"
           data-decks="8"
           data-total="48"
+          data-market-price="0.18"
+          data-rarity="UC"
+          data-card-text="[Counter] Up to 1 of your Leader or Character cards gains +2000 power during this battle. Then, if your opponent has 2 or less Life cards, that card gains an additional +2000 power during this battle. [Trigger] K.O. up to 1 of your opponent&#x27;s Characters with a cost equal to or less than the number of your opponent&#x27;s Life Cards."
+          data-card-color="Yellow"
+          data-card-type="Event"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Sky Island"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#5</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-114_EN.webp"
@@ -2354,6 +3098,16 @@
           data-avg="2.0"
           data-decks="8"
           data-total="48"
+          data-market-price="0.22"
+          data-rarity="R"
+          data-card-text="[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +3000 power during this battle. [Trigger] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less."
+          data-card-color="Green"
+          data-card-type="Event"
+          data-card-cost="0"
+          data-card-power=""
+          data-sub-types="Donquixote Pirates"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#6</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-037_EN.webp"
@@ -2378,6 +3132,16 @@
           data-avg="1.75"
           data-decks="8"
           data-total="48"
+          data-market-price="0.42"
+          data-rarity="R"
+          data-card-text="[Counter] Up to 1 of your Leader or Character cards gains +4000 power during this battle. Then, rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less. [Trigger] Rest up to 1 of your opponent&#x27;s Characters.  This card has been officially errata&#x27;d."
+          data-card-color="Green"
+          data-card-type="Event"
+          data-card-cost="2"
+          data-card-power=""
+          data-sub-types="Kid Pirates Supernovas"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#7</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-058_EN.webp"
@@ -2402,6 +3166,20 @@
           data-avg="2.14"
           data-decks="7"
           data-total="48"
+          data-market-price="0.19"
+          data-rarity="R"
+          data-card-text="[Main] Choose one:
+• K.O. up to 1 of your opponent&#x27;s Characters with a cost of 5 or less.
+• If your opponent has 1 Life card, deal 1 damage to your opponent.
+Then, add 1 card from the top of your Life cards to your hand.
+[Trigger] Draw 1 cards."
+          data-card-color="Yellow"
+          data-card-type="Event"
+          data-card-cost="4"
+          data-card-power=""
+          data-sub-types="Sky Island Shandian Warrior"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#8</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-116_EN.webp"
@@ -2426,6 +3204,16 @@
           data-avg="2.2"
           data-decks="5"
           data-total="48"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#9</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST02/ST02-017_EN.webp"
@@ -2450,6 +3238,16 @@
           data-avg="3.25"
           data-decks="4"
           data-total="48"
+          data-market-price="0.16"
+          data-rarity="R"
+          data-card-text="[Main] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less. [Trigger] K.O. up to 1 of your opponent&#x27;s rested Characters with a cost of 3 or less."
+          data-card-color="Green"
+          data-card-type="Event"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Land of Wano Kouzuki Clan"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#10</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP02/OP02-047_EN.webp"
@@ -2474,6 +3272,16 @@
           data-avg="2.25"
           data-decks="4"
           data-total="48"
+          data-market-price="0.08"
+          data-rarity="C"
+          data-card-text="[Main] You may rest 2 of your Characters: Draw 2 cards."
+          data-card-color="Green"
+          data-card-type="Event"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Land of Wano Kouzuki Clan"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#11</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-055_EN.webp"
@@ -2498,6 +3306,17 @@
           data-avg="2.0"
           data-decks="3"
           data-total="48"
+          data-market-price="3.4"
+          data-rarity="R"
+          data-card-text="[Main] You may rest 3 of your DON!! cards: Rest up to a total of 2 of your opponent&#x27;s Characters or DON!! cards.
+[Counter] Your Leader gains +3000 power during this battle."
+          data-card-color="Green"
+          data-card-type="Event"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Straw Hat Crew"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#12</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-037_EN.webp"
@@ -2522,6 +3341,16 @@
           data-avg="2.5"
           data-decks="2"
           data-total="48"
+          data-market-price="7.24"
+          data-rarity="R"
+          data-card-text="[Main] All of your opponent&#x27;s rested Characters with a cost of 7 or less will not become active in your opponent&#x27;s next Refresh Phase. [Trigger] Rest up to 1 of your opponent&#x27;s Characters."
+          data-card-color="Green"
+          data-card-type="Event"
+          data-card-cost="3"
+          data-card-power=""
+          data-sub-types="Minks"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#13</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP08/OP08-036_EN.webp"
@@ -2546,6 +3375,16 @@
           data-avg="2.0"
           data-decks="2"
           data-total="48"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#14</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST13/ST13-017_EN.webp"
@@ -2570,6 +3409,17 @@
           data-avg="2.0"
           data-decks="1"
           data-total="48"
+          data-market-price="0.15"
+          data-rarity="R"
+          data-card-text="[Main] You may rest 3 of your DON!! cards: If you and your opponent have a total of 5 or more Life cards, K.O. up to 1 of your opponent&#x27;s Characters with a base cost of 5 or less.
+[Counter] Up to 1 of your Leader gains +3000 power during this battle."
+          data-card-color="Yellow"
+          data-card-type="Event"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Straw Hat Crew"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#15</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP11/OP11-114_EN.webp"
@@ -2594,6 +3444,16 @@
           data-avg="1.0"
           data-decks="1"
           data-total="48"
+          data-market-price="0.16"
+          data-rarity="C"
+          data-card-text="[Counter] If you have 2 or less Life cards, give up to 1 of your opponent&#x27;s Leader or Character cards -3000 power during this turn.[Trigger] You may trash 2 cards from your hand: Add up to 1 card from the top of your deck to the top of your Life cards."
+          data-card-color="Yellow"
+          data-card-type="Event"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Land of Wano"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#16</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST09/ST09-014_EN.webp"
@@ -2627,7 +3487,18 @@
            data-usage="100"
            data-avg="1.0"
            data-decks="5"
-           data-total="5">
+           data-total="5"
+           data-market-price="0.32"
+           data-rarity="L"
+           data-card-text="[When Attacking]/[On Your Opponent&#x27;s Attack] You may trash any number of Event or Stage cards from your hand. This Leader gains +1000 power during this battle for every card trashed.
+[Activate: Main] [Once Per Turn] If you have activated an Event with a base cost of 3 or more during this turn, draw 1 card."
+           data-card-color="Blue Red"
+           data-card-type="Leader"
+           data-card-cost=""
+           data-card-power="5000"
+           data-sub-types="Revolutionary Army Dressrosa"
+           data-counter-amount="0"
+           data-attribute="Strike">
       <div class="leader-meta">
         <h2>Lucy</h2>
         <span class="badge">OP15-002</span>
@@ -2724,6 +3595,16 @@
           data-avg="4.0"
           data-decks="5"
           data-total="5"
+          data-market-price="1.17"
+          data-rarity="R"
+          data-card-text="[On Play] Look at 3 cards from the top of your deck; reveal up to 1 {Dressrosa} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
+          data-card-color="Blue"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="2000"
+          data-sub-types="Donquixote Pirates Dressrosa"
+          data-counter-amount="2000"
+          data-attribute="Special"
         >
           <div class="card-rank">#1</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-040_EN.webp"
@@ -2748,6 +3629,16 @@
           data-avg="4.0"
           data-decks="5"
           data-total="5"
+          data-market-price="0.36"
+          data-rarity="UC"
+          data-card-text="If your Character with 7000 base power or less would be removed from the field by your opponent&#x27;s effect, you may place 1 of your Characters at the bottom of the owner&#x27;s deck instead."
+          data-card-color="Blue"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="2000"
+          data-sub-types="Dressrosa The Tontattas"
+          data-counter-amount="2000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#2</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-052_EN.webp"
@@ -2772,6 +3663,17 @@
           data-avg="4.0"
           data-decks="5"
           data-total="5"
+          data-market-price="10.21"
+          data-rarity="SR"
+          data-card-text="[DON!! x1] This Character gains [Blocker].
+[On Play] Look at 3 cards from the top of your deck; reveal up to 1 {Dressrosa} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
+          data-card-color="Blue"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="0"
+          data-sub-types="Dressrosa"
+          data-counter-amount="1000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#3</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-053_EN.webp"
@@ -2796,6 +3698,16 @@
           data-avg="4.0"
           data-decks="5"
           data-total="5"
+          data-market-price="5.41"
+          data-rarity="R"
+          data-card-text="[When Attacking] [Once Per Turn] Draw 2 cards and trash 1 card from your hand."
+          data-card-color="Blue"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="6000"
+          data-sub-types="Beautiful Pirates Dressrosa"
+          data-counter-amount="0"
+          data-attribute="Slash"
         >
           <div class="card-rank">#4</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-045_EN.webp"
@@ -2820,6 +3732,17 @@
           data-avg="4.0"
           data-decks="5"
           data-total="5"
+          data-market-price="5.48"
+          data-rarity="SR"
+          data-card-text="[Blocker]
+[On Play] If your Leader has the {Dressrosa} type, activate up to 1 {Dressrosa} type Event from your hand."
+          data-card-color="Blue"
+          data-card-type="Character"
+          data-card-cost="7"
+          data-card-power="9000"
+          data-sub-types="Revolutionary Army Dressrosa"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#5</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-046_EN.webp"
@@ -2844,6 +3767,17 @@
           data-avg="1.0"
           data-decks="5"
           data-total="5"
+          data-market-price="41.42"
+          data-rarity="SEC"
+          data-card-text="[Rush] (This card can attack on the turn in which it is played.)
+When your opponent activates [Blocker], if either you or your opponent has 0 Life cards, you win the game."
+          data-card-color="Red"
+          data-card-type="Character"
+          data-card-cost="10"
+          data-card-power="13000"
+          data-sub-types="Roger Pirates King of the Pirates"
+          data-counter-amount="0"
+          data-attribute="Slash"
         >
           <div class="card-rank">#6</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP09/OP09-118_EN.webp"
@@ -2868,6 +3802,16 @@
           data-avg="2.67"
           data-decks="3"
           data-total="5"
+          data-market-price="1.18"
+          data-rarity="R"
+          data-card-text="[On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Revolutionary Army] type card other than [Belo Betty] and add it to your hand. Then, place the rest at the bottom of your deck in any order."
+          data-card-color="Red"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="2000"
+          data-sub-types="Revolutionary Army"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#7</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-015_EN.webp"
@@ -2892,6 +3836,16 @@
           data-avg="2.0"
           data-decks="2"
           data-total="5"
+          data-market-price="0.34"
+          data-rarity="R"
+          data-card-text="If your Character with a base cost of 7 or less other than [Sabo] would be removed from the field by your opponent&#x27;s effect, you may return this Character to the owner&#x27;s hand instead."
+          data-card-color="Blue"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="Revolutionary Army Dressrosa"
+          data-counter-amount="2000"
+          data-attribute="Special"
         >
           <div class="card-rank">#8</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-049_EN.webp"
@@ -2916,6 +3870,16 @@
           data-avg="2.0"
           data-decks="1"
           data-total="5"
+          data-market-price="1.34"
+          data-rarity="SR"
+          data-card-text="[On Play] If your Leader has the [Revolutionary Army] type, give up to 1 of your opponent&#x27;s Characters -3000 power during this turn."
+          data-card-color="Red"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="3000"
+          data-sub-types="Revolutionary Army"
+          data-counter-amount="2000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#9</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-006_EN.webp"
@@ -2940,6 +3904,16 @@
           data-avg="1.0"
           data-decks="1"
           data-total="5"
+          data-market-price="12.24"
+          data-rarity="SR"
+          data-card-text="[On Play] Up to 1 of your opponent&#x27;s Characters other than [Monkey.D.Luffy] cannot attack until the end of your opponent&#x27;s next turn. Then, place up to 1 Character with a cost of 1 or less at the bottom of the owner&#x27;s deck."
+          data-card-color="Blue"
+          data-card-type="Character"
+          data-card-cost="6"
+          data-card-power="8000"
+          data-sub-types="Kuja Pirates The Seven Warlords of the Sea"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#10</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-051_EN.webp"
@@ -3032,6 +4006,18 @@
           data-avg="4.0"
           data-decks="5"
           data-total="5"
+          data-market-price="0.16"
+          data-rarity="C"
+          data-card-text="[Main] If your Leader is [Lucy], choose one:
+• Draw 2 cards and trash 1 card from your hand. Then, play up to 1 {Dressrosa} type Character card with a cost of 4 or less from your hand.
+• Return up to 1 Stage to the owner&#x27;s hand."
+          data-card-color="Blue"
+          data-card-type="Event"
+          data-card-cost="4"
+          data-card-power=""
+          data-sub-types="Revolutionary Army Dressrosa"
+          data-counter-amount="0"
+          data-attribute=""
         >
           <div class="card-rank">#1</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-054_EN.webp"
@@ -3056,6 +4042,17 @@
           data-avg="4.0"
           data-decks="5"
           data-total="5"
+          data-market-price="0.33"
+          data-rarity="C"
+          data-card-text="[Main] Place up to 1 of your opponent&#x27;s Characters with 6000 power or less at the bottom of the owner&#x27;s deck.
+[Trigger] Activate this card&#x27;s [Main] effect."
+          data-card-color="Blue"
+          data-card-type="Event"
+          data-card-cost="5"
+          data-card-power=""
+          data-sub-types="Dressrosa Barto Club"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#2</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-060_EN.webp"
@@ -3080,6 +4077,16 @@
           data-avg="4.0"
           data-decks="5"
           data-total="5"
+          data-market-price="1.1"
+          data-rarity="R"
+          data-card-text="[Main] Your Leader gains +3000 power during this turn and give up to 1 of your opponent&#x27;s Characters -8000 power until the end of your opponent&#x27;s next End Phase. Then, you may trash 2 cards from your hand. If you do, K.O. up to 1 of your opponent&#x27;s Characters with 0 power or less."
+          data-card-color="Red"
+          data-card-type="Event"
+          data-card-cost="7"
+          data-card-power=""
+          data-sub-types="Revolutionary Army Dressrosa"
+          data-counter-amount="0"
+          data-attribute=""
         >
           <div class="card-rank">#3</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-020_EN.webp"
@@ -3104,6 +4111,16 @@
           data-avg="3.6"
           data-decks="5"
           data-total="5"
+          data-market-price="0.25"
+          data-rarity="UC"
+          data-card-text="If you have 4 or more Events in your trash, give this card in your hand -3 cost.[Main]/[Counter] Give up to 1 of your opponent&#x27;s Characters -3000 power during this turn."
+          data-card-color="Red"
+          data-card-type="Event"
+          data-card-cost="4"
+          data-card-power=""
+          data-sub-types="Revolutionary Army Dressrosa"
+          data-counter-amount="0"
+          data-attribute=""
         >
           <div class="card-rank">#4</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-021_EN.webp"
@@ -3128,6 +4145,16 @@
           data-avg="2.6"
           data-decks="5"
           data-total="5"
+          data-market-price="0.91"
+          data-rarity="R"
+          data-card-text="[Main] Give up to 1 of your opponent&#x27;s Characters -4000 power during this turn. Then, if you have 2 or less Life cards, K.O. up to 1 of your opponent&#x27;s Characters with 0 power or less. [Trigger] Activate this card&#x27;s [Main] effect."
+          data-card-color="Red"
+          data-card-type="Event"
+          data-card-cost="2"
+          data-card-power=""
+          data-sub-types="Revolutionary Army"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#5</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-019_EN.webp"
@@ -3152,6 +4179,17 @@
           data-avg="2.4"
           data-decks="5"
           data-total="5"
+          data-market-price="2.07"
+          data-rarity="R"
+          data-card-text="[Main] Look at 5 cards from the top of your deck; reveal up to 1 &quot;Dressrosa&quot; type Character card and add it to your hand. Then, place the rest at the bottom of your deck in any order.
+[Trigger] Activate this card&#x27;s [Main] effect."
+          data-card-color="Blue"
+          data-card-type="Event"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Straw Hat Crew Dressrosa"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#6</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-059_EN.webp"
@@ -3176,6 +4214,18 @@
           data-avg="2.4"
           data-decks="5"
           data-total="5"
+          data-market-price="0.18"
+          data-rarity="C"
+          data-card-text="[Main] Draw 2 cards. Then, your [Lucy] Leader gains [Double Attack] and +3000 power during this turn.
+(This card deals 2 damage.)
+[Trigger] Draw 2 cards."
+          data-card-color="Blue"
+          data-card-type="Event"
+          data-card-cost="7"
+          data-card-power=""
+          data-sub-types="Revolutionary Army Dressrosa"
+          data-counter-amount="0"
+          data-attribute=""
         >
           <div class="card-rank">#7</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-056_EN.webp"
@@ -3200,6 +4250,18 @@
           data-avg="2.5"
           data-decks="2"
           data-total="5"
+          data-market-price="0.27"
+          data-rarity="R"
+          data-card-text="[Main] If your Leader is multicolored, choose one:
+• Return up to 1 of your opponent&#x27;s Characters with a cost of 4 or less to the owner&#x27;s hand.
+• If you have 6 or less cards in your hand, draw 2 cards."
+          data-card-color="Blue"
+          data-card-type="Event"
+          data-card-cost="3"
+          data-card-power=""
+          data-sub-types="Straw Hat Crew"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#8</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-060_EN.webp"
@@ -3243,6 +4305,17 @@
           data-avg="2.5"
           data-decks="4"
           data-total="5"
+          data-market-price="0.17"
+          data-rarity="C"
+          data-card-text="[On Play] If your Leader has the {Dressrosa} type, draw 1 card.
+[On Your Opponent&#x27;s Attack] You may rest this Stage and trash 1 Event or Stage card from your hand: Up to 1 of your Leader or Character cards gains +2000 power during this battle."
+          data-card-color="Blue"
+          data-card-type="Stage"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Dressrosa"
+          data-counter-amount="0"
+          data-attribute=""
         >
           <div class="card-rank">#1</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-057_EN.webp"
@@ -3276,7 +4349,17 @@
            data-usage="100"
            data-avg="1.0"
            data-decks="8"
-           data-total="8">
+           data-total="8"
+           data-market-price="0.21"
+           data-rarity="L"
+           data-card-text="[Opponent&#x27;s Turn] When you play a Character, draw 1 card. [DON!!x1] [Once Per Turn] When one of your {Amazon Lily} or {Kuja Pirates} type Characters with 5000 base power or more is K.O.&#x27;d add up to 1 card from the top of your opponent&#x27;s Life cards to the owner&#x27;s hand."
+           data-card-color="Blue Yellow"
+           data-card-type="Leader"
+           data-card-cost=""
+           data-card-power="5000"
+           data-sub-types="Kuja Pirates The Seven Warlords of the Sea"
+           data-counter-amount=""
+           data-attribute="Special">
       <div class="leader-meta">
         <h2>Boa Hancock</h2>
         <span class="badge">OP14-041</span>
@@ -3408,6 +4491,17 @@
           data-avg="4.0"
           data-decks="8"
           data-total="8"
+          data-market-price="0.23"
+          data-rarity="UC"
+          data-card-text="[Activate: Main] [Once Per Turn] Give up to 1 rested DON!! card to 1 of your {Kuja Pirates} type Leader or Character cards.
+[Trigger] If your Leader has the {Kuja Pirates} type, play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="Kuja Pirates"
+          data-counter-amount="1000"
+          data-attribute="Ranged"
         >
           <div class="card-rank">#1</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-114_EN.webp"
@@ -3432,6 +4526,17 @@
           data-avg="4.0"
           data-decks="8"
           data-total="8"
+          data-market-price="0.27"
+          data-rarity="UC"
+          data-card-text="[Activate: Main] [Once Per Turn] You may reveal 3 {Amazon Lily} or {Kuja Pirates} type cards from your hand: Give your Leader and all of your Characters up to 1 rested DON!! card each.
+[Trigger] If your Leader has the {Kuja Pirates} type, play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="6"
+          data-card-power="5000"
+          data-sub-types="Kuja Pirates The Seven Warlords of the Sea"
+          data-counter-amount="2000"
+          data-attribute="Slash Special"
         >
           <div class="card-rank">#2</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-105_EN.webp"
@@ -3456,6 +4561,17 @@
           data-avg="4.0"
           data-decks="8"
           data-total="8"
+          data-market-price="6.75"
+          data-rarity="SR"
+          data-card-text="[On Play] If your Leader has the {The Seven Warlords of the Sea} type, add up to 1 card from the top of your deck to the top of your Life cards. Then, add up to 1 card from the top of your opponent&#x27;s Life cards to the owner&#x27;s hand.
+[Trigger] Play up to 1 Character card with 6000 power or less and a [Trigger] from your hand."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="9"
+          data-card-power="10000"
+          data-sub-types="Kuja Pirates The Seven Warlords of the Sea"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#3</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-112_EN.webp"
@@ -3480,6 +4596,16 @@
           data-avg="3.88"
           data-decks="8"
           data-total="8"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#4</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST17/ST17-004_EN.webp"
@@ -3504,6 +4630,17 @@
           data-avg="3.88"
           data-decks="8"
           data-total="8"
+          data-market-price="19.69"
+          data-rarity="SEC"
+          data-card-text="[On Play] You may trash 1 card from your hand: Add up to 1 card from the top of your deck to the top of your Life cards. Then, this Character gains +2 cost until the end of your opponent&#x27;s next End Phase.
+[Opponent&#x27;s Turn] [On K.O.] Add up to 1 card from the top of your deck to the top of your Life cards."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="6"
+          data-card-power="7000"
+          data-sub-types="Revolutionary Army The Seven Warlords of the Sea"
+          data-counter-amount="1000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#5</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-119_EN.webp"
@@ -3528,6 +4665,17 @@
           data-avg="3.88"
           data-decks="8"
           data-total="8"
+          data-market-price="0.15"
+          data-rarity="UC"
+          data-card-text="[On Play] If your opponent has 3 or less Life cards, draw 2 cards and trash 2 cards from your hand.
+[Trigger] If your Leader has the {Kuja Pirates} type, play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="6"
+          data-card-power="5000"
+          data-sub-types="Amazon Lily"
+          data-counter-amount="2000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#6</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-107_EN.webp"
@@ -3552,6 +4700,17 @@
           data-avg="3.75"
           data-decks="8"
           data-total="8"
+          data-market-price="0.15"
+          data-rarity="UC"
+          data-card-text="[On Play] Look at 5 cards from the top of your deck; reveal up to 1 {Amazon Lily} or {Kuja Pirates} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order and trash 1 card from your hand.
+[Trigger] If your Leader has the {Kuja Pirates} type, play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="5000"
+          data-sub-types="Amazon Lily"
+          data-counter-amount="0"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#7</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-113_EN.webp"
@@ -3576,6 +4735,16 @@
           data-avg="2.38"
           data-decks="8"
           data-total="8"
+          data-market-price="0.53"
+          data-rarity="R"
+          data-card-text="[On Play] Your opponent returns all cards in their hand to their deck and shuffles their deck. Then, your opponent draws 5 cards."
+          data-card-color="Blue"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="4000"
+          data-sub-types="Big Mom Pirates"
+          data-counter-amount="1000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#8</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-047_EN.webp"
@@ -3600,6 +4769,17 @@
           data-avg="1.86"
           data-decks="7"
           data-total="8"
+          data-market-price="0.21"
+          data-rarity="R"
+          data-card-text="[On Play] If your Leader is multicolored and your opponent has 3 or less Life cards, K.O. up to 1 of your opponent&#x27;s Characters with 7000 base power or less.
+[Trigger] Activate this card&#x27;s [On Play] effect."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="6"
+          data-card-power="6000"
+          data-sub-types="Former Roger Pirates"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#9</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-108_EN.webp"
@@ -3624,6 +4804,16 @@
           data-avg="2.33"
           data-decks="6"
           data-total="8"
+          data-market-price="0.12"
+          data-rarity="C"
+          data-card-text="[On Play] You may add 1 card from the top or bottom of your Life cards to your hand: Add up to 1 card from your hand to the top of your Life cards. [Trigger] Play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="0"
+          data-sub-types="Amazon Lily"
+          data-counter-amount="1000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#10</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-103_EN.webp"
@@ -3648,6 +4838,16 @@
           data-avg="4.0"
           data-decks="5"
           data-total="8"
+          data-market-price="2.35"
+          data-rarity="SR"
+          data-card-text="[On Play] You may add 1 card from the top or bottom of your Life cards to your hand: Add up to 1 card from your hand to the top of your Life cards."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="0"
+          data-sub-types="Land of Wano Kouzuki Clan"
+          data-counter-amount="2000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#11</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-106_EN.webp"
@@ -3672,6 +4872,16 @@
           data-avg="3.4"
           data-decks="5"
           data-total="8"
+          data-market-price="2.1"
+          data-rarity="R"
+          data-card-text="[On Play] Look at 5 cards from the top of your deck; reveal up to 1 [The Seven Warlords of the Sea] type card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
+          data-card-color="Blue"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="2000"
+          data-sub-types="Navy"
+          data-counter-amount="1000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#12</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-046_EN.webp"
@@ -3696,6 +4906,17 @@
           data-avg="4.0"
           data-decks="3"
           data-total="8"
+          data-market-price="32.5"
+          data-rarity="SR"
+          data-card-text="[On Play] Give up to 1 rested DON!! card to your Leader. Then, if your opponent has 3 or more Life cards, add up to 1 card from the top of your opponent&#x27;s Life cards to the owner&#x27;s hand.
+[On K.O.] You may turn 1 card from the top of your Life cards face-up: Play up to 1 Character card with 6000 power or less from your hand."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="6000"
+          data-sub-types="Straw Hat Crew"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#13</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB03/EB03-053_EN.webp"
@@ -3720,6 +4941,17 @@
           data-avg="4.0"
           data-decks="1"
           data-total="8"
+          data-market-price="0.11"
+          data-rarity="C"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)
+[Trigger] Play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="1000"
+          data-sub-types="Animal Amazon Lily"
+          data-counter-amount="1000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#14</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-106_EN.webp"
@@ -3744,6 +4976,17 @@
           data-avg="4.0"
           data-decks="1"
           data-total="8"
+          data-market-price="0.13"
+          data-rarity="C"
+          data-card-text="[Opponent&#x27;s Turn] [On K.O.] Add up to 1 card from the top of your deck to the top of your Life cards. Then, you take 1 damage.
+[Trigger] If your Leader has the {Kuja Pirates} type, play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="5000"
+          data-sub-types="Kuja Pirates"
+          data-counter-amount="1000"
+          data-attribute="Ranged"
         >
           <div class="card-rank">#15</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-115_EN.webp"
@@ -3768,6 +5011,16 @@
           data-avg="4.0"
           data-decks="1"
           data-total="8"
+          data-market-price="0.12"
+          data-rarity="C"
+          data-card-text="[Trigger] Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 4 or less from your trash rested."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="2000"
+          data-sub-types="Thriller Bark Pirates"
+          data-counter-amount="2000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#16</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-102_EN.webp"
@@ -3792,6 +5045,17 @@
           data-avg="4.0"
           data-decks="1"
           data-total="8"
+          data-market-price="2.74"
+          data-rarity="R"
+          data-card-text="[On K.O.] Play up to 1 Character card with a cost of 4 or less and a [Trigger] other than [Dr. Hogback] from your trash.
+[Trigger] Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 4 or less from your trash rested."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="Thriller Bark Pirates"
+          data-counter-amount="1000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#17</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-110_EN.webp"
@@ -3816,6 +5080,17 @@
           data-avg="4.0"
           data-decks="1"
           data-total="8"
+          data-market-price="0.48"
+          data-rarity="R"
+          data-card-text="[On Play]/[On K.O.] Up to 1 of your opponent&#x27;s Characters with a cost of 6 or less cannot attack until the end of your opponent&#x27;s next End Phase.
+[Trigger] Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 4 or less from your trash rested."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="Thriller Bark Pirates"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#18</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-111_EN.webp"
@@ -3840,6 +5115,16 @@
           data-avg="3.0"
           data-decks="1"
           data-total="8"
+          data-market-price="0.69"
+          data-rarity="R"
+          data-card-text="[Trigger] Up to 1 of your opponent&#x27;s Leader or Character cards cannot attack during this turn."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="3000"
+          data-sub-types="Firetank Pirates"
+          data-counter-amount="2000"
+          data-attribute="Ranged"
         >
           <div class="card-rank">#19</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-100_EN.webp"
@@ -3864,6 +5149,17 @@
           data-avg="3.0"
           data-decks="1"
           data-total="8"
+          data-market-price="7.93"
+          data-rarity="SR"
+          data-card-text="[On Play] Select up to 1 {Thriller Bark Pirates} type Character with a cost of 4 or less from your trash and play it or add it to the top of your Life cards face-up.
+[Trigger] Play up to 1 Character card with a cost of 4 or less from your trash."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="8"
+          data-card-power="10000"
+          data-sub-types="The Seven Warlords of the Sea Thriller Bark Pirates"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#20</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-104_EN.webp"
@@ -3888,6 +5184,17 @@
           data-avg="2.0"
           data-decks="1"
           data-total="8"
+          data-market-price="0.1"
+          data-rarity="C"
+          data-card-text="[Blocker]
+[Trigger] Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 4 or less from your trash rested."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="1000"
+          data-sub-types="Thriller Bark Pirates"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#21</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-109_EN.webp"
@@ -3973,6 +5280,16 @@
           data-avg="2.0"
           data-decks="8"
           data-total="8"
+          data-market-price="1.7"
+          data-rarity="R"
+          data-card-text="[Main] Select up to 1 of your [The Seven Warlords of the Sea] type Leader or Character cards and that card gains +2000 power during this turn. Then, if the selected card attacks during this turn, your opponent cannot activate [Blocker]. [Trigger] Draw 1 card."
+          data-card-color="Blue"
+          data-card-type="Event"
+          data-card-cost="2"
+          data-card-power=""
+          data-sub-types="Kuja Pirates The Seven Warlords of the Sea"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#1</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-057_EN.webp"
@@ -3997,6 +5314,16 @@
           data-avg="2.6"
           data-decks="5"
           data-total="8"
+          data-market-price="0.17"
+          data-rarity="UC"
+          data-card-text="[Counter] You may return 1 of your Characters with a cost of 2 or more to the owner&#x27;s hand: Up to 1 of your Leader or Character cards gains +4000 power during this battle. [Trigger] Draw 2 cards and place 2 cards from your hand at the bottom of your deck in any order."
+          data-card-color="Blue"
+          data-card-type="Event"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Kuja Pirates The Seven Warlords of the Sea"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#2</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-056_EN.webp"
@@ -4021,6 +5348,17 @@
           data-avg="1.6"
           data-decks="5"
           data-total="8"
+          data-market-price="1.32"
+          data-rarity="R"
+          data-card-text="[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +3000 power during this battle.
+[Trigger] If you have 0 Life cards, you may add up to 1 card from the top of your deck to the top of your Life cards. Then, trash 1 card from your hand."
+          data-card-color="Yellow"
+          data-card-type="Event"
+          data-card-cost="0"
+          data-card-power=""
+          data-sub-types="Sky Island"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#3</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-115_EN.webp"
@@ -4045,6 +5383,17 @@
           data-avg="2.5"
           data-decks="4"
           data-total="8"
+          data-market-price="0.46"
+          data-rarity="R"
+          data-card-text="[Counter] If you have 2 or less Life cards, up to 1 of your opponent&#x27;s active Characters cannot attack during this turn.
+[Trigger] Play up to 1 Character card with 6000 power or less and a [Trigger] from your hand."
+          data-card-color="Yellow"
+          data-card-type="Event"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Kuja Pirates The Seven Warlords of the Sea"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#4</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-118_EN.webp"
@@ -4069,6 +5418,16 @@
           data-avg="2.0"
           data-decks="3"
           data-total="8"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#5</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST03/ST03-015_EN.webp"
@@ -4093,6 +5452,16 @@
           data-avg="1.5"
           data-decks="2"
           data-total="8"
+          data-market-price="0.84"
+          data-rarity="R"
+          data-card-text="[Main] Place up to 1 Character at the bottom of the owner&#x27;s deck. [Trigger] Place up to 1 Character with a cost of 4 or less at the bottom of the owner&#x27;s deck."
+          data-card-color="Blue"
+          data-card-type="Event"
+          data-card-cost="6"
+          data-card-power=""
+          data-sub-types="Straw Hat Crew"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#6</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-056_EN.webp"
@@ -4117,6 +5486,17 @@
           data-avg="2.0"
           data-decks="1"
           data-total="8"
+          data-market-price="2.38"
+          data-rarity="R"
+          data-card-text="[Main] Place up to 2 Characters with a cost of 6 or less at the bottom of the owner&#x27;s deck in any order.
+[Trigger] Place up to 1 Character with a cost of 5 or less at the bottom of the owner&#x27;s deck."
+          data-card-color="Blue"
+          data-card-type="Event"
+          data-card-cost="7"
+          data-card-power=""
+          data-sub-types="Navy"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#7</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-058_EN.webp"
@@ -4150,7 +5530,18 @@
            data-usage="100"
            data-avg="1.0"
            data-decks="12"
-           data-total="12">
+           data-total="12"
+           data-market-price="0.2"
+           data-rarity="L"
+           data-card-text="Under the rules of this game, your DON!! deck consists of 6 cards.
+[Activate: Main] [Once Per Turn] If it is your second turn or later, add up to 1 DON!! card from your DON!! deck and set it as active, and add up to 4 additional DON!! cards and rest them. Then, give up to 4 rested DON!! cards to 1 of your Characters."
+           data-card-color="Purple"
+           data-card-type="Leader"
+           data-card-cost=""
+           data-card-power="5000"
+           data-sub-types="Sky Island"
+           data-counter-amount="0"
+           data-attribute="Special">
       <div class="leader-meta">
         <h2>Enel</h2>
         <span class="badge">OP15-058</span>
@@ -4254,6 +5645,17 @@
           data-avg="4.0"
           data-decks="12"
           data-total="12"
+          data-market-price="0.26"
+          data-rarity="R"
+          data-card-text="[On Play] DON!! 1: Draw 1 card.
+[When Attacking] If you have 6 or less DON!! cards on your field, give up to 1 of your opponent&#x27;s Characters 1000 power during this turn."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="2000"
+          data-sub-types="Sky Island Vassals"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#1</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-061_EN.webp"
@@ -4278,6 +5680,17 @@
           data-avg="4.0"
           data-decks="12"
           data-total="12"
+          data-market-price="48.74"
+          data-rarity="SEC"
+          data-card-text="If you have 6 or less DON!! cards on your field, this Character cannot be removed from the field by your opponent&#x27;s effects and gains +2000 power.
+[On Play] DON!! 1: Look at 5 cards from the top of your deck and add up to 1 card to your hand. Then, place the rest at the bottom of your deck in any order, and trash 1 card from your hand."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="6"
+          data-card-power="8000"
+          data-sub-types="Sky Island"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#2</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-118_EN.webp"
@@ -4302,6 +5715,16 @@
           data-avg="3.5"
           data-decks="12"
           data-total="12"
+          data-market-price="2.09"
+          data-rarity="R"
+          data-card-text="[On Play] Look at 4 cards from the top of your deck; reveal up to 1 [Sanji] or Event card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="2000"
+          data-sub-types="Big Mom Pirates"
+          data-counter-amount="1000"
+          data-attribute="Wisdom"
         >
           <div class="card-rank">#3</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-071_EN.webp"
@@ -4326,6 +5749,17 @@
           data-avg="3.91"
           data-decks="11"
           data-total="12"
+          data-market-price="0.65"
+          data-rarity="R"
+          data-card-text="[On Play] DON!! 1: Draw 1 card.
+[When Attacking] If you have 6 or less DON!! cards on your field, look at 2 cards from the top of your deck and place them at the top or bottom of your deck in any order."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="2000"
+          data-sub-types="Sky Island Vassals"
+          data-counter-amount="1000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#4</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-066_EN.webp"
@@ -4350,6 +5784,18 @@
           data-avg="3.91"
           data-decks="11"
           data-total="12"
+          data-market-price="0.17"
+          data-rarity="C"
+          data-card-text="All of your [Ohm] cards and this Character gain [Double Attack].
+(This card deals 2 damage.)
+[Opponent&#x27;s Turn] All of your [Ohm] cards&#x27; base power and this Character&#x27;s base power become 6000."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="4000"
+          data-sub-types="Animal Sky Island"
+          data-counter-amount="1000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#5</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-071_EN.webp"
@@ -4374,6 +5820,16 @@
           data-avg="2.36"
           data-decks="11"
           data-total="12"
+          data-market-price="3.46"
+          data-rarity="SR"
+          data-card-text="If the number of DON!! cards on your field is at least 2 less than the number on your opponent&#x27;s field, give this card in your hand -3 cost. [Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)"
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="6"
+          data-card-power="6000"
+          data-sub-types="Straw Hat Crew"
+          data-counter-amount="2000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#6</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-064_EN.webp"
@@ -4398,6 +5854,17 @@
           data-avg="3.25"
           data-decks="8"
           data-total="12"
+          data-market-price="4.96"
+          data-rarity="SR"
+          data-card-text="If you have 4 or more Events in your trash, this Character gains +2000 power and +5 cost.
+[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)"
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="The Vinsmoke Family GERMA 66"
+          data-counter-amount="1000"
+          data-attribute="Special"
         >
           <div class="card-rank">#7</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-063_EN.webp"
@@ -4422,6 +5889,16 @@
           data-avg="2.88"
           data-decks="8"
           data-total="12"
+          data-market-price="0.27"
+          data-rarity="R"
+          data-card-text="[On Play] DON!! 1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Add up to 1 purple Event with a cost of 5 or less from your trash to your hand. Then, set up to 1 of your DON!! cards as active."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="6000"
+          data-sub-types="Donquixote Pirates"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#8</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-067_EN.webp"
@@ -4446,6 +5923,18 @@
           data-avg="2.71"
           data-decks="7"
           data-total="12"
+          data-market-price="0.53"
+          data-rarity="R"
+          data-card-text="If you have 6 or less DON!! cards on your field, this Character gains [Rush].
+(This card can attack on the turn in which it is played.)
+[On Play] DON!! 1: Draw 1 card."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="2000"
+          data-sub-types="Sky Island Vassals"
+          data-counter-amount="1000"
+          data-attribute="Slash"
         >
           <div class="card-rank">#9</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-067_EN.webp"
@@ -4470,6 +5959,17 @@
           data-avg="2.14"
           data-decks="7"
           data-total="12"
+          data-market-price="1.85"
+          data-rarity="SR"
+          data-card-text="If you have 6 or less DON!! cards on your field, this Character cannot be removed from the field by your opponent&#x27;s effects and gains +2000 power.
+[Activate: Main] DON!! 1: This Character gains [Blocker] until the end of your opponent&#x27;s next End Phase. Then, trash 1 card from your hand."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="6"
+          data-card-power="8000"
+          data-sub-types="Sky Island"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#10</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-060_EN.webp"
@@ -4494,6 +5994,17 @@
           data-avg="2.75"
           data-decks="4"
           data-total="12"
+          data-market-price="0.35"
+          data-rarity="SR"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)
+[On Play] DON!! 2, You may trash 1 card from your hand: Draw 2 cards."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="Straw Hat Crew"
+          data-counter-amount="1000"
+          data-attribute="Strike"
         >
           <div class="card-rank">#11</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP09/OP09-072_EN.webp"
@@ -4579,6 +6090,17 @@
           data-avg="4.0"
           data-decks="12"
           data-total="12"
+          data-market-price="0.22"
+          data-rarity="UC"
+          data-card-text="[Main] DON!! 1: If your Leader is [Enel], draw 1 card. Then, give up to 1 of your opponent&#x27;s Characters 1000 power during this turn.
+[Counter] Up to 1 of your [Enel] cards gains +2000 power during this battle."
+          data-card-color="Purple"
+          data-card-type="Event"
+          data-card-cost="0"
+          data-card-power=""
+          data-sub-types="Sky Island"
+          data-counter-amount="0"
+          data-attribute=""
         >
           <div class="card-rank">#1</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-076_EN.webp"
@@ -4603,6 +6125,17 @@
           data-avg="4.0"
           data-decks="12"
           data-total="12"
+          data-market-price="5.35"
+          data-rarity="SR"
+          data-card-text="[Main] DON!! 2: Draw 1 card. Then, rest up to 1 of your opponent&#x27;s Characters with 5000 power or less.
+[Counter] Up to 1 of your Leader or Character cards gains +1000 power during this battle. Then, if you have 6 or less DON!! cards on your field, draw 1 card."
+          data-card-color="Purple"
+          data-card-type="Event"
+          data-card-cost="0"
+          data-card-power=""
+          data-sub-types="Sky Island"
+          data-counter-amount="0"
+          data-attribute=""
         >
           <div class="card-rank">#2</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-078_EN.webp"
@@ -4627,6 +6160,17 @@
           data-avg="3.92"
           data-decks="12"
           data-total="12"
+          data-market-price="0.18"
+          data-rarity="UC"
+          data-card-text="[Main] DON!! 1: If your Leader is [Enel], up to 1 of your Leader or Character cards gains +1000 power during this turn. Then, K.O. up to 1 of your opponent&#x27;s Characters with 3000 power or less.
+[Counter] Up to 1 of your [Enel] cards gains +2000 power during this battle."
+          data-card-color="Purple"
+          data-card-type="Event"
+          data-card-cost="0"
+          data-card-power=""
+          data-sub-types="Sky Island"
+          data-counter-amount="0"
+          data-attribute=""
         >
           <div class="card-rank">#3</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-075_EN.webp"
@@ -4651,6 +6195,16 @@
           data-avg="3.92"
           data-decks="12"
           data-total="12"
+          data-market-price="0.38"
+          data-rarity="R"
+          data-card-text="[Main] DON!! 1: Draw 1 card. Then, up to 1 of your opponent&#x27;s rested Characters with 6000 power or less will not become active in your opponent&#x27;s next Refresh Phase."
+          data-card-color="Purple"
+          data-card-type="Event"
+          data-card-cost="0"
+          data-card-power=""
+          data-sub-types="Sky Island"
+          data-counter-amount="0"
+          data-attribute=""
         >
           <div class="card-rank">#4</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-077_EN.webp"
@@ -4675,6 +6229,16 @@
           data-avg="2.5"
           data-decks="12"
           data-total="12"
+          data-market-price="0.23"
+          data-rarity="C"
+          data-card-text="[Main] DON!! -1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Give up to 1 of your opponent&#x27;s Characters -5000 power during this turn. [Trigger] Add up to 1 DON!! card from your DON!! deck and set it as active."
+          data-card-color="Purple"
+          data-card-type="Event"
+          data-card-cost="2"
+          data-card-power=""
+          data-sub-types="Heart Pirates"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#5</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-077_EN.webp"
@@ -4699,6 +6263,17 @@
           data-avg="2.08"
           data-decks="12"
           data-total="12"
+          data-market-price="1.86"
+          data-rarity="R"
+          data-card-text="[Main] You may rest 5 of your DON!! cards: If you have any DON!! cards given, give up to 1 of your opponent&#x27;s Characters 8000 power during this turn.
+[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +3000 power during this battle."
+          data-card-color="Purple"
+          data-card-type="Event"
+          data-card-cost="0"
+          data-card-power=""
+          data-sub-types="Roger Pirates King of the Pirates"
+          data-counter-amount=""
+          data-attribute=""
         >
           <div class="card-rank">#6</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP13/OP13-076_EN.webp"
@@ -4723,6 +6298,16 @@
           data-avg="1.57"
           data-decks="7"
           data-total="12"
+          data-market-price="0.17"
+          data-rarity="UC"
+          data-card-text="[Main] DON!! 1: If your Leader is [Enel], draw 1 card. Then, up to 1 of your Characters gains +2 cost until the end of your opponent&#x27;s next End Phase. [Counter] Up to 1 of your [Enel] cards gains +2000 power during this battle."
+          data-card-color="Purple"
+          data-card-type="Event"
+          data-card-cost="0"
+          data-card-power=""
+          data-sub-types="Sky Island"
+          data-counter-amount="0"
+          data-attribute=""
         >
           <div class="card-rank">#7</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-074_EN.webp"
@@ -4755,45 +6340,71 @@
         <div class="overlay-name" id="overlay-name"></div>
         <div class="overlay-badges" id="overlay-badges"></div>
         <div class="overlay-stats" id="overlay-stats"></div>
+        <div class="overlay-card-text" id="overlay-card-text"></div>
       </div>
     </div>
   </div>
 
   <script>
     // ── Card / leader click → overlay ────────────────────────────────────
-    const backdrop = document.getElementById('overlay');
-    const oImg     = document.getElementById('overlay-img');
-    const oName    = document.getElementById('overlay-name');
-    const oBadges  = document.getElementById('overlay-badges');
-    const oStats   = document.getElementById('overlay-stats');
+    const backdrop  = document.getElementById('overlay');
+    const oImg      = document.getElementById('overlay-img');
+    const oName     = document.getElementById('overlay-name');
+    const oBadges   = document.getElementById('overlay-badges');
+    const oStats    = document.getElementById('overlay-stats');
+    const oCardText = document.getElementById('overlay-card-text');
+
+    const RARITY_LABELS = {
+      L:'Leader', C:'Common', UC:'Uncommon', R:'Rare',
+      SR:'Super Rare', SEC:'Secret Rare', SP:'Special',
+    };
+
+    function stat(label, value, style='') {
+      if (value === null || value === undefined || value === '') return '';
+      return `<div class="overlay-stat">
+        <div class="overlay-stat-label">${label}</div>
+        <div class="overlay-stat-value"${style ? ` style="${style}"` : ''}>${value}</div>
+      </div>`;
+    }
 
     function openOverlay(el) {
       const d = el.dataset;
-      oImg.src     = d.image;
-      oImg.alt     = d.name;
+      oImg.src = d.image;
+      oImg.alt = d.name;
       oName.textContent = d.name;
 
+      // ── Badges: card ID + rarity ──────────────────────────────────────
+      const rarityLabel = d.rarity ? (RARITY_LABELS[d.rarity] || d.rarity) : '';
       oBadges.innerHTML =
-        `<span class="badge">${d.id}</span>`;
+        `<span class="badge">${d.id}</span>` +
+        (d.rarity ? `<span class="badge rarity-badge">${d.rarity} — ${rarityLabel}</span>` : '');
 
-      const usagePct  = parseFloat(d.usage);
+      // ── Usage colour ─────────────────────────────────────────────────
+      const usagePct = parseFloat(d.usage);
       const col = usagePct >= 80 ? '#34d399'
                 : usagePct >= 50 ? '#a3e635'
                 : usagePct >= 25 ? '#fbbf24' : '#f87171';
 
-      oStats.innerHTML = `
-        <div class="overlay-stat">
-          <div class="overlay-stat-label">Usage</div>
-          <div class="overlay-stat-value" style="color:${col}">${d.usage}%</div>
-        </div>
-        <div class="overlay-stat">
-          <div class="overlay-stat-label">Decks with card</div>
-          <div class="overlay-stat-value">${d.decks} / ${d.total}</div>
-        </div>
-        <div class="overlay-stat">
-          <div class="overlay-stat-label">Avg copies</div>
-          <div class="overlay-stat-value">${parseFloat(d.avg).toFixed(1)}</div>
-        </div>`;
+      // ── Market price formatting ───────────────────────────────────────
+      const priceStr = d.marketPrice && d.marketPrice !== ''
+        ? `$${parseFloat(d.marketPrice).toFixed(2)}` : '';
+
+      // ── Stats grid ───────────────────────────────────────────────────
+      oStats.innerHTML =
+        stat('Usage',           `${d.usage}%`,                col ? `color:${col}` : '') +
+        stat('Decks with card', `${d.decks} / ${d.total}`) +
+        stat('Avg copies',      parseFloat(d.avg).toFixed(1)) +
+        stat('Market price',    priceStr,                       'color:#a78bfa') +
+        stat('Color',           d.cardColor) +
+        stat('Type',            d.cardType) +
+        stat('Power',           d.cardPower) +
+        (d.cardCost && d.cardCost !== '' ? stat('Cost', d.cardCost) : '') +
+        stat('Counter',         d.counterAmount) +
+        stat('Attribute',       d.attribute) +
+        stat('Sub-types',       d.subTypes);
+
+      // ── Card text ────────────────────────────────────────────────────
+      oCardText.textContent = d.cardText || '';
 
       backdrop.classList.add('open');
     }
