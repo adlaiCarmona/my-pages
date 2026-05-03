@@ -3,7 +3,10 @@ name: Update One Piece TCG
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 0' # Runs every Sunday at midnight UTC
+    - cron: "0 0 * * 0" # Runs every Sunday at midnight UTC
+  push:
+    paths:
+      - "one-piece-tcg/sets.json"
 
 jobs:
   update:
