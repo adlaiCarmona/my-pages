@@ -1,0 +1,4212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One Piece TCG — Top Deck Cards by Leader</title>
+  <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f0f13;
+      color: #e0e0e0;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #17171f;
+      border-right: 1px solid #2a2a3a;
+      overflow-y: auto;
+      padding: 1.5rem 0;
+      z-index: 100;
+    }
+    .sidebar h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #a78bfa;
+      padding: 0 1.2rem 1rem;
+      border-bottom: 1px solid #2a2a3a;
+      margin-bottom: .8rem;
+    }
+    .sidebar ul { list-style: none; }
+    .sidebar li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .1rem .8rem .1rem 1.2rem;
+      gap: .4rem;
+    }
+    .sidebar a {
+      color: #c4c4d4;
+      text-decoration: none;
+      font-size: .82rem;
+      flex: 1;
+      padding: .35rem 0;
+      line-height: 1.3;
+    }
+    .sidebar a:hover { color: #a78bfa; }
+    .nav-card-id { color: #6b6b8a; font-size: .72rem; }
+    .nav-total {
+      font-size: .72rem;
+      color: #6b6b8a;
+      white-space: nowrap;
+    }
+
+    /* ── Main ── */
+    .main {
+      margin-left: 240px;
+      padding: 2rem 2rem 6rem;
+    }
+
+    /* ── Leader section ── */
+    .leader-section {
+      margin-bottom: 5rem;
+      scroll-margin-top: 1rem;
+    }
+    .section-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: #0f0f13;
+      padding: .6rem 0;
+      border-bottom: 2px solid #2a2a3a;
+      margin-bottom: 1.8rem;
+    }
+    .leader-hero {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+    .leader-img {
+      width: 64px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      object-fit: cover;
+      aspect-ratio: 5/7;
+      cursor: pointer;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .leader-img:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 0 2px #a78bfa;
+    }
+    .leader-meta h2 {
+      font-size: 1.25rem;
+      color: #a78bfa;
+      line-height: 1.2;
+    }
+    .deck-count {
+      font-size: .78rem;
+      color: #6b6b8a;
+      display: block;
+      margin-top: .2rem;
+    }
+
+    /* ── Type sub-section ── */
+    .type-section { margin-bottom: 2.5rem; }
+    .type-heading {
+      font-size: 1rem;
+      color: #c4c4d4;
+      margin-bottom: .8rem;
+      padding-left: .2rem;
+      border-left: 3px solid #a78bfa;
+      padding-left: .6rem;
+    }
+
+    /* ── Chart ── */
+    .chart-details {
+      margin-bottom: 1rem;
+      border: 1px solid #2a2a3a;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .chart-toggle {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .55rem 1rem;
+      background: #1c1c28;
+      cursor: pointer;
+      font-size: .8rem;
+      color: #a78bfa;
+      user-select: none;
+      list-style: none;
+    }
+    .chart-toggle::-webkit-details-marker { display: none; }
+    .chart-toggle::before {
+      content: "▶";
+      font-size: .6rem;
+      transition: transform .2s;
+    }
+    .chart-details[open] .chart-toggle::before { transform: rotate(90deg); }
+    .chart-toggle:hover { background: #22222e; }
+    .chart {
+      padding: 1.2rem 1rem 1rem;
+      background: #17171f;
+      overflow-x: auto;
+    }
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: .6rem;
+      height: 160px;
+      min-width: max-content;
+    }
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 52px;
+      height: 100%;
+      cursor: default;
+    }
+    .bar-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 1;
+      width: 100%;
+      gap: 4px;
+    }
+    .bar {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      min-height: 4px;
+      transition: opacity .15s;
+    }
+    .bar-group:hover .bar { opacity: .75; }
+    .bar-val {
+      font-size: .65rem;
+      font-weight: 700;
+      color: #c4c4d4;
+    }
+    .bar-label {
+      font-size: .58rem;
+      color: #6b6b8a;
+      margin-top: .3rem;
+      text-align: center;
+      width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Cards grid ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+      gap: .85rem;
+    }
+    .card {
+      background: #1c1c28;
+      border: 1px solid #2a2a3a;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform .15s, border-color .15s;
+      position: relative;
+      cursor: pointer;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: #a78bfa;
+    }
+    .card-rank {
+      position: absolute;
+      top: 6px; left: 6px;
+      background: rgba(0,0,0,.65);
+      color: #a78bfa;
+      font-size: .68rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      z-index: 1;
+    }
+    .card-img {
+      width: 100%;
+      aspect-ratio: 5/7;
+      object-fit: cover;
+      object-position: top;
+      background: #111118;
+      display: block;
+    }
+    .card-body {
+      padding: .55rem .65rem .7rem;
+      display: flex;
+      flex-direction: column;
+      gap: .3rem;
+    }
+    .card-name {
+      font-size: .75rem;
+      font-weight: 600;
+      color: #e0e0e0;
+      line-height: 1.3;
+    }
+    .card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .25rem;
+      align-items: center;
+    }
+    .badge {
+      background: #2a2a3a;
+      color: #a0a0c0;
+      font-size: .62rem;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .avg-badge { background: #1e2a3a; color: #60a5fa; }
+    .usage-bar-wrap {
+      height: 4px;
+      background: #2a2a3a;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: .15rem;
+    }
+    .usage-bar {
+      height: 100%;
+      border-radius: 2px;
+      transition: width .3s;
+    }
+    .usage-label {
+      font-size: .68rem;
+      font-weight: 700;
+    }
+
+    /* ── Overlay ── */
+    .overlay-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.78);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .overlay-backdrop.open { display: flex; }
+    .overlay {
+      background: #17171f;
+      border: 1px solid #2a2a3a;
+      border-radius: 14px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      display: flex;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      position: relative;
+    }
+    .overlay-img-col {
+      flex: 0 0 300px;
+      display: flex;
+      align-items: flex-start;
+    }
+    .overlay-img {
+      width: 300px;
+      border-radius: 10px;
+      display: block;
+    }
+    .overlay-info-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: .9rem;
+      min-width: 0;
+    }
+    .overlay-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+    }
+    .overlay-badges { display: flex; flex-wrap: wrap; gap: .35rem; }
+    .overlay-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: .5rem;
+    }
+    .overlay-stat {
+      background: #1c1c28;
+      border: 1px solid #2a2a3a;
+      border-radius: 7px;
+      padding: .4rem .65rem;
+    }
+    .overlay-stat-label {
+      font-size: .58rem;
+      color: #6b6b8a;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .overlay-stat-value {
+      font-size: .95rem;
+      font-weight: 700;
+      color: #e0e0e0;
+    }
+    .overlay-close {
+      position: absolute;
+      top: .8rem; right: .9rem;
+      background: none;
+      border: none;
+      color: #6b6b8a;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+    .overlay-close:hover { color: #e0e0e0; background: #2a2a3a; }
+
+    @media (max-width: 640px) {
+      .sidebar { display: none; }
+      .main { margin-left: 0; padding: 1rem; }
+      .overlay { flex-direction: column; }
+      .overlay-img-col { flex: none; align-self: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="sidebar">
+    <h1>TCG Top Cards<br><small style="color:#6b6b8a;font-weight:400">by Leader</small></h1>
+    <ul>
+      <li><a href="#op06-022">Yamato <span class="nav-card-id">(OP06-022)</span></a><span class="nav-total">48 decks</span></li>
+      <li><a href="#op15-002">Lucy <span class="nav-card-id">(OP15-002)</span></a><span class="nav-total">5 decks</span></li>
+      <li><a href="#op14-041">Boa Hancock <span class="nav-card-id">(OP14-041)</span></a><span class="nav-total">8 decks</span></li>
+    </ul>
+  </nav>
+
+  <main class="main">
+
+  <section class="leader-section" id="op06-022">
+    <div class="section-header">
+      
+    <div class="leader-hero">
+      <img class="leader-img card-trigger" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-022_EN.webp"
+           alt="Yamato" loading="lazy"
+           role="button" tabindex="0"
+           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-022_EN.webp"
+           data-name="Yamato"
+           data-id="OP06-022"
+           data-usage="100"
+           data-avg="1.0"
+           data-decks="48"
+           data-total="48">
+      <div class="leader-meta">
+        <h2>Yamato</h2>
+        <span class="badge">OP06-022</span>
+        <span class="deck-count">48 tournament decks analysed</span>
+      </div>
+    </div>
+    </div>
+    
+    <div class="type-section">
+      <h3 class="type-heading">Character</h3>
+      <details class="chart-details" id="op06-022-character-chart">
+        <summary class="chart-toggle">Usage chart (top 15)</summary>
+        <div class="chart">
+          <div class="chart-bars">
+              <div class="bar-group" title="Izo (OP01-033) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Izo</div>
+              </div>
+              <div class="bar-group" title="Hody Jones (OP06-035) — 97.9%">
+                <div class="bar-wrap">
+                  <span class="bar-val">97.9%</span>
+                  <div class="bar" style="height:117px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Hody Jones</div>
+              </div>
+              <div class="bar-group" title="O-Nami (OP06-101) — 91.7%">
+                <div class="bar-wrap">
+                  <span class="bar-val">91.7%</span>
+                  <div class="bar" style="height:110px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">O-Nami</div>
+              </div>
+              <div class="bar-group" title="Kikunojo (OP06-104) — 64.6%">
+                <div class="bar-wrap">
+                  <span class="bar-val">64.6%</span>
+                  <div class="bar" style="height:78px;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">Kikunojo</div>
+              </div>
+              <div class="bar-group" title="Kouzuki Momonosuke (OP06-107) — 56.2%">
+                <div class="bar-wrap">
+                  <span class="bar-val">56.2%</span>
+                  <div class="bar" style="height:67px;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">Kouzuki Momono…</div>
+              </div>
+              <div class="bar-group" title="Satori (OP05-105) — 52.1%">
+                <div class="bar-wrap">
+                  <span class="bar-val">52.1%</span>
+                  <div class="bar" style="height:63px;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">Satori</div>
+              </div>
+              <div class="bar-group" title="Kouzuki Hiyori (OP06-106) — 45.8%">
+                <div class="bar-wrap">
+                  <span class="bar-val">45.8%</span>
+                  <div class="bar" style="height:55px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Kouzuki Hiyori</div>
+              </div>
+              <div class="bar-group" title="Dracule Mihawk (ST12-003) — 39.6%">
+                <div class="bar-wrap">
+                  <span class="bar-val">39.6%</span>
+                  <div class="bar" style="height:48px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Dracule Mihawk</div>
+              </div>
+              <div class="bar-group" title="Nekomamushi (OP06-110) — 39.6%">
+                <div class="bar-wrap">
+                  <span class="bar-val">39.6%</span>
+                  <div class="bar" style="height:48px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Nekomamushi</div>
+              </div>
+              <div class="bar-group" title="Kouzuki Momonosuke (OP01-041) — 31.2%">
+                <div class="bar-wrap">
+                  <span class="bar-val">31.2%</span>
+                  <div class="bar" style="height:37px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Kouzuki Momono…</div>
+              </div>
+              <div class="bar-group" title="Holly (OP05-110) — 29.2%">
+                <div class="bar-wrap">
+                  <span class="bar-val">29.2%</span>
+                  <div class="bar" style="height:35px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Holly</div>
+              </div>
+              <div class="bar-group" title="Ohm (OP05-101) — 29.2%">
+                <div class="bar-wrap">
+                  <span class="bar-val">29.2%</span>
+                  <div class="bar" style="height:35px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Ohm</div>
+              </div>
+              <div class="bar-group" title="Eustass&quot;Captain&quot;Kid (OP01-051) — 29.2%">
+                <div class="bar-wrap">
+                  <span class="bar-val">29.2%</span>
+                  <div class="bar" style="height:35px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Eustass&quot;Captai…</div>
+              </div>
+              <div class="bar-group" title="Donquixote Rosinante (OP05-030) — 29.2%">
+                <div class="bar-wrap">
+                  <span class="bar-val">29.2%</span>
+                  <div class="bar" style="height:35px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Donquixote Ros…</div>
+              </div>
+              <div class="bar-group" title="Charlotte Cracker (OP03-108) — 29.2%">
+                <div class="bar-wrap">
+                  <span class="bar-val">29.2%</span>
+                  <div class="bar" style="height:35px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Charlotte Crac…</div>
+              </div>
+          </div>
+        </div>
+      </details>
+      <div class="cards-grid">
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-033_EN.webp"
+          data-name="Izo"
+          data-id="OP01-033"
+          data-usage="100.0"
+          data-avg="3.96"
+          data-decks="48"
+          data-total="48"
+        >
+          <div class="card-rank">#1</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-033_EN.webp"
+               alt="Izo" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Izo</div>
+            <div class="card-meta">
+              <span class="badge">OP01-033</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-035_EN.webp"
+          data-name="Hody Jones"
+          data-id="OP06-035"
+          data-usage="97.9"
+          data-avg="3.85"
+          data-decks="47"
+          data-total="48"
+        >
+          <div class="card-rank">#2</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-035_EN.webp"
+               alt="Hody Jones" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Hody Jones</div>
+            <div class="card-meta">
+              <span class="badge">OP06-035</span>
+              <span class="badge avg-badge">×3.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:97.9%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">97.9% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-101_EN.webp"
+          data-name="O-Nami"
+          data-id="OP06-101"
+          data-usage="91.7"
+          data-avg="3.91"
+          data-decks="44"
+          data-total="48"
+        >
+          <div class="card-rank">#3</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-101_EN.webp"
+               alt="O-Nami" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">O-Nami</div>
+            <div class="card-meta">
+              <span class="badge">OP06-101</span>
+              <span class="badge avg-badge">×3.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:91.7%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">91.7% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-104_EN.webp"
+          data-name="Kikunojo"
+          data-id="OP06-104"
+          data-usage="64.6"
+          data-avg="3.84"
+          data-decks="31"
+          data-total="48"
+        >
+          <div class="card-rank">#4</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-104_EN.webp"
+               alt="Kikunojo" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Kikunojo</div>
+            <div class="card-meta">
+              <span class="badge">OP06-104</span>
+              <span class="badge avg-badge">×3.8 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:64.6%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">64.6% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-107_EN.webp"
+          data-name="Kouzuki Momonosuke"
+          data-id="OP06-107"
+          data-usage="56.2"
+          data-avg="3.11"
+          data-decks="27"
+          data-total="48"
+        >
+          <div class="card-rank">#5</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-107_EN.webp"
+               alt="Kouzuki Momonosuke" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Kouzuki Momonosuke</div>
+            <div class="card-meta">
+              <span class="badge">OP06-107</span>
+              <span class="badge avg-badge">×3.1 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:56.2%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">56.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-105_EN.webp"
+          data-name="Satori"
+          data-id="OP05-105"
+          data-usage="52.1"
+          data-avg="3.72"
+          data-decks="25"
+          data-total="48"
+        >
+          <div class="card-rank">#6</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-105_EN.webp"
+               alt="Satori" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Satori</div>
+            <div class="card-meta">
+              <span class="badge">OP05-105</span>
+              <span class="badge avg-badge">×3.7 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:52.1%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">52.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-106_EN.webp"
+          data-name="Kouzuki Hiyori"
+          data-id="OP06-106"
+          data-usage="45.8"
+          data-avg="3.55"
+          data-decks="22"
+          data-total="48"
+        >
+          <div class="card-rank">#7</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-106_EN.webp"
+               alt="Kouzuki Hiyori" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Kouzuki Hiyori</div>
+            <div class="card-meta">
+              <span class="badge">OP06-106</span>
+              <span class="badge avg-badge">×3.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:45.8%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">45.8% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST12/ST12-003_EN.webp"
+          data-name="Dracule Mihawk"
+          data-id="ST12-003"
+          data-usage="39.6"
+          data-avg="3.89"
+          data-decks="19"
+          data-total="48"
+        >
+          <div class="card-rank">#8</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST12/ST12-003_EN.webp"
+               alt="Dracule Mihawk" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Dracule Mihawk</div>
+            <div class="card-meta">
+              <span class="badge">ST12-003</span>
+              <span class="badge avg-badge">×3.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:39.6%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">39.6% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-110_EN.webp"
+          data-name="Nekomamushi"
+          data-id="OP06-110"
+          data-usage="39.6"
+          data-avg="3.53"
+          data-decks="19"
+          data-total="48"
+        >
+          <div class="card-rank">#9</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-110_EN.webp"
+               alt="Nekomamushi" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Nekomamushi</div>
+            <div class="card-meta">
+              <span class="badge">OP06-110</span>
+              <span class="badge avg-badge">×3.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:39.6%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">39.6% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-041_EN.webp"
+          data-name="Kouzuki Momonosuke"
+          data-id="OP01-041"
+          data-usage="31.2"
+          data-avg="3.27"
+          data-decks="15"
+          data-total="48"
+        >
+          <div class="card-rank">#10</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-041_EN.webp"
+               alt="Kouzuki Momonosuke" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Kouzuki Momonosuke</div>
+            <div class="card-meta">
+              <span class="badge">OP01-041</span>
+              <span class="badge avg-badge">×3.3 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:31.2%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">31.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-110_EN.webp"
+          data-name="Holly"
+          data-id="OP05-110"
+          data-usage="29.2"
+          data-avg="4.0"
+          data-decks="14"
+          data-total="48"
+        >
+          <div class="card-rank">#11</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-110_EN.webp"
+               alt="Holly" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Holly</div>
+            <div class="card-meta">
+              <span class="badge">OP05-110</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:29.2%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">29.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-101_EN.webp"
+          data-name="Ohm"
+          data-id="OP05-101"
+          data-usage="29.2"
+          data-avg="4.0"
+          data-decks="14"
+          data-total="48"
+        >
+          <div class="card-rank">#12</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-101_EN.webp"
+               alt="Ohm" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Ohm</div>
+            <div class="card-meta">
+              <span class="badge">OP05-101</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:29.2%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">29.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-051_EN.webp"
+          data-name="Eustass&quot;Captain&quot;Kid"
+          data-id="OP01-051"
+          data-usage="29.2"
+          data-avg="3.93"
+          data-decks="14"
+          data-total="48"
+        >
+          <div class="card-rank">#13</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-051_EN.webp"
+               alt="Eustass&quot;Captain&quot;Kid" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Eustass&quot;Captain&quot;Kid</div>
+            <div class="card-meta">
+              <span class="badge">OP01-051</span>
+              <span class="badge avg-badge">×3.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:29.2%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">29.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-030_EN.webp"
+          data-name="Donquixote Rosinante"
+          data-id="OP05-030"
+          data-usage="29.2"
+          data-avg="3.86"
+          data-decks="14"
+          data-total="48"
+        >
+          <div class="card-rank">#14</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-030_EN.webp"
+               alt="Donquixote Rosinante" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Donquixote Rosinante</div>
+            <div class="card-meta">
+              <span class="badge">OP05-030</span>
+              <span class="badge avg-badge">×3.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:29.2%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">29.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP03/OP03-108_EN.webp"
+          data-name="Charlotte Cracker"
+          data-id="OP03-108"
+          data-usage="29.2"
+          data-avg="2.79"
+          data-decks="14"
+          data-total="48"
+        >
+          <div class="card-rank">#15</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP03/OP03-108_EN.webp"
+               alt="Charlotte Cracker" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Charlotte Cracker</div>
+            <div class="card-meta">
+              <span class="badge">OP03-108</span>
+              <span class="badge avg-badge">×2.8 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:29.2%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">29.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-106_EN.webp"
+          data-name="Shura"
+          data-id="OP05-106"
+          data-usage="27.1"
+          data-avg="3.85"
+          data-decks="13"
+          data-total="48"
+        >
+          <div class="card-rank">#16</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-106_EN.webp"
+               alt="Shura" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Shura</div>
+            <div class="card-meta">
+              <span class="badge">OP05-106</span>
+              <span class="badge avg-badge">×3.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:27.1%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">27.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-109_EN.webp"
+          data-name="Tonoyasu"
+          data-id="OP04-109"
+          data-usage="25.0"
+          data-avg="3.0"
+          data-decks="12"
+          data-total="48"
+        >
+          <div class="card-rank">#17</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-109_EN.webp"
+               alt="Tonoyasu" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Tonoyasu</div>
+            <div class="card-meta">
+              <span class="badge">OP04-109</span>
+              <span class="badge avg-badge">×3.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:25.0%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">25.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST13/ST13-011_EN.webp"
+          data-name="Portgas.D.Ace"
+          data-id="ST13-011"
+          data-usage="22.9"
+          data-avg="3.27"
+          data-decks="11"
+          data-total="48"
+        >
+          <div class="card-rank">#18</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST13/ST13-011_EN.webp"
+               alt="Portgas.D.Ace" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Portgas.D.Ace</div>
+            <div class="card-meta">
+              <span class="badge">ST13-011</span>
+              <span class="badge avg-badge">×3.3 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:22.9%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">22.9% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-024_EN.webp"
+          data-name="Sugar"
+          data-id="OP04-024"
+          data-usage="22.9"
+          data-avg="2.82"
+          data-decks="11"
+          data-total="48"
+        >
+          <div class="card-rank">#19</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-024_EN.webp"
+               alt="Sugar" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Sugar</div>
+            <div class="card-meta">
+              <span class="badge">OP04-024</span>
+              <span class="badge avg-badge">×2.8 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:22.9%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">22.9% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-100_EN.webp"
+          data-name="Inuarashi"
+          data-id="OP06-100"
+          data-usage="18.8"
+          data-avg="3.56"
+          data-decks="9"
+          data-total="48"
+        >
+          <div class="card-rank">#20</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-100_EN.webp"
+               alt="Inuarashi" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Inuarashi</div>
+            <div class="card-meta">
+              <span class="badge">OP06-100</span>
+              <span class="badge avg-badge">×3.6 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:18.8%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">18.8% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-005_EN.webp"
+          data-name="Yamato"
+          data-id="ST28-005"
+          data-usage="16.7"
+          data-avg="4.0"
+          data-decks="8"
+          data-total="48"
+        >
+          <div class="card-rank">#21</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-005_EN.webp"
+               alt="Yamato" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Yamato</div>
+            <div class="card-meta">
+              <span class="badge">ST28-005</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:16.7%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">16.7% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-002_EN.webp"
+          data-name="Izo"
+          data-id="ST28-002"
+          data-usage="16.7"
+          data-avg="3.62"
+          data-decks="8"
+          data-total="48"
+        >
+          <div class="card-rank">#22</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-002_EN.webp"
+               alt="Izo" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Izo</div>
+            <div class="card-meta">
+              <span class="badge">ST28-002</span>
+              <span class="badge avg-badge">×3.6 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:16.7%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">16.7% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-001_EN.webp"
+          data-name="Ashura Doji"
+          data-id="ST28-001"
+          data-usage="16.7"
+          data-avg="3.5"
+          data-decks="8"
+          data-total="48"
+        >
+          <div class="card-rank">#23</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-001_EN.webp"
+               alt="Ashura Doji" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Ashura Doji</div>
+            <div class="card-meta">
+              <span class="badge">ST28-001</span>
+              <span class="badge avg-badge">×3.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:16.7%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">16.7% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-003_EN.webp"
+          data-name="Kin&#x27;emon"
+          data-id="ST28-003"
+          data-usage="14.6"
+          data-avg="4.0"
+          data-decks="7"
+          data-total="48"
+        >
+          <div class="card-rank">#24</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-003_EN.webp"
+               alt="Kin&#x27;emon" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Kin&#x27;emon</div>
+            <div class="card-meta">
+              <span class="badge">ST28-003</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:14.6%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">14.6% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST02/ST02-007_EN.webp"
+          data-name="Jewelry Bonney"
+          data-id="ST02-007"
+          data-usage="14.6"
+          data-avg="4.0"
+          data-decks="7"
+          data-total="48"
+        >
+          <div class="card-rank">#25</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST02/ST02-007_EN.webp"
+               alt="Jewelry Bonney" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Jewelry Bonney</div>
+            <div class="card-meta">
+              <span class="badge">ST02-007</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:14.6%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">14.6% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST02/ST02-008_EN.webp"
+          data-name="Scratchmen Apoo"
+          data-id="ST02-008"
+          data-usage="14.6"
+          data-avg="3.86"
+          data-decks="7"
+          data-total="48"
+        >
+          <div class="card-rank">#26</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST02/ST02-008_EN.webp"
+               alt="Scratchmen Apoo" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Scratchmen Apoo</div>
+            <div class="card-meta">
+              <span class="badge">ST02-008</span>
+              <span class="badge avg-badge">×3.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:14.6%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">14.6% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-034_EN.webp"
+          data-name="Baby 5"
+          data-id="OP05-034"
+          data-usage="14.6"
+          data-avg="3.71"
+          data-decks="7"
+          data-total="48"
+        >
+          <div class="card-rank">#27</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-034_EN.webp"
+               alt="Baby 5" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Baby 5</div>
+            <div class="card-meta">
+              <span class="badge">OP05-034</span>
+              <span class="badge avg-badge">×3.7 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:14.6%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">14.6% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-036_EN.webp"
+          data-name="Monet"
+          data-id="OP05-036"
+          data-usage="14.6"
+          data-avg="3.14"
+          data-decks="7"
+          data-total="48"
+        >
+          <div class="card-rank">#28</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-036_EN.webp"
+               alt="Monet" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Monet</div>
+            <div class="card-meta">
+              <span class="badge">OP05-036</span>
+              <span class="badge avg-badge">×3.1 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:14.6%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">14.6% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-004_EN.webp"
+          data-name="Kouzuki Momonosuke"
+          data-id="ST28-004"
+          data-usage="14.6"
+          data-avg="2.71"
+          data-decks="7"
+          data-total="48"
+        >
+          <div class="card-rank">#29</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST28/ST28-004_EN.webp"
+               alt="Kouzuki Momonosuke" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Kouzuki Momonosuke</div>
+            <div class="card-meta">
+              <span class="badge">ST28-004</span>
+              <span class="badge avg-badge">×2.7 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:14.6%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">14.6% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-032_EN.webp"
+          data-name="Baby 5"
+          data-id="OP04-032"
+          data-usage="14.6"
+          data-avg="2.43"
+          data-decks="7"
+          data-total="48"
+        >
+          <div class="card-rank">#30</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-032_EN.webp"
+               alt="Baby 5" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Baby 5</div>
+            <div class="card-meta">
+              <span class="badge">OP04-032</span>
+              <span class="badge avg-badge">×2.4 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:14.6%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">14.6% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-102_EN.webp"
+          data-name="Gedatsu"
+          data-id="OP05-102"
+          data-usage="14.6"
+          data-avg="2.14"
+          data-decks="7"
+          data-total="48"
+        >
+          <div class="card-rank">#31</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-102_EN.webp"
+               alt="Gedatsu" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Gedatsu</div>
+            <div class="card-meta">
+              <span class="badge">OP05-102</span>
+              <span class="badge avg-badge">×2.1 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:14.6%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">14.6% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-039_EN.webp"
+          data-name="Killer"
+          data-id="OP01-039"
+          data-usage="12.5"
+          data-avg="4.0"
+          data-decks="6"
+          data-total="48"
+        >
+          <div class="card-rank">#32</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-039_EN.webp"
+               alt="Killer" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Killer</div>
+            <div class="card-meta">
+              <span class="badge">OP01-039</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:12.5%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">12.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-100_EN.webp"
+          data-name="Capone&quot;Gang&quot;Bege"
+          data-id="OP04-100"
+          data-usage="12.5"
+          data-avg="3.33"
+          data-decks="6"
+          data-total="48"
+        >
+          <div class="card-rank">#33</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-100_EN.webp"
+               alt="Capone&quot;Gang&quot;Bege" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Capone&quot;Gang&quot;Bege</div>
+            <div class="card-meta">
+              <span class="badge">OP04-100</span>
+              <span class="badge avg-badge">×3.3 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:12.5%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">12.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-100_EN.webp"
+          data-name="Enel"
+          data-id="OP05-100"
+          data-usage="12.5"
+          data-avg="1.83"
+          data-decks="6"
+          data-total="48"
+        >
+          <div class="card-rank">#34</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-100_EN.webp"
+               alt="Enel" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Enel</div>
+            <div class="card-meta">
+              <span class="badge">OP05-100</span>
+              <span class="badge avg-badge">×1.8 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:12.5%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">12.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-031_EN.webp"
+          data-name="Donquixote Doflamingo"
+          data-id="OP04-031"
+          data-usage="10.4"
+          data-avg="3.4"
+          data-decks="5"
+          data-total="48"
+        >
+          <div class="card-rank">#35</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-031_EN.webp"
+               alt="Donquixote Doflamingo" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Donquixote Doflamingo</div>
+            <div class="card-meta">
+              <span class="badge">OP04-031</span>
+              <span class="badge avg-badge">×3.4 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:10.4%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">10.4% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-022_EN.webp"
+          data-name="Otama"
+          data-id="OP07-022"
+          data-usage="8.3"
+          data-avg="4.0"
+          data-decks="4"
+          data-total="48"
+        >
+          <div class="card-rank">#36</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-022_EN.webp"
+               alt="Otama" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Otama</div>
+            <div class="card-meta">
+              <span class="badge">OP07-022</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:8.3%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">8.3% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-109_EN.webp"
+          data-name="Basil Hawkins"
+          data-id="OP10-109"
+          data-usage="8.3"
+          data-avg="3.75"
+          data-decks="4"
+          data-total="48"
+        >
+          <div class="card-rank">#37</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-109_EN.webp"
+               alt="Basil Hawkins" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Basil Hawkins</div>
+            <div class="card-meta">
+              <span class="badge">OP10-109</span>
+              <span class="badge avg-badge">×3.8 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:8.3%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">8.3% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB01/EB01-013_EN.webp"
+          data-name="Kouzuki Hiyori"
+          data-id="EB01-013"
+          data-usage="8.3"
+          data-avg="3.25"
+          data-decks="4"
+          data-total="48"
+        >
+          <div class="card-rank">#38</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB01/EB01-013_EN.webp"
+               alt="Kouzuki Hiyori" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Kouzuki Hiyori</div>
+            <div class="card-meta">
+              <span class="badge">EB01-013</span>
+              <span class="badge avg-badge">×3.2 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:8.3%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">8.3% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP08/OP08-106_EN.webp"
+          data-name="Nami"
+          data-id="OP08-106"
+          data-usage="8.3"
+          data-avg="2.5"
+          data-decks="4"
+          data-total="48"
+        >
+          <div class="card-rank">#39</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP08/OP08-106_EN.webp"
+               alt="Nami" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Nami</div>
+            <div class="card-meta">
+              <span class="badge">OP08-106</span>
+              <span class="badge avg-badge">×2.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:8.3%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">8.3% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-099_EN.webp"
+          data-name="Aisa"
+          data-id="OP06-099"
+          data-usage="8.3"
+          data-avg="2.0"
+          data-decks="4"
+          data-total="48"
+        >
+          <div class="card-rank">#40</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-099_EN.webp"
+               alt="Aisa" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Aisa</div>
+            <div class="card-meta">
+              <span class="badge">OP06-099</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:8.3%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">8.3% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-107_EN.webp"
+          data-name="Franky"
+          data-id="OP07-107"
+          data-usage="6.2"
+          data-avg="4.0"
+          data-decks="3"
+          data-total="48"
+        >
+          <div class="card-rank">#41</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-107_EN.webp"
+               alt="Franky" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Franky</div>
+            <div class="card-meta">
+              <span class="badge">OP07-107</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:6.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">6.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-023_EN.webp"
+          data-name="Arlong"
+          data-id="OP06-023"
+          data-usage="6.2"
+          data-avg="3.67"
+          data-decks="3"
+          data-total="48"
+        >
+          <div class="card-rank">#42</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-023_EN.webp"
+               alt="Arlong" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Arlong</div>
+            <div class="card-meta">
+              <span class="badge">OP06-023</span>
+              <span class="badge avg-badge">×3.7 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:6.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">6.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-112_EN.webp"
+          data-name="Yamato"
+          data-id="OP04-112"
+          data-usage="6.2"
+          data-avg="2.33"
+          data-decks="3"
+          data-total="48"
+        >
+          <div class="card-rank">#43</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-112_EN.webp"
+               alt="Yamato" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Yamato</div>
+            <div class="card-meta">
+              <span class="badge">OP04-112</span>
+              <span class="badge avg-badge">×2.3 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:6.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">6.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP03/OP03-116_EN.webp"
+          data-name="Shirahoshi"
+          data-id="OP03-116"
+          data-usage="6.2"
+          data-avg="2.33"
+          data-decks="3"
+          data-total="48"
+        >
+          <div class="card-rank">#44</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP03/OP03-116_EN.webp"
+               alt="Shirahoshi" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Shirahoshi</div>
+            <div class="card-meta">
+              <span class="badge">OP03-116</span>
+              <span class="badge avg-badge">×2.3 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:6.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">6.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-119_EN.webp"
+          data-name="Bartholomew Kuma"
+          data-id="OP12-119"
+          data-usage="4.2"
+          data-avg="4.0"
+          data-decks="2"
+          data-total="48"
+        >
+          <div class="card-rank">#45</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-119_EN.webp"
+               alt="Bartholomew Kuma" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Bartholomew Kuma</div>
+            <div class="card-meta">
+              <span class="badge">OP12-119</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:4.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">4.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST07/ST07-007_EN.webp"
+          data-name="Charlotte Brulee"
+          data-id="ST07-007"
+          data-usage="4.2"
+          data-avg="4.0"
+          data-decks="2"
+          data-total="48"
+        >
+          <div class="card-rank">#46</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST07/ST07-007_EN.webp"
+               alt="Charlotte Brulee" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Charlotte Brulee</div>
+            <div class="card-meta">
+              <span class="badge">ST07-007</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:4.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">4.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-036_EN.webp"
+          data-name="Ryuma"
+          data-id="OP06-036"
+          data-usage="4.2"
+          data-avg="3.0"
+          data-decks="2"
+          data-total="48"
+        >
+          <div class="card-rank">#47</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-036_EN.webp"
+               alt="Ryuma" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Ryuma</div>
+            <div class="card-meta">
+              <span class="badge">OP06-036</span>
+              <span class="badge avg-badge">×3.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:4.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">4.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-103_EN.webp"
+          data-name="Kouzuki Hiyori"
+          data-id="OP04-103"
+          data-usage="4.2"
+          data-avg="3.0"
+          data-decks="2"
+          data-total="48"
+        >
+          <div class="card-rank">#48</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-103_EN.webp"
+               alt="Kouzuki Hiyori" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Kouzuki Hiyori</div>
+            <div class="card-meta">
+              <span class="badge">OP04-103</span>
+              <span class="badge avg-badge">×3.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:4.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">4.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST07/ST07-010_EN.webp"
+          data-name="Charlotte Linlin"
+          data-id="ST07-010"
+          data-usage="4.2"
+          data-avg="2.5"
+          data-decks="2"
+          data-total="48"
+        >
+          <div class="card-rank">#49</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST07/ST07-010_EN.webp"
+               alt="Charlotte Linlin" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Charlotte Linlin</div>
+            <div class="card-meta">
+              <span class="badge">ST07-010</span>
+              <span class="badge avg-badge">×2.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:4.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">4.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-047_EN.webp"
+          data-name="Trafalgar Law"
+          data-id="OP01-047"
+          data-usage="4.2"
+          data-avg="2.5"
+          data-decks="2"
+          data-total="48"
+        >
+          <div class="card-rank">#50</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-047_EN.webp"
+               alt="Trafalgar Law" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Trafalgar Law</div>
+            <div class="card-meta">
+              <span class="badge">OP01-047</span>
+              <span class="badge avg-badge">×2.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:4.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">4.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB01/EB01-054_EN.webp"
+          data-name="Gan.Fall"
+          data-id="EB01-054"
+          data-usage="4.2"
+          data-avg="2.0"
+          data-decks="2"
+          data-total="48"
+        >
+          <div class="card-rank">#51</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB01/EB01-054_EN.webp"
+               alt="Gan.Fall" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Gan.Fall</div>
+            <div class="card-meta">
+              <span class="badge">EB01-054</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:4.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">4.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-118_EN.webp"
+          data-name="Roronoa Zoro"
+          data-id="OP06-118"
+          data-usage="4.2"
+          data-avg="1.5"
+          data-decks="2"
+          data-total="48"
+        >
+          <div class="card-rank">#52</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-118_EN.webp"
+               alt="Roronoa Zoro" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Roronoa Zoro</div>
+            <div class="card-meta">
+              <span class="badge">OP06-118</span>
+              <span class="badge avg-badge">×1.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:4.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">4.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-029_EN.webp"
+          data-name="Shimotsuki Kouzaburou"
+          data-id="OP12-029"
+          data-usage="2.1"
+          data-avg="4.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#53</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-029_EN.webp"
+               alt="Shimotsuki Kouzaburou" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Shimotsuki Kouzaburou</div>
+            <div class="card-meta">
+              <span class="badge">OP12-029</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-104_EN.webp"
+          data-name="Sanji"
+          data-id="OP04-104"
+          data-usage="2.1"
+          data-avg="4.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#54</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-104_EN.webp"
+               alt="Sanji" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Sanji</div>
+            <div class="card-meta">
+              <span class="badge">OP04-104</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-099_EN.webp"
+          data-name="Olin"
+          data-id="OP04-099"
+          data-usage="2.1"
+          data-avg="4.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#55</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-099_EN.webp"
+               alt="Olin" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Olin</div>
+            <div class="card-meta">
+              <span class="badge">OP04-099</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-030_EN.webp"
+          data-name="Dracule Mihawk"
+          data-id="OP12-030"
+          data-usage="2.1"
+          data-avg="3.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#56</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-030_EN.webp"
+               alt="Dracule Mihawk" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Dracule Mihawk</div>
+            <div class="card-meta">
+              <span class="badge">OP12-030</span>
+              <span class="badge avg-badge">×3.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-112_EN.webp"
+          data-name="Eustass&quot;Captain&quot;Kid"
+          data-id="OP10-112"
+          data-usage="2.1"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#57</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-112_EN.webp"
+               alt="Eustass&quot;Captain&quot;Kid" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Eustass&quot;Captain&quot;Kid</div>
+            <div class="card-meta">
+              <span class="badge">OP10-112</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP11/OP11-106_EN.webp"
+          data-name="Zeus"
+          data-id="OP11-106"
+          data-usage="2.1"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#58</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP11/OP11-106_EN.webp"
+               alt="Zeus" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Zeus</div>
+            <div class="card-meta">
+              <span class="badge">OP11-106</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-027_EN.webp"
+          data-name="Kin&#x27;emon"
+          data-id="OP10-027"
+          data-usage="2.1"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#59</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-027_EN.webp"
+               alt="Kin&#x27;emon" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Kin&#x27;emon</div>
+            <div class="card-meta">
+              <span class="badge">OP10-027</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP09/OP09-107_EN.webp"
+          data-name="Nico Robin"
+          data-id="OP09-107"
+          data-usage="2.1"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#60</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP09/OP09-107_EN.webp"
+               alt="Nico Robin" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Nico Robin</div>
+            <div class="card-meta">
+              <span class="badge">OP09-107</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-021_EN.webp"
+          data-name="Viola"
+          data-id="OP04-021"
+          data-usage="2.1"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#61</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-021_EN.webp"
+               alt="Viola" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Viola</div>
+            <div class="card-meta">
+              <span class="badge">OP04-021</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-104_EN.webp"
+          data-name="Conis"
+          data-id="OP05-104"
+          data-usage="2.1"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#62</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-104_EN.webp"
+               alt="Conis" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Conis</div>
+            <div class="card-meta">
+              <span class="badge">OP05-104</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP08/OP08-023_EN.webp"
+          data-name="Carrot"
+          data-id="OP08-023"
+          data-usage="2.1"
+          data-avg="1.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#63</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP08/OP08-023_EN.webp"
+               alt="Carrot" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Carrot</div>
+            <div class="card-meta">
+              <span class="badge">OP08-023</span>
+              <span class="badge avg-badge">×1.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST07/ST07-003_EN.webp"
+          data-name="Charlotte Katakuri"
+          data-id="ST07-003"
+          data-usage="2.1"
+          data-avg="1.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#64</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST07/ST07-003_EN.webp"
+               alt="Charlotte Katakuri" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Charlotte Katakuri</div>
+            <div class="card-meta">
+              <span class="badge">ST07-003</span>
+              <span class="badge avg-badge">×1.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP02/OP02-042_EN.webp"
+          data-name="Yamato"
+          data-id="OP02-042"
+          data-usage="2.1"
+          data-avg="1.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#65</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP02/OP02-042_EN.webp"
+               alt="Yamato" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Yamato</div>
+            <div class="card-meta">
+              <span class="badge">OP02-042</span>
+              <span class="badge avg-badge">×1.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-121_EN.webp"
+          data-name="Yamato"
+          data-id="OP01-121"
+          data-usage="2.1"
+          data-avg="1.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#66</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-121_EN.webp"
+               alt="Yamato" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Yamato</div>
+            <div class="card-meta">
+              <span class="badge">OP01-121</span>
+              <span class="badge avg-badge">×1.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="type-section">
+      <h3 class="type-heading">Event</h3>
+      <details class="chart-details" id="op06-022-event-chart">
+        <summary class="chart-toggle">Usage chart (top 15)</summary>
+        <div class="chart">
+          <div class="chart-bars">
+              <div class="bar-group" title="You&#x27;re the One Who Should Disappear. (OP06-115) — 72.9%">
+                <div class="bar-wrap">
+                  <span class="bar-val">72.9%</span>
+                  <div class="bar" style="height:120px;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">You&#x27;re the One…</div>
+              </div>
+              <div class="bar-group" title="Two-Hundred Million Volts Amaru (OP05-115) — 50.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">50.0%</span>
+                  <div class="bar" style="height:82px;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">Two-Hundred Mi…</div>
+              </div>
+              <div class="bar-group" title="Blaze Slice (OP07-116) — 22.9%">
+                <div class="bar-wrap">
+                  <span class="bar-val">22.9%</span>
+                  <div class="bar" style="height:38px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Blaze Slice</div>
+              </div>
+              <div class="bar-group" title="Demonic Aura Nine-Sword Style Asura Demon Nine Flash (OP07-036) — 20.8%">
+                <div class="bar-wrap">
+                  <span class="bar-val">20.8%</span>
+                  <div class="bar" style="height:34px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Demonic Aura N…</div>
+              </div>
+              <div class="bar-group" title="El Thor (OP05-114) — 16.7%">
+                <div class="bar-wrap">
+                  <span class="bar-val">16.7%</span>
+                  <div class="bar" style="height:27px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">El Thor</div>
+              </div>
+              <div class="bar-group" title="Because the Side of Justice Will Be Whichever Side Wins!! (OP05-037) — 16.7%">
+                <div class="bar-wrap">
+                  <span class="bar-val">16.7%</span>
+                  <div class="bar" style="height:27px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Because the Si…</div>
+              </div>
+              <div class="bar-group" title="Punk Gibson (OP01-058) — 16.7%">
+                <div class="bar-wrap">
+                  <span class="bar-val">16.7%</span>
+                  <div class="bar" style="height:27px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Punk Gibson</div>
+              </div>
+              <div class="bar-group" title="Reject (OP06-116) — 14.6%">
+                <div class="bar-wrap">
+                  <span class="bar-val">14.6%</span>
+                  <div class="bar" style="height:24px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Reject</div>
+              </div>
+              <div class="bar-group" title="Straw Sword (ST02-017) — 10.4%">
+                <div class="bar-wrap">
+                  <span class="bar-val">10.4%</span>
+                  <div class="bar" style="height:17px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Straw Sword</div>
+              </div>
+              <div class="bar-group" title="Paradise Totsuka (OP02-047) — 8.3%">
+                <div class="bar-wrap">
+                  <span class="bar-val">8.3%</span>
+                  <div class="bar" style="height:14px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Paradise Totsu…</div>
+              </div>
+              <div class="bar-group" title="You Can Be My Samurai!! (OP01-055) — 8.3%">
+                <div class="bar-wrap">
+                  <span class="bar-val">8.3%</span>
+                  <div class="bar" style="height:14px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">You Can Be My …</div>
+              </div>
+              <div class="bar-group" title="Demon Aura Nine Sword Style Asura Blades Drawn Dead Man&#x27;s Game (OP12-037) — 6.2%">
+                <div class="bar-wrap">
+                  <span class="bar-val">6.2%</span>
+                  <div class="bar" style="height:10px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Demon Aura Nin…</div>
+              </div>
+              <div class="bar-group" title="Electrical Luna (OP08-036) — 4.2%">
+                <div class="bar-wrap">
+                  <span class="bar-val">4.2%</span>
+                  <div class="bar" style="height:7px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Electrical Luna</div>
+              </div>
+              <div class="bar-group" title="Flame Dragon King (ST13-017) — 4.2%">
+                <div class="bar-wrap">
+                  <span class="bar-val">4.2%</span>
+                  <div class="bar" style="height:7px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Flame Dragon K…</div>
+              </div>
+              <div class="bar-group" title="Gum-Gum Fire-Fist Pistol Red Hawk (OP11-114) — 2.1%">
+                <div class="bar-wrap">
+                  <span class="bar-val">2.1%</span>
+                  <div class="bar" style="height:4px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Gum-Gum Fire-F…</div>
+              </div>
+          </div>
+        </div>
+      </details>
+      <div class="cards-grid">
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-115_EN.webp"
+          data-name="You&#x27;re the One Who Should Disappear."
+          data-id="OP06-115"
+          data-usage="72.9"
+          data-avg="2.57"
+          data-decks="35"
+          data-total="48"
+        >
+          <div class="card-rank">#1</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-115_EN.webp"
+               alt="You&#x27;re the One Who Should Disappear." loading="lazy">
+          <div class="card-body">
+            <div class="card-name">You&#x27;re the One Who Should Disappear.</div>
+            <div class="card-meta">
+              <span class="badge">OP06-115</span>
+              <span class="badge avg-badge">×2.6 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:72.9%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">72.9% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-115_EN.webp"
+          data-name="Two-Hundred Million Volts Amaru"
+          data-id="OP05-115"
+          data-usage="50.0"
+          data-avg="2.92"
+          data-decks="24"
+          data-total="48"
+        >
+          <div class="card-rank">#2</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-115_EN.webp"
+               alt="Two-Hundred Million Volts Amaru" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Two-Hundred Million Volts Amaru</div>
+            <div class="card-meta">
+              <span class="badge">OP05-115</span>
+              <span class="badge avg-badge">×2.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:50.0%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">50.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-116_EN.webp"
+          data-name="Blaze Slice"
+          data-id="OP07-116"
+          data-usage="22.9"
+          data-avg="2.45"
+          data-decks="11"
+          data-total="48"
+        >
+          <div class="card-rank">#3</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-116_EN.webp"
+               alt="Blaze Slice" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Blaze Slice</div>
+            <div class="card-meta">
+              <span class="badge">OP07-116</span>
+              <span class="badge avg-badge">×2.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:22.9%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">22.9% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-036_EN.webp"
+          data-name="Demonic Aura Nine-Sword Style Asura Demon Nine Flash"
+          data-id="OP07-036"
+          data-usage="20.8"
+          data-avg="2.8"
+          data-decks="10"
+          data-total="48"
+        >
+          <div class="card-rank">#4</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-036_EN.webp"
+               alt="Demonic Aura Nine-Sword Style Asura Demon Nine Flash" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Demonic Aura Nine-Sword Style Asura Demon Nine Flash</div>
+            <div class="card-meta">
+              <span class="badge">OP07-036</span>
+              <span class="badge avg-badge">×2.8 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:20.8%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">20.8% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-114_EN.webp"
+          data-name="El Thor"
+          data-id="OP05-114"
+          data-usage="16.7"
+          data-avg="2.38"
+          data-decks="8"
+          data-total="48"
+        >
+          <div class="card-rank">#5</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-114_EN.webp"
+               alt="El Thor" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">El Thor</div>
+            <div class="card-meta">
+              <span class="badge">OP05-114</span>
+              <span class="badge avg-badge">×2.4 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:16.7%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">16.7% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-037_EN.webp"
+          data-name="Because the Side of Justice Will Be Whichever Side Wins!!"
+          data-id="OP05-037"
+          data-usage="16.7"
+          data-avg="2.0"
+          data-decks="8"
+          data-total="48"
+        >
+          <div class="card-rank">#6</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-037_EN.webp"
+               alt="Because the Side of Justice Will Be Whichever Side Wins!!" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Because the Side of Justice Will Be Whichever Side Wins!!</div>
+            <div class="card-meta">
+              <span class="badge">OP05-037</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:16.7%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">16.7% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-058_EN.webp"
+          data-name="Punk Gibson"
+          data-id="OP01-058"
+          data-usage="16.7"
+          data-avg="1.75"
+          data-decks="8"
+          data-total="48"
+        >
+          <div class="card-rank">#7</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-058_EN.webp"
+               alt="Punk Gibson" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Punk Gibson</div>
+            <div class="card-meta">
+              <span class="badge">OP01-058</span>
+              <span class="badge avg-badge">×1.8 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:16.7%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">16.7% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-116_EN.webp"
+          data-name="Reject"
+          data-id="OP06-116"
+          data-usage="14.6"
+          data-avg="2.14"
+          data-decks="7"
+          data-total="48"
+        >
+          <div class="card-rank">#8</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-116_EN.webp"
+               alt="Reject" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Reject</div>
+            <div class="card-meta">
+              <span class="badge">OP06-116</span>
+              <span class="badge avg-badge">×2.1 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:14.6%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">14.6% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST02/ST02-017_EN.webp"
+          data-name="Straw Sword"
+          data-id="ST02-017"
+          data-usage="10.4"
+          data-avg="2.2"
+          data-decks="5"
+          data-total="48"
+        >
+          <div class="card-rank">#9</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST02/ST02-017_EN.webp"
+               alt="Straw Sword" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Straw Sword</div>
+            <div class="card-meta">
+              <span class="badge">ST02-017</span>
+              <span class="badge avg-badge">×2.2 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:10.4%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">10.4% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP02/OP02-047_EN.webp"
+          data-name="Paradise Totsuka"
+          data-id="OP02-047"
+          data-usage="8.3"
+          data-avg="3.25"
+          data-decks="4"
+          data-total="48"
+        >
+          <div class="card-rank">#10</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP02/OP02-047_EN.webp"
+               alt="Paradise Totsuka" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Paradise Totsuka</div>
+            <div class="card-meta">
+              <span class="badge">OP02-047</span>
+              <span class="badge avg-badge">×3.2 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:8.3%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">8.3% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-055_EN.webp"
+          data-name="You Can Be My Samurai!!"
+          data-id="OP01-055"
+          data-usage="8.3"
+          data-avg="2.25"
+          data-decks="4"
+          data-total="48"
+        >
+          <div class="card-rank">#11</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP01/OP01-055_EN.webp"
+               alt="You Can Be My Samurai!!" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">You Can Be My Samurai!!</div>
+            <div class="card-meta">
+              <span class="badge">OP01-055</span>
+              <span class="badge avg-badge">×2.2 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:8.3%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">8.3% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-037_EN.webp"
+          data-name="Demon Aura Nine Sword Style Asura Blades Drawn Dead Man&#x27;s Game"
+          data-id="OP12-037"
+          data-usage="6.2"
+          data-avg="2.0"
+          data-decks="3"
+          data-total="48"
+        >
+          <div class="card-rank">#12</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-037_EN.webp"
+               alt="Demon Aura Nine Sword Style Asura Blades Drawn Dead Man&#x27;s Game" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Demon Aura Nine Sword Style Asura Blades Drawn Dead Man&#x27;s Game</div>
+            <div class="card-meta">
+              <span class="badge">OP12-037</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:6.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">6.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP08/OP08-036_EN.webp"
+          data-name="Electrical Luna"
+          data-id="OP08-036"
+          data-usage="4.2"
+          data-avg="2.5"
+          data-decks="2"
+          data-total="48"
+        >
+          <div class="card-rank">#13</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP08/OP08-036_EN.webp"
+               alt="Electrical Luna" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Electrical Luna</div>
+            <div class="card-meta">
+              <span class="badge">OP08-036</span>
+              <span class="badge avg-badge">×2.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:4.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">4.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST13/ST13-017_EN.webp"
+          data-name="Flame Dragon King"
+          data-id="ST13-017"
+          data-usage="4.2"
+          data-avg="2.0"
+          data-decks="2"
+          data-total="48"
+        >
+          <div class="card-rank">#14</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST13/ST13-017_EN.webp"
+               alt="Flame Dragon King" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Flame Dragon King</div>
+            <div class="card-meta">
+              <span class="badge">ST13-017</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:4.2%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">4.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP11/OP11-114_EN.webp"
+          data-name="Gum-Gum Fire-Fist Pistol Red Hawk"
+          data-id="OP11-114"
+          data-usage="2.1"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#15</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP11/OP11-114_EN.webp"
+               alt="Gum-Gum Fire-Fist Pistol Red Hawk" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Gum-Gum Fire-Fist Pistol Red Hawk</div>
+            <div class="card-meta">
+              <span class="badge">OP11-114</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST09/ST09-014_EN.webp"
+          data-name="Narikabura Arrow"
+          data-id="ST09-014"
+          data-usage="2.1"
+          data-avg="1.0"
+          data-decks="1"
+          data-total="48"
+        >
+          <div class="card-rank">#16</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST09/ST09-014_EN.webp"
+               alt="Narikabura Arrow" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Narikabura Arrow</div>
+            <div class="card-meta">
+              <span class="badge">ST09-014</span>
+              <span class="badge avg-badge">×1.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:2.1%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">2.1% of decks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="leader-section" id="op15-002">
+    <div class="section-header">
+      
+    <div class="leader-hero">
+      <img class="leader-img card-trigger" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-002_EN.webp"
+           alt="Lucy" loading="lazy"
+           role="button" tabindex="0"
+           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-002_EN.webp"
+           data-name="Lucy"
+           data-id="OP15-002"
+           data-usage="100"
+           data-avg="1.0"
+           data-decks="5"
+           data-total="5">
+      <div class="leader-meta">
+        <h2>Lucy</h2>
+        <span class="badge">OP15-002</span>
+        <span class="deck-count">5 tournament decks analysed</span>
+      </div>
+    </div>
+    </div>
+    
+    <div class="type-section">
+      <h3 class="type-heading">Character</h3>
+      <details class="chart-details" id="op15-002-character-chart">
+        <summary class="chart-toggle">Usage chart (top 10)</summary>
+        <div class="chart">
+          <div class="chart-bars">
+              <div class="bar-group" title="Viola (OP15-040) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Viola</div>
+              </div>
+              <div class="bar-group" title="Leo (OP15-052) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Leo</div>
+              </div>
+              <div class="bar-group" title="Rebecca (OP15-053) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Rebecca</div>
+              </div>
+              <div class="bar-group" title="Cavendish (OP10-045) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Cavendish</div>
+              </div>
+              <div class="bar-group" title="Sabo (OP15-046) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Sabo</div>
+              </div>
+              <div class="bar-group" title="Gol.D.Roger (OP09-118) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Gol.D.Roger</div>
+              </div>
+              <div class="bar-group" title="Belo Betty (OP05-015) — 60.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">60.0%</span>
+                  <div class="bar" style="height:72px;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">Belo Betty</div>
+              </div>
+              <div class="bar-group" title="Sabo (OP10-049) — 40.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">40.0%</span>
+                  <div class="bar" style="height:48px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Sabo</div>
+              </div>
+              <div class="bar-group" title="Koala (OP05-006) — 20.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">20.0%</span>
+                  <div class="bar" style="height:24px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Koala</div>
+              </div>
+              <div class="bar-group" title="Boa Hancock (OP07-051) — 20.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">20.0%</span>
+                  <div class="bar" style="height:24px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Boa Hancock</div>
+              </div>
+          </div>
+        </div>
+      </details>
+      <div class="cards-grid">
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-040_EN.webp"
+          data-name="Viola"
+          data-id="OP15-040"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#1</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-040_EN.webp"
+               alt="Viola" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Viola</div>
+            <div class="card-meta">
+              <span class="badge">OP15-040</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-052_EN.webp"
+          data-name="Leo"
+          data-id="OP15-052"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#2</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-052_EN.webp"
+               alt="Leo" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Leo</div>
+            <div class="card-meta">
+              <span class="badge">OP15-052</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-053_EN.webp"
+          data-name="Rebecca"
+          data-id="OP15-053"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#3</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-053_EN.webp"
+               alt="Rebecca" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Rebecca</div>
+            <div class="card-meta">
+              <span class="badge">OP15-053</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-045_EN.webp"
+          data-name="Cavendish"
+          data-id="OP10-045"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#4</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-045_EN.webp"
+               alt="Cavendish" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Cavendish</div>
+            <div class="card-meta">
+              <span class="badge">OP10-045</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-046_EN.webp"
+          data-name="Sabo"
+          data-id="OP15-046"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#5</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-046_EN.webp"
+               alt="Sabo" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Sabo</div>
+            <div class="card-meta">
+              <span class="badge">OP15-046</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP09/OP09-118_EN.webp"
+          data-name="Gol.D.Roger"
+          data-id="OP09-118"
+          data-usage="100.0"
+          data-avg="1.0"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#6</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP09/OP09-118_EN.webp"
+               alt="Gol.D.Roger" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Gol.D.Roger</div>
+            <div class="card-meta">
+              <span class="badge">OP09-118</span>
+              <span class="badge avg-badge">×1.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-015_EN.webp"
+          data-name="Belo Betty"
+          data-id="OP05-015"
+          data-usage="60.0"
+          data-avg="2.67"
+          data-decks="3"
+          data-total="5"
+        >
+          <div class="card-rank">#7</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-015_EN.webp"
+               alt="Belo Betty" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Belo Betty</div>
+            <div class="card-meta">
+              <span class="badge">OP05-015</span>
+              <span class="badge avg-badge">×2.7 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:60.0%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">60.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-049_EN.webp"
+          data-name="Sabo"
+          data-id="OP10-049"
+          data-usage="40.0"
+          data-avg="2.0"
+          data-decks="2"
+          data-total="5"
+        >
+          <div class="card-rank">#8</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-049_EN.webp"
+               alt="Sabo" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Sabo</div>
+            <div class="card-meta">
+              <span class="badge">OP10-049</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:40.0%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">40.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-006_EN.webp"
+          data-name="Koala"
+          data-id="OP05-006"
+          data-usage="20.0"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="5"
+        >
+          <div class="card-rank">#9</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-006_EN.webp"
+               alt="Koala" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Koala</div>
+            <div class="card-meta">
+              <span class="badge">OP05-006</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:20.0%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">20.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-051_EN.webp"
+          data-name="Boa Hancock"
+          data-id="OP07-051"
+          data-usage="20.0"
+          data-avg="1.0"
+          data-decks="1"
+          data-total="5"
+        >
+          <div class="card-rank">#10</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-051_EN.webp"
+               alt="Boa Hancock" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Boa Hancock</div>
+            <div class="card-meta">
+              <span class="badge">OP07-051</span>
+              <span class="badge avg-badge">×1.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:20.0%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">20.0% of decks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="type-section">
+      <h3 class="type-heading">Event</h3>
+      <details class="chart-details" id="op15-002-event-chart">
+        <summary class="chart-toggle">Usage chart (top 8)</summary>
+        <div class="chart">
+          <div class="chart-bars">
+              <div class="bar-group" title="And No One Else Can Have It! It&#x27;s Our Memento of Him (OP15-054) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">And No One Els…</div>
+              </div>
+              <div class="bar-group" title="Barrier-Barrier Pistol (OP10-060) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Barrier-Barrie…</div>
+              </div>
+              <div class="bar-group" title="Fire Fist (OP15-020) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Fire Fist</div>
+              </div>
+              <div class="bar-group" title="Just Watch Me, Ace!!! (OP15-021) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Just Watch Me,…</div>
+              </div>
+              <div class="bar-group" title="Fire Fist (OP05-019) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Fire Fist</div>
+              </div>
+              <div class="bar-group" title="Fo...llow...Me...and...I...Will...Gui...de...You (OP10-059) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Fo...llow...Me…</div>
+              </div>
+              <div class="bar-group" title="Would You Let Me Eat the Flame-Flame Fruit? (OP15-056) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Would You Let …</div>
+              </div>
+              <div class="bar-group" title="Boeuf Burst (OP12-060) — 40.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">40.0%</span>
+                  <div class="bar" style="height:48px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Boeuf Burst</div>
+              </div>
+          </div>
+        </div>
+      </details>
+      <div class="cards-grid">
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-054_EN.webp"
+          data-name="And No One Else Can Have It! It&#x27;s Our Memento of Him"
+          data-id="OP15-054"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#1</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-054_EN.webp"
+               alt="And No One Else Can Have It! It&#x27;s Our Memento of Him" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">And No One Else Can Have It! It&#x27;s Our Memento of Him</div>
+            <div class="card-meta">
+              <span class="badge">OP15-054</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-060_EN.webp"
+          data-name="Barrier-Barrier Pistol"
+          data-id="OP10-060"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#2</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-060_EN.webp"
+               alt="Barrier-Barrier Pistol" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Barrier-Barrier Pistol</div>
+            <div class="card-meta">
+              <span class="badge">OP10-060</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-020_EN.webp"
+          data-name="Fire Fist"
+          data-id="OP15-020"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#3</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-020_EN.webp"
+               alt="Fire Fist" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Fire Fist</div>
+            <div class="card-meta">
+              <span class="badge">OP15-020</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-021_EN.webp"
+          data-name="Just Watch Me, Ace!!!"
+          data-id="OP15-021"
+          data-usage="100.0"
+          data-avg="3.6"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#4</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-021_EN.webp"
+               alt="Just Watch Me, Ace!!!" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Just Watch Me, Ace!!!</div>
+            <div class="card-meta">
+              <span class="badge">OP15-021</span>
+              <span class="badge avg-badge">×3.6 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-019_EN.webp"
+          data-name="Fire Fist"
+          data-id="OP05-019"
+          data-usage="100.0"
+          data-avg="2.6"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#5</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-019_EN.webp"
+               alt="Fire Fist" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Fire Fist</div>
+            <div class="card-meta">
+              <span class="badge">OP05-019</span>
+              <span class="badge avg-badge">×2.6 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-059_EN.webp"
+          data-name="Fo...llow...Me...and...I...Will...Gui...de...You"
+          data-id="OP10-059"
+          data-usage="100.0"
+          data-avg="2.4"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#6</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-059_EN.webp"
+               alt="Fo...llow...Me...and...I...Will...Gui...de...You" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Fo...llow...Me...and...I...Will...Gui...de...You</div>
+            <div class="card-meta">
+              <span class="badge">OP10-059</span>
+              <span class="badge avg-badge">×2.4 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-056_EN.webp"
+          data-name="Would You Let Me Eat the Flame-Flame Fruit?"
+          data-id="OP15-056"
+          data-usage="100.0"
+          data-avg="2.4"
+          data-decks="5"
+          data-total="5"
+        >
+          <div class="card-rank">#7</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-056_EN.webp"
+               alt="Would You Let Me Eat the Flame-Flame Fruit?" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Would You Let Me Eat the Flame-Flame Fruit?</div>
+            <div class="card-meta">
+              <span class="badge">OP15-056</span>
+              <span class="badge avg-badge">×2.4 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-060_EN.webp"
+          data-name="Boeuf Burst"
+          data-id="OP12-060"
+          data-usage="40.0"
+          data-avg="2.5"
+          data-decks="2"
+          data-total="5"
+        >
+          <div class="card-rank">#8</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-060_EN.webp"
+               alt="Boeuf Burst" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Boeuf Burst</div>
+            <div class="card-meta">
+              <span class="badge">OP12-060</span>
+              <span class="badge avg-badge">×2.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:40.0%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">40.0% of decks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="type-section">
+      <h3 class="type-heading">Stage</h3>
+      <details class="chart-details" id="op15-002-stage-chart">
+        <summary class="chart-toggle">Usage chart (top 1)</summary>
+        <div class="chart">
+          <div class="chart-bars">
+              <div class="bar-group" title="Dressrosa Kingdom (OP15-057) — 80.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">80.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Dressrosa King…</div>
+              </div>
+          </div>
+        </div>
+      </details>
+      <div class="cards-grid">
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-057_EN.webp"
+          data-name="Dressrosa Kingdom"
+          data-id="OP15-057"
+          data-usage="80.0"
+          data-avg="2.5"
+          data-decks="4"
+          data-total="5"
+        >
+          <div class="card-rank">#1</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-057_EN.webp"
+               alt="Dressrosa Kingdom" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Dressrosa Kingdom</div>
+            <div class="card-meta">
+              <span class="badge">OP15-057</span>
+              <span class="badge avg-badge">×2.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:80.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">80.0% of decks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="leader-section" id="op14-041">
+    <div class="section-header">
+      
+    <div class="leader-hero">
+      <img class="leader-img card-trigger" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-041_EN.webp"
+           alt="Boa Hancock" loading="lazy"
+           role="button" tabindex="0"
+           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-041_EN.webp"
+           data-name="Boa Hancock"
+           data-id="OP14-041"
+           data-usage="100"
+           data-avg="1.0"
+           data-decks="8"
+           data-total="8">
+      <div class="leader-meta">
+        <h2>Boa Hancock</h2>
+        <span class="badge">OP14-041</span>
+        <span class="deck-count">8 tournament decks analysed</span>
+      </div>
+    </div>
+    </div>
+    
+    <div class="type-section">
+      <h3 class="type-heading">Character</h3>
+      <details class="chart-details" id="op14-041-character-chart">
+        <summary class="chart-toggle">Usage chart (top 15)</summary>
+        <div class="chart">
+          <div class="chart-bars">
+              <div class="bar-group" title="Ran (OP14-114) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Ran</div>
+              </div>
+              <div class="bar-group" title="Gorgon Sisters (OP14-105) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Gorgon Sisters</div>
+              </div>
+              <div class="bar-group" title="Boa Hancock (OP14-112) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Boa Hancock</div>
+              </div>
+              <div class="bar-group" title="Boa Hancock (ST17-004) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Boa Hancock</div>
+              </div>
+              <div class="bar-group" title="Bartholomew Kuma (OP12-119) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Bartholomew Ku…</div>
+              </div>
+              <div class="bar-group" title="Shakuyaku (OP14-107) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Shakuyaku</div>
+              </div>
+              <div class="bar-group" title="Marguerite (OP14-113) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Marguerite</div>
+              </div>
+              <div class="bar-group" title="Charlotte Pudding (OP06-047) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Charlotte Pudd…</div>
+              </div>
+              <div class="bar-group" title="Silvers Rayleigh (OP14-108) — 87.5%">
+                <div class="bar-wrap">
+                  <span class="bar-val">87.5%</span>
+                  <div class="bar" style="height:105px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Silvers Raylei…</div>
+              </div>
+              <div class="bar-group" title="Gloriosa (Grandma Nyon) (OP14-103) — 75.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">75.0%</span>
+                  <div class="bar" style="height:90px;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">Gloriosa (Gran…</div>
+              </div>
+              <div class="bar-group" title="Kouzuki Hiyori (OP06-106) — 62.5%">
+                <div class="bar-wrap">
+                  <span class="bar-val">62.5%</span>
+                  <div class="bar" style="height:75px;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">Kouzuki Hiyori</div>
+              </div>
+              <div class="bar-group" title="Sengoku (OP07-046) — 62.5%">
+                <div class="bar-wrap">
+                  <span class="bar-val">62.5%</span>
+                  <div class="bar" style="height:75px;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">Sengoku</div>
+              </div>
+              <div class="bar-group" title="Nami (EB03-053) — 37.5%">
+                <div class="bar-wrap">
+                  <span class="bar-val">37.5%</span>
+                  <div class="bar" style="height:45px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Nami</div>
+              </div>
+              <div class="bar-group" title="Salome (OP14-106) — 12.5%">
+                <div class="bar-wrap">
+                  <span class="bar-val">12.5%</span>
+                  <div class="bar" style="height:15px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Salome</div>
+              </div>
+              <div class="bar-group" title="Rindo (OP14-115) — 12.5%">
+                <div class="bar-wrap">
+                  <span class="bar-val">12.5%</span>
+                  <div class="bar" style="height:15px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Rindo</div>
+              </div>
+          </div>
+        </div>
+      </details>
+      <div class="cards-grid">
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-114_EN.webp"
+          data-name="Ran"
+          data-id="OP14-114"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="8"
+          data-total="8"
+        >
+          <div class="card-rank">#1</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-114_EN.webp"
+               alt="Ran" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Ran</div>
+            <div class="card-meta">
+              <span class="badge">OP14-114</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-105_EN.webp"
+          data-name="Gorgon Sisters"
+          data-id="OP14-105"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="8"
+          data-total="8"
+        >
+          <div class="card-rank">#2</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-105_EN.webp"
+               alt="Gorgon Sisters" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Gorgon Sisters</div>
+            <div class="card-meta">
+              <span class="badge">OP14-105</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-112_EN.webp"
+          data-name="Boa Hancock"
+          data-id="OP14-112"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="8"
+          data-total="8"
+        >
+          <div class="card-rank">#3</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-112_EN.webp"
+               alt="Boa Hancock" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Boa Hancock</div>
+            <div class="card-meta">
+              <span class="badge">OP14-112</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST17/ST17-004_EN.webp"
+          data-name="Boa Hancock"
+          data-id="ST17-004"
+          data-usage="100.0"
+          data-avg="3.88"
+          data-decks="8"
+          data-total="8"
+        >
+          <div class="card-rank">#4</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST17/ST17-004_EN.webp"
+               alt="Boa Hancock" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Boa Hancock</div>
+            <div class="card-meta">
+              <span class="badge">ST17-004</span>
+              <span class="badge avg-badge">×3.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-119_EN.webp"
+          data-name="Bartholomew Kuma"
+          data-id="OP12-119"
+          data-usage="100.0"
+          data-avg="3.88"
+          data-decks="8"
+          data-total="8"
+        >
+          <div class="card-rank">#5</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-119_EN.webp"
+               alt="Bartholomew Kuma" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Bartholomew Kuma</div>
+            <div class="card-meta">
+              <span class="badge">OP12-119</span>
+              <span class="badge avg-badge">×3.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-107_EN.webp"
+          data-name="Shakuyaku"
+          data-id="OP14-107"
+          data-usage="100.0"
+          data-avg="3.88"
+          data-decks="8"
+          data-total="8"
+        >
+          <div class="card-rank">#6</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-107_EN.webp"
+               alt="Shakuyaku" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Shakuyaku</div>
+            <div class="card-meta">
+              <span class="badge">OP14-107</span>
+              <span class="badge avg-badge">×3.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-113_EN.webp"
+          data-name="Marguerite"
+          data-id="OP14-113"
+          data-usage="100.0"
+          data-avg="3.75"
+          data-decks="8"
+          data-total="8"
+        >
+          <div class="card-rank">#7</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-113_EN.webp"
+               alt="Marguerite" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Marguerite</div>
+            <div class="card-meta">
+              <span class="badge">OP14-113</span>
+              <span class="badge avg-badge">×3.8 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-047_EN.webp"
+          data-name="Charlotte Pudding"
+          data-id="OP06-047"
+          data-usage="100.0"
+          data-avg="2.38"
+          data-decks="8"
+          data-total="8"
+        >
+          <div class="card-rank">#8</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-047_EN.webp"
+               alt="Charlotte Pudding" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Charlotte Pudding</div>
+            <div class="card-meta">
+              <span class="badge">OP06-047</span>
+              <span class="badge avg-badge">×2.4 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-108_EN.webp"
+          data-name="Silvers Rayleigh"
+          data-id="OP14-108"
+          data-usage="87.5"
+          data-avg="1.86"
+          data-decks="7"
+          data-total="8"
+        >
+          <div class="card-rank">#9</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-108_EN.webp"
+               alt="Silvers Rayleigh" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Silvers Rayleigh</div>
+            <div class="card-meta">
+              <span class="badge">OP14-108</span>
+              <span class="badge avg-badge">×1.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:87.5%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">87.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-103_EN.webp"
+          data-name="Gloriosa (Grandma Nyon)"
+          data-id="OP14-103"
+          data-usage="75.0"
+          data-avg="2.33"
+          data-decks="6"
+          data-total="8"
+        >
+          <div class="card-rank">#10</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-103_EN.webp"
+               alt="Gloriosa (Grandma Nyon)" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Gloriosa (Grandma Nyon)</div>
+            <div class="card-meta">
+              <span class="badge">OP14-103</span>
+              <span class="badge avg-badge">×2.3 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:75.0%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">75.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-106_EN.webp"
+          data-name="Kouzuki Hiyori"
+          data-id="OP06-106"
+          data-usage="62.5"
+          data-avg="4.0"
+          data-decks="5"
+          data-total="8"
+        >
+          <div class="card-rank">#11</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-106_EN.webp"
+               alt="Kouzuki Hiyori" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Kouzuki Hiyori</div>
+            <div class="card-meta">
+              <span class="badge">OP06-106</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:62.5%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">62.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-046_EN.webp"
+          data-name="Sengoku"
+          data-id="OP07-046"
+          data-usage="62.5"
+          data-avg="3.4"
+          data-decks="5"
+          data-total="8"
+        >
+          <div class="card-rank">#12</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-046_EN.webp"
+               alt="Sengoku" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Sengoku</div>
+            <div class="card-meta">
+              <span class="badge">OP07-046</span>
+              <span class="badge avg-badge">×3.4 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:62.5%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">62.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB03/EB03-053_EN.webp"
+          data-name="Nami"
+          data-id="EB03-053"
+          data-usage="37.5"
+          data-avg="4.0"
+          data-decks="3"
+          data-total="8"
+        >
+          <div class="card-rank">#13</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB03/EB03-053_EN.webp"
+               alt="Nami" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Nami</div>
+            <div class="card-meta">
+              <span class="badge">EB03-053</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:37.5%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">37.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-106_EN.webp"
+          data-name="Salome"
+          data-id="OP14-106"
+          data-usage="12.5"
+          data-avg="4.0"
+          data-decks="1"
+          data-total="8"
+        >
+          <div class="card-rank">#14</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-106_EN.webp"
+               alt="Salome" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Salome</div>
+            <div class="card-meta">
+              <span class="badge">OP14-106</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:12.5%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">12.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-115_EN.webp"
+          data-name="Rindo"
+          data-id="OP14-115"
+          data-usage="12.5"
+          data-avg="4.0"
+          data-decks="1"
+          data-total="8"
+        >
+          <div class="card-rank">#15</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-115_EN.webp"
+               alt="Rindo" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Rindo</div>
+            <div class="card-meta">
+              <span class="badge">OP14-115</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:12.5%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">12.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-102_EN.webp"
+          data-name="Kumacy"
+          data-id="OP14-102"
+          data-usage="12.5"
+          data-avg="4.0"
+          data-decks="1"
+          data-total="8"
+        >
+          <div class="card-rank">#16</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-102_EN.webp"
+               alt="Kumacy" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Kumacy</div>
+            <div class="card-meta">
+              <span class="badge">OP14-102</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:12.5%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">12.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-110_EN.webp"
+          data-name="Dr. Hogback"
+          data-id="OP14-110"
+          data-usage="12.5"
+          data-avg="4.0"
+          data-decks="1"
+          data-total="8"
+        >
+          <div class="card-rank">#17</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-110_EN.webp"
+               alt="Dr. Hogback" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Dr. Hogback</div>
+            <div class="card-meta">
+              <span class="badge">OP14-110</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:12.5%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">12.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-111_EN.webp"
+          data-name="Perona"
+          data-id="OP14-111"
+          data-usage="12.5"
+          data-avg="4.0"
+          data-decks="1"
+          data-total="8"
+        >
+          <div class="card-rank">#18</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-111_EN.webp"
+               alt="Perona" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Perona</div>
+            <div class="card-meta">
+              <span class="badge">OP14-111</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:12.5%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">12.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-100_EN.webp"
+          data-name="Capone&quot;Gang&quot;Bege"
+          data-id="OP04-100"
+          data-usage="12.5"
+          data-avg="3.0"
+          data-decks="1"
+          data-total="8"
+        >
+          <div class="card-rank">#19</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-100_EN.webp"
+               alt="Capone&quot;Gang&quot;Bege" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Capone&quot;Gang&quot;Bege</div>
+            <div class="card-meta">
+              <span class="badge">OP04-100</span>
+              <span class="badge avg-badge">×3.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:12.5%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">12.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-104_EN.webp"
+          data-name="Gecko Moria"
+          data-id="OP14-104"
+          data-usage="12.5"
+          data-avg="3.0"
+          data-decks="1"
+          data-total="8"
+        >
+          <div class="card-rank">#20</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-104_EN.webp"
+               alt="Gecko Moria" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Gecko Moria</div>
+            <div class="card-meta">
+              <span class="badge">OP14-104</span>
+              <span class="badge avg-badge">×3.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:12.5%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">12.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-109_EN.webp"
+          data-name="Victoria Cindry"
+          data-id="OP14-109"
+          data-usage="12.5"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="8"
+        >
+          <div class="card-rank">#21</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-109_EN.webp"
+               alt="Victoria Cindry" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Victoria Cindry</div>
+            <div class="card-meta">
+              <span class="badge">OP14-109</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:12.5%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">12.5% of decks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="type-section">
+      <h3 class="type-heading">Event</h3>
+      <details class="chart-details" id="op14-041-event-chart">
+        <summary class="chart-toggle">Usage chart (top 7)</summary>
+        <div class="chart">
+          <div class="chart-bars">
+              <div class="bar-group" title="Perfume Femur (OP07-057) — 100.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">100.0%</span>
+                  <div class="bar" style="height:120px;background:#34d399;"></div>
+                </div>
+                <div class="bar-label">Perfume Femur</div>
+              </div>
+              <div class="bar-group" title="Slave Arrow (OP07-056) — 62.5%">
+                <div class="bar-wrap">
+                  <span class="bar-val">62.5%</span>
+                  <div class="bar" style="height:75px;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">Slave Arrow</div>
+              </div>
+              <div class="bar-group" title="You&#x27;re the One Who Should Disappear. (OP06-115) — 62.5%">
+                <div class="bar-wrap">
+                  <span class="bar-val">62.5%</span>
+                  <div class="bar" style="height:75px;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">You&#x27;re the One…</div>
+              </div>
+              <div class="bar-group" title="You&#x27;ll Frighten Me... ♡ (OP14-118) — 50.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">50.0%</span>
+                  <div class="bar" style="height:60px;background:#a3e635;"></div>
+                </div>
+                <div class="bar-label">You&#x27;ll Frighte…</div>
+              </div>
+              <div class="bar-group" title="Sables (ST03-015) — 37.5%">
+                <div class="bar-wrap">
+                  <span class="bar-val">37.5%</span>
+                  <div class="bar" style="height:45px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Sables</div>
+              </div>
+              <div class="bar-group" title="Gum-Gum Red Roc (OP04-056) — 25.0%">
+                <div class="bar-wrap">
+                  <span class="bar-val">25.0%</span>
+                  <div class="bar" style="height:30px;background:#fbbf24;"></div>
+                </div>
+                <div class="bar-label">Gum-Gum Red Roc</div>
+              </div>
+              <div class="bar-group" title="Gravity Blade Raging Tiger (OP06-058) — 12.5%">
+                <div class="bar-wrap">
+                  <span class="bar-val">12.5%</span>
+                  <div class="bar" style="height:15px;background:#f87171;"></div>
+                </div>
+                <div class="bar-label">Gravity Blade …</div>
+              </div>
+          </div>
+        </div>
+      </details>
+      <div class="cards-grid">
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-057_EN.webp"
+          data-name="Perfume Femur"
+          data-id="OP07-057"
+          data-usage="100.0"
+          data-avg="2.0"
+          data-decks="8"
+          data-total="8"
+        >
+          <div class="card-rank">#1</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-057_EN.webp"
+               alt="Perfume Femur" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Perfume Femur</div>
+            <div class="card-meta">
+              <span class="badge">OP07-057</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-056_EN.webp"
+          data-name="Slave Arrow"
+          data-id="OP07-056"
+          data-usage="62.5"
+          data-avg="2.6"
+          data-decks="5"
+          data-total="8"
+        >
+          <div class="card-rank">#2</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-056_EN.webp"
+               alt="Slave Arrow" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Slave Arrow</div>
+            <div class="card-meta">
+              <span class="badge">OP07-056</span>
+              <span class="badge avg-badge">×2.6 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:62.5%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">62.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-115_EN.webp"
+          data-name="You&#x27;re the One Who Should Disappear."
+          data-id="OP06-115"
+          data-usage="62.5"
+          data-avg="1.6"
+          data-decks="5"
+          data-total="8"
+        >
+          <div class="card-rank">#3</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-115_EN.webp"
+               alt="You&#x27;re the One Who Should Disappear." loading="lazy">
+          <div class="card-body">
+            <div class="card-name">You&#x27;re the One Who Should Disappear.</div>
+            <div class="card-meta">
+              <span class="badge">OP06-115</span>
+              <span class="badge avg-badge">×1.6 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:62.5%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">62.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-118_EN.webp"
+          data-name="You&#x27;ll Frighten Me... ♡"
+          data-id="OP14-118"
+          data-usage="50.0"
+          data-avg="2.5"
+          data-decks="4"
+          data-total="8"
+        >
+          <div class="card-rank">#4</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP14/OP14-118_EN.webp"
+               alt="You&#x27;ll Frighten Me... ♡" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">You&#x27;ll Frighten Me... ♡</div>
+            <div class="card-meta">
+              <span class="badge">OP14-118</span>
+              <span class="badge avg-badge">×2.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:50.0%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">50.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST03/ST03-015_EN.webp"
+          data-name="Sables"
+          data-id="ST03-015"
+          data-usage="37.5"
+          data-avg="2.0"
+          data-decks="3"
+          data-total="8"
+        >
+          <div class="card-rank">#5</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST03/ST03-015_EN.webp"
+               alt="Sables" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Sables</div>
+            <div class="card-meta">
+              <span class="badge">ST03-015</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:37.5%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">37.5% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-056_EN.webp"
+          data-name="Gum-Gum Red Roc"
+          data-id="OP04-056"
+          data-usage="25.0"
+          data-avg="1.5"
+          data-decks="2"
+          data-total="8"
+        >
+          <div class="card-rank">#6</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP04/OP04-056_EN.webp"
+               alt="Gum-Gum Red Roc" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Gum-Gum Red Roc</div>
+            <div class="card-meta">
+              <span class="badge">OP04-056</span>
+              <span class="badge avg-badge">×1.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:25.0%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">25.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-058_EN.webp"
+          data-name="Gravity Blade Raging Tiger"
+          data-id="OP06-058"
+          data-usage="12.5"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="8"
+        >
+          <div class="card-rank">#7</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-058_EN.webp"
+               alt="Gravity Blade Raging Tiger" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Gravity Blade Raging Tiger</div>
+            <div class="card-meta">
+              <span class="badge">OP06-058</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:12.5%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">12.5% of decks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+
+
+  <div class="overlay-backdrop" id="overlay">
+    <div class="overlay">
+      <button class="overlay-close" id="overlay-close">✕</button>
+      <div class="overlay-img-col">
+        <img class="overlay-img" id="overlay-img" src="" alt="">
+      </div>
+      <div class="overlay-info-col">
+        <div class="overlay-name" id="overlay-name"></div>
+        <div class="overlay-badges" id="overlay-badges"></div>
+        <div class="overlay-stats" id="overlay-stats"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── Card / leader click → overlay ────────────────────────────────────
+    const backdrop = document.getElementById('overlay');
+    const oImg     = document.getElementById('overlay-img');
+    const oName    = document.getElementById('overlay-name');
+    const oBadges  = document.getElementById('overlay-badges');
+    const oStats   = document.getElementById('overlay-stats');
+
+    function openOverlay(el) {
+      const d = el.dataset;
+      oImg.src     = d.image;
+      oImg.alt     = d.name;
+      oName.textContent = d.name;
+
+      oBadges.innerHTML =
+        `<span class="badge">${d.id}</span>`;
+
+      const usagePct  = parseFloat(d.usage);
+      const col = usagePct >= 80 ? '#34d399'
+                : usagePct >= 50 ? '#a3e635'
+                : usagePct >= 25 ? '#fbbf24' : '#f87171';
+
+      oStats.innerHTML = `
+        <div class="overlay-stat">
+          <div class="overlay-stat-label">Usage</div>
+          <div class="overlay-stat-value" style="color:${col}">${d.usage}%</div>
+        </div>
+        <div class="overlay-stat">
+          <div class="overlay-stat-label">Decks with card</div>
+          <div class="overlay-stat-value">${d.decks} / ${d.total}</div>
+        </div>
+        <div class="overlay-stat">
+          <div class="overlay-stat-label">Avg copies</div>
+          <div class="overlay-stat-value">${parseFloat(d.avg).toFixed(1)}</div>
+        </div>`;
+
+      backdrop.classList.add('open');
+    }
+
+    document.querySelectorAll('.card, .card-trigger').forEach(el => {
+      el.addEventListener('click', () => openOverlay(el));
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') openOverlay(el);
+      });
+    });
+
+    document.getElementById('overlay-close').addEventListener('click', () => {
+      backdrop.classList.remove('open');
+    });
+    backdrop.addEventListener('click', e => {
+      if (e.target === backdrop) backdrop.classList.remove('open');
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') backdrop.classList.remove('open');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+name: Update One Piece TCG Decks
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0' # Runs every Sunday at midnight UTC
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: pip install -r one-piece-tcg-decks/requirements.txt
+
+      - name: Run fetch script
+        run: python fetch_top_cards_for_leader.py
+        working-directory: one-piece-tcg-decks
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add one-piece-tcg-decks/index.html one-piece-tcg-decks/cache/
+          git diff --cached --quiet || git commit -m "chore: update one-piece-tcg-decks index.html"
+          git push
