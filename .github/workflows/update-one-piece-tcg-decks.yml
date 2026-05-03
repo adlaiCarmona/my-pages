@@ -3,10 +3,10 @@ name: Update One Piece TCG Decks
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 0' # Runs every Sunday at midnight UTC
+    - cron: "0 0 * * 0" # Runs every Sunday at midnight UTC
   push:
     paths:
-      - 'one-piece-tcg-decks/leaders.json'
+      - "one-piece-tcg-decks/leaders.json"
 
 jobs:
   update:
@@ -31,6 +31,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add one-piece-tcg-decks/index.html one-piece-tcg-decks/cache/
+          git add one-piece-tcg-decks/index.html
           git diff --cached --quiet || git commit -m "chore: update one-piece-tcg-decks index.html"
           git push
