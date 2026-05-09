@@ -16,7 +16,8 @@ HEADERS = {
     "Content-Type": "application/json",
 }
 
-CACHE_DIR = "cache"
+_HERE = os.path.dirname(os.path.abspath(__file__))
+CACHE_DIR = os.path.join(_HERE, "cache")
 
 
 def build_payload(set_name: str) -> dict:
@@ -111,7 +112,7 @@ def get_card_info(result: dict) -> dict:
 
 IMAGE_BASE = "https://tcgplayer-cdn.tcgplayer.com/product"
 IMAGE_SIZE = "400x400"
-OUTPUT_HTML = "index.html"
+OUTPUT_HTML = os.path.join(_HERE, "index.html")
 
 
 def card_image_url(product_id, size=IMAGE_SIZE) -> str:
@@ -350,25 +351,32 @@ def build_html(sets_data: list[dict]) -> str:
     }}
 
     /* ── Sidebar nav ── */
-    .sidebar {{
-      position: fixed;
-      top: 0; left: 0;
-      width: 240px;
-      height: 100vh;
-      background: #17171f;
-      border-right: 1px solid #2a2a3a;
-      overflow-y: auto;
-      padding: 1.5rem 0;
-      z-index: 100;
-    }}
-    .sidebar h1 {{
-      font-size: 1rem;
-      font-weight: 700;
-      color: #a78bfa;
-      padding: 0 1.2rem 1rem;
-      border-bottom: 1px solid #2a2a3a;
-      margin-bottom: .8rem;
-    }}
+     .sidebar {{
+       position: fixed;
+       top: 0; left: 0;
+       width: 240px;
+       height: 100vh;
+       background: #17171f;
+       border-right: 1px solid #2a2a3a;
+       overflow-y: auto;
+       padding: 1.5rem 0;
+       z-index: 100;
+       display: flex;
+       flex-direction: column;
+     }}
+     .sidebar-logo {{
+       display: block;
+       width: 140px;
+       margin: 0 auto 1rem;
+     }}
+     .sidebar h1 {{
+       font-size: 1rem;
+       font-weight: 700;
+       color: #a78bfa;
+       padding: 0 1.2rem 1rem;
+       border-bottom: 1px solid #2a2a3a;
+       margin-bottom: .8rem;
+     }}
     .sidebar ul {{ list-style: none; }}
     .sidebar li {{
       display: flex;
@@ -620,9 +628,74 @@ def build_html(sets_data: list[dict]) -> str:
     .price-mid  {{ color: #fbbf24; }}
     .price-low  {{ color: #34d399; }}
 
-    @media (max-width: 640px) {{
-      .sidebar {{ display: none; }}
-      .main {{ margin-left: 0; padding: 1rem; }}
+    /* ── Site header (mobile only) ── */
+    .site-header {{
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      background: #17171f;
+      border-bottom: 1px solid #2a2a3a;
+      z-index: 200;
+      align-items: center;
+      padding: 0 1rem;
+      gap: .75rem;
+    }}
+    .site-header-logo {{
+      height: 28px;
+      flex: 1;
+      object-fit: contain;
+      object-position: left center;
+    }}
+
+    /* ── Hamburger button ── */
+    .hamburger {{
+      background: none;
+      border: 1px solid #2a2a3a;
+      border-radius: 7px;
+      padding: .4rem .5rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: center;
+      justify-content: center;
+    }}
+    .hamburger span {{
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: #a78bfa;
+      border-radius: 2px;
+    }}
+
+    /* ── Sidebar backdrop (mobile) ── */
+    .sidebar-backdrop {{
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 99;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }}
+
+    @media (max-width: 800px) {{
+      .site-header {{ display: flex; }}
+      .sidebar {{
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+        top: 52px;
+        height: calc(100vh - 52px);
+      }}
+      .sidebar-logo {{ display: none; }}
+      .sidebar.open {{ transform: translateX(0); }}
+      .main {{ margin-left: 0; padding: 4rem 1rem 1rem; }}
+      .sidebar-backdrop {{ display: block; }}
+      .sidebar-backdrop.open {{ opacity: 1; pointer-events: all; }}
+      .set-section {{ scroll-margin-top: 52px; }}
+      .set-header {{ top: 52px; }}
     }}
 
     /* ── Card overlay ── */
@@ -842,7 +915,15 @@ def build_html(sets_data: list[dict]) -> str:
   </style>
 </head>
 <body>
-  <nav class="sidebar">
+  <header class="site-header">
+    <img class="site-header-logo" src="../common/one-piece-full-logo.webp" alt="One Piece TCG" />
+    <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <nav class="sidebar" id="sidebar">
+    <img class="sidebar-logo" src="../common/one-piece-full-logo.webp" alt="One Piece TCG" />
     <h1>TCG Top Cards</h1>
     <ul>
       {set_nav}
@@ -972,6 +1053,27 @@ def build_html(sets_data: list[dict]) -> str:
     ovClose.addEventListener('click', closeOverlay);
     backdrop.addEventListener('click', e => {{ if (e.target === backdrop) closeOverlay(); }});
     document.addEventListener('keydown', e => {{ if (e.key === 'Escape') closeOverlay(); }});
+
+    /* ── Hamburger / sidebar ── */
+    const hamburger      = document.getElementById('hamburger');
+    const sidebar        = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+    function openSidebar() {{
+      sidebar.classList.add('open');
+      sidebarBackdrop.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }}
+    function closeSidebar() {{
+      sidebar.classList.remove('open');
+      sidebarBackdrop.classList.remove('open');
+      document.body.style.overflow = '';
+    }}
+
+    hamburger.addEventListener('click', openSidebar);
+    sidebarBackdrop.addEventListener('click', closeSidebar);
+    document.addEventListener('keydown', e => {{ if (e.key === 'Escape') closeSidebar(); }});
+    sidebar.querySelectorAll('a').forEach(a => a.addEventListener('click', closeSidebar));
   </script>
 </body>
 </html>"""

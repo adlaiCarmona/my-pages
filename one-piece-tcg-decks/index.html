@@ -16,25 +16,32 @@
     }
 
     /* ── Sidebar ── */
-    .sidebar {
-      position: fixed;
-      top: 0; left: 0;
-      width: 240px;
-      height: 100vh;
-      background: #17171f;
-      border-right: 1px solid #2a2a3a;
-      overflow-y: auto;
-      padding: 1.5rem 0;
-      z-index: 100;
-    }
-    .sidebar h1 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #a78bfa;
-      padding: 0 1.2rem 1rem;
-      border-bottom: 1px solid #2a2a3a;
-      margin-bottom: .8rem;
-    }
+     .sidebar {
+       position: fixed;
+       top: 0; left: 0;
+       width: 240px;
+       height: 100vh;
+       background: #17171f;
+       border-right: 1px solid #2a2a3a;
+       overflow-y: auto;
+       padding: 1.5rem 0;
+       z-index: 100;
+       display: flex;
+       flex-direction: column;
+     }
+     .sidebar-logo {
+       display: block;
+       width: 140px;
+       margin: 0 auto 1rem;
+     }
+     .sidebar h1 {
+       font-size: 1rem;
+       font-weight: 700;
+       color: #a78bfa;
+       padding: 0 1.2rem 1rem;
+       border-bottom: 1px solid #2a2a3a;
+       margin-bottom: .8rem;
+     }
     .sidebar ul { list-style: none; }
     .sidebar li {
       display: flex;
@@ -396,24 +403,98 @@
     }
     .overlay-card-text:empty { display: none; }
 
-    @media (max-width: 640px) {
-      .sidebar { display: none; }
-      .main { margin-left: 0; padding: 1rem; }
+    /* ── Site header (mobile only) ── */
+    .site-header {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      background: #17171f;
+      border-bottom: 1px solid #2a2a3a;
+      z-index: 200;
+      align-items: center;
+      padding: 0 1rem;
+      gap: .75rem;
+    }
+    .site-header-logo {
+      height: 28px;
+      flex: 1;
+      object-fit: contain;
+      object-position: left center;
+    }
+
+    /* ── Hamburger button ── */
+    .hamburger {
+      background: none;
+      border: 1px solid #2a2a3a;
+      border-radius: 7px;
+      padding: .4rem .5rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: center;
+      justify-content: center;
+    }
+    .hamburger span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: #a78bfa;
+      border-radius: 2px;
+    }
+
+    /* ── Sidebar backdrop (mobile) ── */
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 99;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .25s;
+    }
+
+    @media (max-width: 800px) {
+      .site-header { display: flex; }
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform .25s ease;
+        top: 52px;
+        height: calc(100vh - 52px);
+      }
+      .sidebar-logo { display: none; }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; padding: 4rem 1rem 1rem; }
+      .sidebar-backdrop { display: block; }
+      .sidebar-backdrop.open { opacity: 1; pointer-events: all; }
       .overlay { flex-direction: column; }
       .overlay-img-col { flex: none; align-self: center; }
+      .leader-section { scroll-margin-top: 52px; }
+      .section-header { top: 52px; }
     }
   </style>
 </head>
 <body>
 
-  <nav class="sidebar">
+  <header class="site-header">
+    <img class="site-header-logo" src="../common/one-piece-full-logo.webp" alt="One Piece TCG" />
+    <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <nav class="sidebar" id="sidebar">
+    <img class="sidebar-logo" src="../common/one-piece-full-logo.webp" alt="One Piece TCG" />
     <h1>TCG Top Cards<br><small style="color:#6b6b8a;font-weight:400">by Leader</small></h1>
     <ul>
       <li><a href="#op06-022">Yamato <span class="nav-card-id">(OP06-022)</span></a><span class="nav-total">48 decks</span></li>
       <li><a href="#op07-019">Jewelry Bonney <span class="nav-card-id">(OP07-019)</span></a><span class="nav-total">50 decks</span></li>
       <li><a href="#op14-041">Boa Hancock <span class="nav-card-id">(OP14-041)</span></a><span class="nav-total">8 decks</span></li>
-      <li><a href="#op15-002">Lucy <span class="nav-card-id">(OP15-002)</span></a><span class="nav-total">5 decks</span></li>
-      <li><a href="#op15-058">Enel <span class="nav-card-id">(OP15-058)</span></a><span class="nav-total">12 decks</span></li>
+      <li><a href="#op15-002">Lucy <span class="nav-card-id">(OP15-002)</span></a><span class="nav-total">12 decks</span></li>
+      <li><a href="#op15-058">Enel <span class="nav-card-id">(OP15-058)</span></a><span class="nav-total">33 decks</span></li>
+      <li><a href="#op15-098">Monkey.D.Luffy <span class="nav-card-id">(OP15-098)</span></a><span class="nav-total">2 decks</span></li>
     </ul>
   </nav>
 
@@ -540,7 +621,7 @@
           data-avg="3.96"
           data-decks="48"
           data-total="48"
-          data-market-price="0.3"
+          data-market-price="0.24"
           data-rarity="UC"
           data-card-text="[On Play] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less.  This card has been officially errata&#x27;d."
           data-card-color="Green"
@@ -574,7 +655,7 @@
           data-avg="3.85"
           data-decks="47"
           data-total="48"
-          data-market-price="3.57"
+          data-market-price="3.89"
           data-rarity="SR"
           data-card-text="[Rush] (This card can attack on the turn in which it is played.)
 [On Play] Rest up to a total of 2 of your opponent&#x27;s Characters or DON!! cards. Then, add 1 card from the top of your Life cards to your hand."
@@ -609,7 +690,7 @@
           data-avg="3.91"
           data-decks="44"
           data-total="48"
-          data-market-price="1.12"
+          data-market-price="1.32"
           data-rarity="R"
           data-card-text="[On Play] Up to 1 of your Leader or Character cards gains [Banish] during this turn. (When this card deals damage, the target card is trashed without activating its Trigger.) [Trigger] K.O. up to 1 of your opponent&#x27;s Characters with a cost of 5 or less."
           data-card-color="Yellow"
@@ -643,7 +724,7 @@
           data-avg="3.84"
           data-decks="31"
           data-total="48"
-          data-market-price="2.1"
+          data-market-price="2.06"
           data-rarity="R"
           data-card-text="[On K.O.] If your opponent has 3 or less Life cards, add up to 1 card from the top of your deck to the top of your Life cards.
 [Trigger] If your opponent has 3 or less Life cards, play this card."
@@ -678,7 +759,7 @@
           data-avg="3.11"
           data-decks="27"
           data-total="48"
-          data-market-price="0.26"
+          data-market-price="0.28"
           data-rarity="SR"
           data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)
 [On Play] Add up to 1 of your &quot;Land of Wano&quot; type Characters other than [Kouzuki Momonosuke] to the top or bottom of the owner&#x27;s Life cards face-up."
@@ -781,7 +862,7 @@
           data-avg="3.89"
           data-decks="19"
           data-total="48"
-          data-market-price="8.95"
+          data-market-price="8.96"
           data-rarity="SR"
           data-card-text="[On Play] If you have 2 or less Characters, play up to 1 [Muggy Kingdom] type or &quot;Slash&quot; attribute Character card with a cost of 4 or less other than [Dracule Mihawk] from your hand rested."
           data-card-color="Green"
@@ -815,7 +896,7 @@
           data-avg="3.53"
           data-decks="19"
           data-total="48"
-          data-market-price="0.06"
+          data-market-price="0.07"
           data-rarity="UC"
           data-card-text="[DON!! x2] This Character can also attack your opponent&#x27;s active Characters.
 [Trigger] If your opponent has 3 or less Life cards, play this card."
@@ -884,7 +965,7 @@
           data-avg="4.0"
           data-decks="14"
           data-total="48"
-          data-market-price="0.16"
+          data-market-price="0.18"
           data-rarity="C"
           data-card-text="NULL"
           data-card-color="Yellow"
@@ -918,7 +999,7 @@
           data-avg="4.0"
           data-decks="14"
           data-total="48"
-          data-market-price="0.36"
+          data-market-price="0.33"
           data-rarity="R"
           data-card-text="If you have 2 or less Life cards, this Character gains +1000 power. [On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Holly] and add it to your hand. Then, place the rest at the bottom of your deck in any order and play up to 1 [Holly] from your hand."
           data-card-color="Yellow"
@@ -952,7 +1033,7 @@
           data-avg="3.93"
           data-decks="14"
           data-total="48"
-          data-market-price="1.07"
+          data-market-price="1.02"
           data-rarity="SR"
           data-card-text="[DON!! x1] [Opponent&#x27;s Turn] If this Character is rested, your opponent cannot attack any card other than the Character [Eustass&quot;Captain&quot;Kid]. [Activate:Main] [Once Per Turn] You may rest this Character: Play up to 1 Character card with a cost of 3 or less from your hand.  This card has been officially errata&#x27;d."
           data-card-color="Green"
@@ -1020,7 +1101,7 @@
           data-avg="2.79"
           data-decks="14"
           data-total="48"
-          data-market-price="0.29"
+          data-market-price="0.32"
           data-rarity="SR"
           data-card-text="[DON!! x1] If you have less Life cards than your opponent, this Character gains [Double Attack] and +1000 power. (This card deals 2 damage.) [Trigger] You may trash 1 card from your hand: Play this card."
           data-card-color="Yellow"
@@ -1054,7 +1135,7 @@
           data-avg="3.85"
           data-decks="13"
           data-total="48"
-          data-market-price="1.56"
+          data-market-price="1.24"
           data-rarity="R"
           data-card-text="[On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Sky Island] type card other than [Shura] and add it to your hand. Then, place the rest at the bottom of your deck in any order. [Trigger] Play this card."
           data-card-color="Yellow"
@@ -1122,7 +1203,7 @@
           data-avg="3.27"
           data-decks="11"
           data-total="48"
-          data-market-price="2.22"
+          data-market-price="2.35"
           data-rarity="SR"
           data-card-text="[On Play] If you have 2 or less Life cards, this Character gains [Rush].
 (This card can attack on the turn in which it is played.)"
@@ -1157,7 +1238,7 @@
           data-avg="2.82"
           data-decks="11"
           data-total="48"
-          data-market-price="0.57"
+          data-market-price="0.51"
           data-rarity="SR"
           data-card-text="[Opponent&#x27;s Turn] [Once Per Turn] When your opponent plays a Character, if your Leader has the [Donquixote Pirates] type, rest up to 1 of your opponent&#x27;s Characters. Then, rest this Character. [On Play] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less."
           data-card-color="Green"
@@ -1226,7 +1307,7 @@
           data-avg="4.0"
           data-decks="8"
           data-total="48"
-          data-market-price="1.45"
+          data-market-price="1.21"
           data-rarity="SR"
           data-card-text="[DON!! x2] [Your Turn] This Character gains +3000 power.
 [On Play] Look at 5 cards from the top of your deck; reveal up to 1 &quot;Land of Wano&quot; type card with a cost of 2 or more and add it to your hand. Then, place the rest at the bottom of your deck in any order."
@@ -1261,7 +1342,7 @@
           data-avg="3.62"
           data-decks="8"
           data-total="48"
-          data-market-price="0.13"
+          data-market-price="0.12"
           data-rarity="C"
           data-card-text="[DON!! x2] This Character gains [Blocker].
 [On Play] Your &quot;Land of Wano&quot; type Leader gains [Banish] during this turn."
@@ -1330,7 +1411,7 @@
           data-avg="4.0"
           data-decks="7"
           data-total="48"
-          data-market-price="0.45"
+          data-market-price="0.44"
           data-rarity="C"
           data-card-text="[Trigger] If your Leader has the &quot;Land of Wano&quot; type and your opponent has 3 or less Life cards, play this card."
           data-card-color="Yellow"
@@ -1364,7 +1445,7 @@
           data-avg="4.0"
           data-decks="7"
           data-total="48"
-          data-market-price="1.08"
+          data-market-price="1.05"
           data-rarity="C"
           data-card-text="[Activate: Main] (1) (You may rest the specified number of DON!! cards in your cost area.) You may rest this card: Look at 5 cards from the top of your deck; reveal up to 1 &quot;Supernovas&quot; type card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
           data-card-color="Green"
@@ -1432,7 +1513,7 @@
           data-avg="3.71"
           data-decks="7"
           data-total="48"
-          data-market-price="0.14"
+          data-market-price="0.13"
           data-rarity="R"
           data-card-text="[Activate:Main] (1) (You may rest the specified number of DON!! cards in your cost area.) You may rest this Character: Look at 5 cards from the top of your deck; reveal up to 1 [Donquixote Pirates] type card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
           data-card-color="Green"
@@ -1466,7 +1547,7 @@
           data-avg="3.14"
           data-decks="7"
           data-total="48"
-          data-market-price="0.07"
+          data-market-price="0.08"
           data-rarity="UC"
           data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [On Block] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less."
           data-card-color="Green"
@@ -1500,7 +1581,7 @@
           data-avg="2.71"
           data-decks="7"
           data-total="48"
-          data-market-price="0.54"
+          data-market-price="0.57"
           data-rarity="SR"
           data-card-text="[Your Turn] If you have 2 or less Life cards, your Leader gains +1000 power.
 [Activate: Main] [Once Per Turn] You may return 2 total of your currently given DON!! cards to your cost area rested: This Character gains [Rush] and +1000 power during this turn.
@@ -1570,7 +1651,7 @@
           data-avg="2.14"
           data-decks="7"
           data-total="48"
-          data-market-price="0.22"
+          data-market-price="0.25"
           data-rarity="R"
           data-card-text="[On Play] K.O. up to 1 of your opponent&#x27;s Characters with a cost equal to or less than the number of your opponent&#x27;s Life cards."
           data-card-color="Yellow"
@@ -1604,7 +1685,7 @@
           data-avg="4.0"
           data-decks="6"
           data-total="48"
-          data-market-price="0.1"
+          data-market-price="0.13"
           data-rarity="UC"
           data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [DON!! x1] [On Block] If you have 3 or more Characters, draw 1 card."
           data-card-color="Green"
@@ -1638,7 +1719,7 @@
           data-avg="3.33"
           data-decks="6"
           data-total="48"
-          data-market-price="0.73"
+          data-market-price="0.66"
           data-rarity="R"
           data-card-text="[Trigger] Up to 1 of your opponent&#x27;s Leader or Character cards cannot attack during this turn."
           data-card-color="Yellow"
@@ -1672,7 +1753,7 @@
           data-avg="1.83"
           data-decks="6"
           data-total="48"
-          data-market-price="0.68"
+          data-market-price="0.73"
           data-rarity="SR"
           data-card-text="[Rush] [Once Per Turn] If this Character would leave the field, you may trash 1 card from the top of your Life cards instead. If there is a [Monkey.D.Luffy] Character, this effect is negated."
           data-card-color="Yellow"
@@ -1706,7 +1787,7 @@
           data-avg="3.4"
           data-decks="5"
           data-total="48"
-          data-market-price="0.81"
+          data-market-price="0.89"
           data-rarity="SR"
           data-card-text="[On Play] Up to a total of 3 of your opponent&#x27;s rested Leader and Character cards will not become active in your opponent&#x27;s next Refresh Phase."
           data-card-color="Green"
@@ -1740,7 +1821,7 @@
           data-avg="4.0"
           data-decks="4"
           data-total="48"
-          data-market-price="0.24"
+          data-market-price="0.23"
           data-rarity="R"
           data-card-text="[On Play] Look at 5 cards from the top of your deck; reveal up to 1 green [Land of Wano] type card other than [Otama] and add it to your hand. Then, place the rest at the bottom of your deck in any order."
           data-card-color="Green"
@@ -1774,7 +1855,7 @@
           data-avg="3.75"
           data-decks="4"
           data-total="48"
-          data-market-price="0.23"
+          data-market-price="0.22"
           data-rarity="R"
           data-card-text="[On K.O.] Trash up to 1 card from the top of your opponent&#x27;s Life cards.
 [Trigger] Draw 2 cards and trash 1 card from your hand."
@@ -1843,7 +1924,7 @@
           data-avg="2.5"
           data-decks="4"
           data-total="48"
-          data-market-price="4.42"
+          data-market-price="3.83"
           data-rarity="SR"
           data-card-text="[On Play] You may trash 1 card with a [Trigger] from your hand: K.O. up to 1 of your opponent&#x27;s Characters with a cost of 5 or less. Then, if you have 3 or less cards in your hand, draw 1 card. [Trigger] Activate this card&#x27;s [On Play] effect."
           data-card-color="Yellow"
@@ -1911,7 +1992,7 @@
           data-avg="4.0"
           data-decks="3"
           data-total="48"
-          data-market-price="0.23"
+          data-market-price="0.24"
           data-rarity="R"
           data-card-text="[Trigger] Draw 1 card. Then, if you have 1 or less Life cards, play this card."
           data-card-color="Yellow"
@@ -1945,7 +2026,7 @@
           data-avg="3.67"
           data-decks="3"
           data-total="48"
-          data-market-price="0.12"
+          data-market-price="0.15"
           data-rarity="R"
           data-card-text="[On Play] You may trash 1 card from your hand: Up to 1 of your opponent&#x27;s rested Leader cannot attack until the end of your opponent&#x27;s next turn.
 [Trigger] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less."
@@ -1980,7 +2061,7 @@
           data-avg="2.33"
           data-decks="3"
           data-total="48"
-          data-market-price="0.56"
+          data-market-price="0.54"
           data-rarity="SR"
           data-card-text="[On Play] K.O. up to 1 of your opponent&#x27;s Characters with a cost equal to or less than the total of your and your opponent&#x27;s Life cards. Then, if you have 1 or less Life cards, add up to 1 card from the top of your deck to the top of your Life cards."
           data-card-color="Yellow"
@@ -2048,7 +2129,7 @@
           data-avg="4.0"
           data-decks="2"
           data-total="48"
-          data-market-price="18.89"
+          data-market-price="19.94"
           data-rarity="SEC"
           data-card-text="[On Play] You may trash 1 card from your hand: Add up to 1 card from the top of your deck to the top of your Life cards. Then, this Character gains +2 cost until the end of your opponent&#x27;s next End Phase.
 [Opponent&#x27;s Turn] [On K.O.] Add up to 1 card from the top of your deck to the top of your Life cards."
@@ -2117,7 +2198,7 @@
           data-avg="3.0"
           data-decks="2"
           data-total="48"
-          data-market-price="0.13"
+          data-market-price="0.15"
           data-rarity="R"
           data-card-text="[On Play] / [On K.O.] K.O. up to 1 of your opponent&#x27;s rested Characters with a cost of 4 or less."
           data-card-color="Green"
@@ -2151,7 +2232,7 @@
           data-avg="3.0"
           data-decks="2"
           data-total="48"
-          data-market-price="0.14"
+          data-market-price="0.12"
           data-rarity="UC"
           data-card-text="[On Play] Up to 1 of your [Land of Wano] type Leader or Character cards gains +1000 power during this turn. [Trigger] Play this card."
           data-card-color="Yellow"
@@ -2185,7 +2266,7 @@
           data-avg="2.5"
           data-decks="2"
           data-total="48"
-          data-market-price="2.51"
+          data-market-price="2.49"
           data-rarity="SR"
           data-card-text="[On Play] Your opponent chooses one: • Trash 1 card from the top of your opponent&#x27;s Life cards. • Add 1 card from the top of your deck to the top of your Life cards."
           data-card-color="Yellow"
@@ -2219,7 +2300,7 @@
           data-avg="2.5"
           data-decks="2"
           data-total="48"
-          data-market-price="0.57"
+          data-market-price="0.54"
           data-rarity="SR"
           data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [On Play] You may return 1 Character to your hand: Play up to 1 Character card with a cost of 3 or less from your hand.  This card has been officially errata&#x27;d."
           data-card-color="Green"
@@ -2253,7 +2334,7 @@
           data-avg="2.0"
           data-decks="2"
           data-total="48"
-          data-market-price="0.19"
+          data-market-price="0.18"
           data-rarity="R"
           data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)[On Play] If your opponent has 1 or less Life cards, K.O. up to 1 of your opponent&#x27;s Characters with a cost of 3 or less."
           data-card-color="Yellow"
@@ -2287,7 +2368,7 @@
           data-avg="1.5"
           data-decks="2"
           data-total="48"
-          data-market-price="4.85"
+          data-market-price="4.87"
           data-rarity="SEC"
           data-card-text="[When Attacking][Once Per Turn](1)(You may rest the specified number of DON!! cards in your cost area.): Set this Character as active.
 [Activate:Main][Once Per Turn](2)(You may rest the specified number of DON!! cards in your cost area.): Set this Character as active."
@@ -2390,7 +2471,7 @@
           data-avg="4.0"
           data-decks="1"
           data-total="48"
-          data-market-price="0.13"
+          data-market-price="0.14"
           data-rarity="R"
           data-card-text="Also treat this card&#x27;s name as [Charlotte Linlin] according to the rules. [Trigger] If you have 1 or less Life cards, play this card."
           data-card-color="Yellow"
@@ -2424,7 +2505,7 @@
           data-avg="3.0"
           data-decks="1"
           data-total="48"
-          data-market-price="1.43"
+          data-market-price="1.57"
           data-rarity="SR"
           data-card-text="[Blocker]
 [On Play] Set up to 4 of your DON!! cards as active. Then, you cannot play Character cards with a base cost of 7 or more during this turn."
@@ -2459,7 +2540,7 @@
           data-avg="2.0"
           data-decks="1"
           data-total="48"
-          data-market-price="0.83"
+          data-market-price="0.82"
           data-rarity="SR"
           data-card-text="[On Play] You may rest this Character: Trash up to 1 card from the top of your opponent&#x27;s Life cards.
 [End of Your Turn] If your opponent has 2 or less Life cards, draw 1 card and trash 1 card from your hand."
@@ -2494,7 +2575,7 @@
           data-avg="2.0"
           data-decks="1"
           data-total="48"
-          data-market-price="1.48"
+          data-market-price="1.78"
           data-rarity="R"
           data-card-text="[On Play] You may add 1 card from the top or bottom of your Life cards to your hand: K.O. up to 1 of your opponent&#x27;s Characters with a cost of 5 or less."
           data-card-color="Yellow"
@@ -2562,7 +2643,7 @@
           data-avg="2.0"
           data-decks="1"
           data-total="48"
-          data-market-price="1.3"
+          data-market-price="1.38"
           data-rarity="R"
           data-card-text="[On Play] If your opponent has 3 or more Life cards, trash up to 1 card from the top of your opponent&#x27;s Life cards.
 [Trigger] Play up to 1 yellow Character card with a cost of 3 or less from your hand."
@@ -2597,7 +2678,7 @@
           data-avg="2.0"
           data-decks="1"
           data-total="48"
-          data-market-price="0.09"
+          data-market-price="0.08"
           data-rarity="C"
           data-card-text="[On Your Opponent&#x27;s Attack] (2) (You may rest the specified number of DON!! cards in your cost area.): Rest up to 1 of your opponent&#x27;s DON!! cards."
           data-card-color="Green"
@@ -2631,7 +2712,7 @@
           data-avg="2.0"
           data-decks="1"
           data-total="48"
-          data-market-price="0.17"
+          data-market-price="0.16"
           data-rarity="UC"
           data-card-text="[On Play] You may place 1 of your Stages at the bottom of your deck: Draw 1 card and trash 1 card from your hand."
           data-card-color="Yellow"
@@ -2665,7 +2746,7 @@
           data-avg="1.0"
           data-decks="1"
           data-total="48"
-          data-market-price="1.76"
+          data-market-price="1.79"
           data-rarity="SR"
           data-card-text="[On Play]/[When Attacking] Up to 1 of your opponent&#x27;s rested Characters with a cost of 7 or less will not become active in your opponent&#x27;s next Refresh Phase."
           data-card-color="Green"
@@ -2699,7 +2780,7 @@
           data-avg="1.0"
           data-decks="1"
           data-total="48"
-          data-market-price="0.83"
+          data-market-price="0.78"
           data-rarity="SR"
           data-card-text="[On Play] Look at up to 1 card from the top of your or your opponent&#x27;s Life cards, and place it at the top or bottom of the Life cards. Then, if you have less Life cards than your opponent, this Character gains [Rush] during this turn. (This card can attack on the turn in which it is played.)"
           data-card-color="Yellow"
@@ -2733,7 +2814,7 @@
           data-avg="1.0"
           data-decks="1"
           data-total="48"
-          data-market-price="0.36"
+          data-market-price="0.35"
           data-rarity="R"
           data-card-text="Also treat this card&#x27;s name as [Kouzuki Oden] according to the rules. [On Play] Rest up to 1 of your opponent&#x27;s Characters with a cost of 6 or less."
           data-card-color="Green"
@@ -2767,7 +2848,7 @@
           data-avg="1.0"
           data-decks="1"
           data-total="48"
-          data-market-price="2.96"
+          data-market-price="2.76"
           data-rarity="SEC"
           data-card-text="Also treat this card&#x27;s name as [Kouzuki Oden] according to the rules. [Double Attack] (This card deals 2 damage.) [Banish] (When this card deals damage, the target card is trashed without activating its Trigger.)"
           data-card-color="Green"
@@ -2848,7 +2929,7 @@
           data-avg="2.57"
           data-decks="35"
           data-total="48"
-          data-market-price="1.4"
+          data-market-price="1.75"
           data-rarity="R"
           data-card-text="[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +3000 power during this battle.
 [Trigger] If you have 0 Life cards, you may add up to 1 card from the top of your deck to the top of your Life cards. Then, trash 1 card from your hand."
@@ -2951,7 +3032,7 @@
           data-avg="2.8"
           data-decks="10"
           data-total="48"
-          data-market-price="0.24"
+          data-market-price="0.18"
           data-rarity="R"
           data-card-text="[Main] Up to 1 of your Leader or Character cards gains +3000 power during this turn. Then, you may rest 1 of your Characters with a cost of 3 or more. If you do, rest up to 1 of your opponent&#x27;s Characters with a cost of 5 or less. [Trigger] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less."
           data-card-color="Green"
@@ -3053,7 +3134,7 @@
           data-avg="1.75"
           data-decks="8"
           data-total="48"
-          data-market-price="0.44"
+          data-market-price="0.45"
           data-rarity="R"
           data-card-text="[Counter] Up to 1 of your Leader or Character cards gains +4000 power during this battle. Then, rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less. [Trigger] Rest up to 1 of your opponent&#x27;s Characters.  This card has been officially errata&#x27;d."
           data-card-color="Green"
@@ -3125,7 +3206,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.2"
           data-decks="5"
           data-total="48"
-          data-market-price="1.02"
+          data-market-price="0.99"
           data-rarity="C"
           data-card-text="[Main] Rest up to 1 of your opponent&#x27;s Characters."
           data-card-color="Green"
@@ -3159,7 +3240,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.25"
           data-decks="4"
           data-total="48"
-          data-market-price="0.17"
+          data-market-price="0.16"
           data-rarity="R"
           data-card-text="[Main] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less. [Trigger] K.O. up to 1 of your opponent&#x27;s rested Characters with a cost of 3 or less."
           data-card-color="Green"
@@ -3227,7 +3308,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.0"
           data-decks="3"
           data-total="48"
-          data-market-price="4.0"
+          data-market-price="4.17"
           data-rarity="R"
           data-card-text="[Main] You may rest 3 of your DON!! cards: Rest up to a total of 2 of your opponent&#x27;s Characters or DON!! cards.
 [Counter] Your Leader gains +3000 power during this battle."
@@ -3262,7 +3343,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.5"
           data-decks="2"
           data-total="48"
-          data-market-price="7.38"
+          data-market-price="7.49"
           data-rarity="R"
           data-card-text="[Main] All of your opponent&#x27;s rested Characters with a cost of 7 or less will not become active in your opponent&#x27;s next Refresh Phase. [Trigger] Rest up to 1 of your opponent&#x27;s Characters."
           data-card-color="Green"
@@ -3296,7 +3377,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.0"
           data-decks="2"
           data-total="48"
-          data-market-price="3.39"
+          data-market-price="3.34"
           data-rarity="C"
           data-card-text="[Counter] Up to 1 of your Leader or Character cards gains +4000 power during this battle. Then, look at all your Life cards and place them back in your Life area in any order.
 [Trigger] You may add 1 card from the top or bottom of your Life cards to your hand: Add up to 1 card from your hand to the top of your Life cards."
@@ -3516,7 +3597,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="50"
           data-total="50"
-          data-market-price="1.43"
+          data-market-price="1.27"
           data-rarity="SR"
           data-card-text="[On Play]/[When Attacking] If your Leader has the [Supernovas] type and you have no other [Cavendish] Characters, set up to 2 of your DON!! cards as active."
           data-card-color="Green"
@@ -3550,7 +3631,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.96"
           data-decks="50"
           data-total="50"
-          data-market-price="1.35"
+          data-market-price="1.19"
           data-rarity="SR"
           data-card-text="If you have a green Character other than [Tashigi] that would be removed from the field by your opponent&#x27;s effect, you may rest this Character instead."
           data-card-color="Green"
@@ -3584,7 +3665,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.78"
           data-decks="49"
           data-total="50"
-          data-market-price="1.08"
+          data-market-price="1.05"
           data-rarity="C"
           data-card-text="[Activate: Main] (1) (You may rest the specified number of DON!! cards in your cost area.) You may rest this card: Look at 5 cards from the top of your deck; reveal up to 1 &quot;Supernovas&quot; type card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
           data-card-color="Green"
@@ -3618,7 +3699,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.35"
           data-decks="49"
           data-total="50"
-          data-market-price="3.57"
+          data-market-price="3.89"
           data-rarity="SR"
           data-card-text="[Rush] (This card can attack on the turn in which it is played.)
 [On Play] Rest up to a total of 2 of your opponent&#x27;s Characters or DON!! cards. Then, add 1 card from the top of your Life cards to your hand."
@@ -3653,7 +3734,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.84"
           data-decks="49"
           data-total="50"
-          data-market-price="17.59"
+          data-market-price="18.83"
           data-rarity="SEC"
           data-card-text="[Blocker]
 [On Play] If you have 8 or more rested cards, draw 2 cards and trash 1 card from your hand. Then, set up to 1 of your DON!! cards as active."
@@ -3688,7 +3769,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.65"
           data-decks="48"
           data-total="50"
-          data-market-price="0.2"
+          data-market-price="0.22"
           data-rarity="UC"
           data-card-text="If your (Slash) attribute Character with a cost of 5 or less other than this Character would be K.O.&#x27;d by your opponent&#x27;s effect, you may rest this Character instead.
 [Blocker]"
@@ -3723,7 +3804,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.5"
           data-decks="48"
           data-total="50"
-          data-market-price="2.29"
+          data-market-price="2.43"
           data-rarity="SR"
           data-card-text="[On Play] K.O. up to 1 of your opponent&#x27;s rested Characters."
           data-card-color="Green"
@@ -3757,7 +3838,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.98"
           data-decks="47"
           data-total="50"
-          data-market-price="1.76"
+          data-market-price="1.79"
           data-rarity="SR"
           data-card-text="[On Play]/[When Attacking] Up to 1 of your opponent&#x27;s rested Characters with a cost of 7 or less will not become active in your opponent&#x27;s next Refresh Phase."
           data-card-color="Green"
@@ -3791,7 +3872,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.41"
           data-decks="46"
           data-total="50"
-          data-market-price="0.2"
+          data-market-price="0.19"
           data-rarity="C"
           data-card-text="[On Play] If your Leader has the &quot;Supernovas&quot; type, rest up to 1 of your opponent&#x27;s Characters with a cost of 5 or less. Then, set up to 1 of your DON!! cards as active at the end of this turn."
           data-card-color="Green"
@@ -3825,7 +3906,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.18"
           data-decks="45"
           data-total="50"
-          data-market-price="1.43"
+          data-market-price="1.57"
           data-rarity="SR"
           data-card-text="[Blocker]
 [On Play] Set up to 4 of your DON!! cards as active. Then, you cannot play Character cards with a base cost of 7 or more during this turn."
@@ -3860,7 +3941,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.2"
           data-decks="44"
           data-total="50"
-          data-market-price="2.18"
+          data-market-price="1.99"
           data-rarity="R"
           data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)[On Your Opponent&#x27;s Attack] [Once Per Turn] Set up to 1 of your DON!! cards as active."
           data-card-color="Green"
@@ -3894,7 +3975,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.7"
           data-decks="44"
           data-total="50"
-          data-market-price="0.81"
+          data-market-price="0.89"
           data-rarity="SR"
           data-card-text="[On Play] Up to a total of 3 of your opponent&#x27;s rested Leader and Character cards will not become active in your opponent&#x27;s next Refresh Phase."
           data-card-color="Green"
@@ -3928,7 +4009,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="1.84"
           data-decks="44"
           data-total="50"
-          data-market-price="1.07"
+          data-market-price="1.02"
           data-rarity="SR"
           data-card-text="[DON!! x1] [Opponent&#x27;s Turn] If this Character is rested, your opponent cannot attack any card other than the Character [Eustass&quot;Captain&quot;Kid]. [Activate:Main] [Once Per Turn] You may rest this Character: Play up to 1 Character card with a cost of 3 or less from your hand.  This card has been officially errata&#x27;d."
           data-card-color="Green"
@@ -3962,7 +4043,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.42"
           data-decks="36"
           data-total="50"
-          data-market-price="12.08"
+          data-market-price="13.97"
           data-rarity="R"
           data-card-text="[Opponent&#x27;s Turn] If this Character would be rested by your opponent&#x27;s Character&#x27;s effect, you may rest 1 of your other Characters instead.[Blocker]"
           data-card-color="Green"
@@ -3996,7 +4077,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.45"
           data-decks="29"
           data-total="50"
-          data-market-price="0.35"
+          data-market-price="0.34"
           data-rarity="R"
           data-card-text="[On Play] Rest up to 1 of your opponent&#x27;s Characters with a cost of 2 or less."
           data-card-color="Green"
@@ -4098,7 +4179,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="1.83"
           data-decks="24"
           data-total="50"
-          data-market-price="4.85"
+          data-market-price="4.87"
           data-rarity="SEC"
           data-card-text="[When Attacking][Once Per Turn](1)(You may rest the specified number of DON!! cards in your cost area.): Set this Character as active.
 [Activate:Main][Once Per Turn](2)(You may rest the specified number of DON!! cards in your cost area.): Set this Character as active."
@@ -4168,7 +4249,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.88"
           data-decks="8"
           data-total="50"
-          data-market-price="1.86"
+          data-market-price="1.24"
           data-rarity="SR"
           data-card-text="[On Play] Look at 5 cards from the top of your deck; reveal up to 1 &quot;Supernovas&quot; type card and add it to your hand. Then, place the rest at the bottom of your deck in any order.
 [On Your Opponent&#x27;s Attack] You may trash this Character: Set up to 1 of your DON!! cards as active."
@@ -4203,7 +4284,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.67"
           data-decks="6"
           data-total="50"
-          data-market-price="0.13"
+          data-market-price="0.14"
           data-rarity="C"
           data-card-text="[End of Your Turn] Set up to 1 of your DON!! cards as active."
           data-card-color="Green"
@@ -4237,7 +4318,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.0"
           data-decks="6"
           data-total="50"
-          data-market-price="1.67"
+          data-market-price="1.88"
           data-rarity="SR"
           data-card-text="[Banish] (When this card deals damage, the target card is trashed without activating its Trigger.)
 [Activate: Main] Set up to 1 of your DON!! cards as active. Then, you cannot set DON!! cards as active using Character effects during this turn."
@@ -4272,7 +4353,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="1.83"
           data-decks="6"
           data-total="50"
-          data-market-price="0.13"
+          data-market-price="0.12"
           data-rarity="R"
           data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [End of Your Turn] Set up to 1 of your DON!! cards as active."
           data-card-color="Green"
@@ -4306,7 +4387,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="1.33"
           data-decks="6"
           data-total="50"
-          data-market-price="5.01"
+          data-market-price="4.31"
           data-rarity="SR"
           data-card-text="[On Play] Rest up to 1 of your opponent&#x27;s Characters and that Character will not become active in your opponent&#x27;s next Refresh Phase. Then, if your opponent has 2 or more rested Characters, your Leader gains +2000 power until the end of your opponent&#x27;s next End Phase."
           data-card-color="Green"
@@ -4340,7 +4421,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="1.2"
           data-decks="5"
           data-total="50"
-          data-market-price="0.51"
+          data-market-price="0.52"
           data-rarity="SR"
           data-card-text="[On Play] Up to 1 of your opponent&#x27;s rested Character or DON!! cards will not become active in your opponent&#x27;s next Refresh Phase."
           data-card-color="Green"
@@ -4374,7 +4455,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="4"
           data-total="50"
-          data-market-price="0.57"
+          data-market-price="0.48"
           data-rarity="R"
           data-card-text="If you have 1 or less Life cards, this Character gains [Blocker].
 [On Play] You may return 1 of your Characters to the owner&#x27;s hand: Play up to 1 Character card with a cost of 5 or less from your hand rested."
@@ -4409,7 +4490,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="3"
           data-total="50"
-          data-market-price="0.45"
+          data-market-price="0.4"
           data-rarity="SR"
           data-card-text="[On Play] Set up to 2 of your DON!! cards as active. Then, you cannot play Character cards with a base cost of 5 or more during this turn.
 [On K.O.] Play up to 1 Character card with a cost of 5 or less from your hand rested."
@@ -4444,7 +4525,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.0"
           data-decks="3"
           data-total="50"
-          data-market-price="0.1"
+          data-market-price="0.13"
           data-rarity="UC"
           data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [DON!! x1] [On Block] If you have 3 or more Characters, draw 1 card."
           data-card-color="Green"
@@ -4478,7 +4559,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="1"
           data-total="50"
-          data-market-price="2.7"
+          data-market-price="2.46"
           data-rarity="SR"
           data-card-text="[On Play] Up to 2 of your opponent&#x27;s Characters with a cost of 5 or less cannot be rested until the end of your opponent&#x27;s next End Phase.
 [On K.O.] You may rest 1 of your cards: Play up to 1 green Character card with a cost of 5 or less from your hand."
@@ -4513,7 +4594,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.0"
           data-decks="1"
           data-total="50"
-          data-market-price="0.12"
+          data-market-price="0.14"
           data-rarity="R"
           data-card-text="[On Play] If you have 2 or more rested Characters, draw 3 cards and trash 2 cards from your hand."
           data-card-color="Green"
@@ -4621,7 +4702,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="1.0"
           data-decks="2"
           data-total="50"
-          data-market-price="4.0"
+          data-market-price="4.17"
           data-rarity="R"
           data-card-text="[Main] You may rest 3 of your DON!! cards: Rest up to a total of 2 of your opponent&#x27;s Characters or DON!! cards.
 [Counter] Your Leader gains +3000 power during this battle."
@@ -4656,7 +4737,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="1"
           data-total="50"
-          data-market-price="1.36"
+          data-market-price="1.49"
           data-rarity="R"
           data-card-text="[Main] Look at 4 cards from the top of your deck; reveal up to 1 card with a cost of 4 or more and add it to your hand. Then, place the rest at the bottom of your deck in any order.
 [Trigger] Activate this card&#x27;s [Main] effect."
@@ -4691,7 +4772,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="1.0"
           data-decks="1"
           data-total="50"
-          data-market-price="0.13"
+          data-market-price="0.15"
           data-rarity="R"
           data-card-text="[Main] Rest up to 1 of your opponent&#x27;s Characters with a cost of 6 or less. Then, K.O. up to 1 of your opponent&#x27;s rested Characters with a cost of 5 or less.
 [Trigger] Rest up to 1 of your opponent&#x27;s Characters with a cost of 4 or less."
@@ -4828,7 +4909,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="8"
           data-total="8"
-          data-market-price="0.2"
+          data-market-price="0.22"
           data-rarity="UC"
           data-card-text="[Activate: Main] [Once Per Turn] Give up to 1 rested DON!! card to 1 of your {Kuja Pirates} type Leader or Character cards.
 [Trigger] If your Leader has the {Kuja Pirates} type, play this card."
@@ -4863,7 +4944,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="8"
           data-total="8"
-          data-market-price="0.22"
+          data-market-price="0.24"
           data-rarity="UC"
           data-card-text="[Activate: Main] [Once Per Turn] You may reveal 3 {Amazon Lily} or {Kuja Pirates} type cards from your hand: Give your Leader and all of your Characters up to 1 rested DON!! card each.
 [Trigger] If your Leader has the {Kuja Pirates} type, play this card."
@@ -4898,7 +4979,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="8"
           data-total="8"
-          data-market-price="6.96"
+          data-market-price="7.76"
           data-rarity="SR"
           data-card-text="[On Play] If your Leader has the {The Seven Warlords of the Sea} type, add up to 1 card from the top of your deck to the top of your Life cards. Then, add up to 1 card from the top of your opponent&#x27;s Life cards to the owner&#x27;s hand.
 [Trigger] Play up to 1 Character card with 6000 power or less and a [Trigger] from your hand."
@@ -4967,7 +5048,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.88"
           data-decks="8"
           data-total="8"
-          data-market-price="18.89"
+          data-market-price="19.94"
           data-rarity="SEC"
           data-card-text="[On Play] You may trash 1 card from your hand: Add up to 1 card from the top of your deck to the top of your Life cards. Then, this Character gains +2 cost until the end of your opponent&#x27;s next End Phase.
 [Opponent&#x27;s Turn] [On K.O.] Add up to 1 card from the top of your deck to the top of your Life cards."
@@ -5002,7 +5083,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.88"
           data-decks="8"
           data-total="8"
-          data-market-price="0.14"
+          data-market-price="0.12"
           data-rarity="UC"
           data-card-text="[On Play] If your opponent has 3 or less Life cards, draw 2 cards and trash 2 cards from your hand.
 [Trigger] If your Leader has the {Kuja Pirates} type, play this card."
@@ -5037,7 +5118,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.75"
           data-decks="8"
           data-total="8"
-          data-market-price="0.12"
+          data-market-price="0.13"
           data-rarity="UC"
           data-card-text="[On Play] Look at 5 cards from the top of your deck; reveal up to 1 {Amazon Lily} or {Kuja Pirates} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order and trash 1 card from your hand.
 [Trigger] If your Leader has the {Kuja Pirates} type, play this card."
@@ -5072,7 +5153,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.38"
           data-decks="8"
           data-total="8"
-          data-market-price="0.5"
+          data-market-price="0.43"
           data-rarity="R"
           data-card-text="[On Play] Your opponent returns all cards in their hand to their deck and shuffles their deck. Then, your opponent draws 5 cards."
           data-card-color="Blue"
@@ -5106,7 +5187,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="1.86"
           data-decks="7"
           data-total="8"
-          data-market-price="0.19"
+          data-market-price="0.28"
           data-rarity="R"
           data-card-text="[On Play] If your Leader is multicolored and your opponent has 3 or less Life cards, K.O. up to 1 of your opponent&#x27;s Characters with 7000 base power or less.
 [Trigger] Activate this card&#x27;s [On Play] effect."
@@ -5141,7 +5222,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.33"
           data-decks="6"
           data-total="8"
-          data-market-price="0.1"
+          data-market-price="0.09"
           data-rarity="C"
           data-card-text="[On Play] You may add 1 card from the top or bottom of your Life cards to your hand: Add up to 1 card from your hand to the top of your Life cards. [Trigger] Play this card."
           data-card-color="Yellow"
@@ -5209,7 +5290,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.4"
           data-decks="5"
           data-total="8"
-          data-market-price="1.89"
+          data-market-price="1.91"
           data-rarity="R"
           data-card-text="[On Play] Look at 5 cards from the top of your deck; reveal up to 1 [The Seven Warlords of the Sea] type card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
           data-card-color="Blue"
@@ -5243,7 +5324,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="3"
           data-total="8"
-          data-market-price="33.42"
+          data-market-price="34.13"
           data-rarity="SR"
           data-card-text="[On Play] Give up to 1 rested DON!! card to your Leader. Then, if your opponent has 3 or more Life cards, add up to 1 card from the top of your opponent&#x27;s Life cards to the owner&#x27;s hand.
 [On K.O.] You may turn 1 card from the top of your Life cards face-up: Play up to 1 Character card with 6000 power or less from your hand."
@@ -5278,7 +5359,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="1"
           data-total="8"
-          data-market-price="0.11"
+          data-market-price="0.12"
           data-rarity="C"
           data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)
 [Trigger] Play this card."
@@ -5313,7 +5394,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="1"
           data-total="8"
-          data-market-price="0.12"
+          data-market-price="0.11"
           data-rarity="C"
           data-card-text="[Opponent&#x27;s Turn] [On K.O.] Add up to 1 card from the top of your deck to the top of your Life cards. Then, you take 1 damage.
 [Trigger] If your Leader has the {Kuja Pirates} type, play this card."
@@ -5348,7 +5429,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="1"
           data-total="8"
-          data-market-price="0.17"
+          data-market-price="0.12"
           data-rarity="C"
           data-card-text="[Trigger] Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 4 or less from your trash rested."
           data-card-color="Yellow"
@@ -5382,7 +5463,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="1"
           data-total="8"
-          data-market-price="3.02"
+          data-market-price="2.61"
           data-rarity="R"
           data-card-text="[On K.O.] Play up to 1 Character card with a cost of 4 or less and a [Trigger] other than [Dr. Hogback] from your trash.
 [Trigger] Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 4 or less from your trash rested."
@@ -5417,7 +5498,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="4.0"
           data-decks="1"
           data-total="8"
-          data-market-price="0.43"
+          data-market-price="0.42"
           data-rarity="R"
           data-card-text="[On Play]/[On K.O.] Up to 1 of your opponent&#x27;s Characters with a cost of 6 or less cannot attack until the end of your opponent&#x27;s next End Phase.
 [Trigger] Play up to 1 {Thriller Bark Pirates} type Character card with a cost of 4 or less from your trash rested."
@@ -5452,7 +5533,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.0"
           data-decks="1"
           data-total="8"
-          data-market-price="0.73"
+          data-market-price="0.66"
           data-rarity="R"
           data-card-text="[Trigger] Up to 1 of your opponent&#x27;s Leader or Character cards cannot attack during this turn."
           data-card-color="Yellow"
@@ -5486,7 +5567,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="3.0"
           data-decks="1"
           data-total="8"
-          data-market-price="7.75"
+          data-market-price="8.12"
           data-rarity="SR"
           data-card-text="[On Play] Select up to 1 {Thriller Bark Pirates} type Character with a cost of 4 or less from your trash and play it or add it to the top of your Life cards face-up.
 [Trigger] Play up to 1 Character card with a cost of 4 or less from your trash."
@@ -5610,7 +5691,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.0"
           data-decks="8"
           data-total="8"
-          data-market-price="1.71"
+          data-market-price="1.45"
           data-rarity="R"
           data-card-text="[Main] Select up to 1 of your [The Seven Warlords of the Sea] type Leader or Character cards and that card gains +2000 power during this turn. Then, if the selected card attacks during this turn, your opponent cannot activate [Blocker]. [Trigger] Draw 1 card."
           data-card-color="Blue"
@@ -5678,7 +5759,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="1.6"
           data-decks="5"
           data-total="8"
-          data-market-price="1.4"
+          data-market-price="1.75"
           data-rarity="R"
           data-card-text="[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +3000 power during this battle.
 [Trigger] If you have 0 Life cards, you may add up to 1 card from the top of your deck to the top of your Life cards. Then, trash 1 card from your hand."
@@ -5713,7 +5794,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.5"
           data-decks="4"
           data-total="8"
-          data-market-price="0.37"
+          data-market-price="0.4"
           data-rarity="R"
           data-card-text="[Counter] If you have 2 or less Life cards, up to 1 of your opponent&#x27;s active Characters cannot attack during this turn.
 [Trigger] Play up to 1 Character card with 6000 power or less and a [Trigger] from your hand."
@@ -5748,7 +5829,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.0"
           data-decks="3"
           data-total="8"
-          data-market-price="2.6"
+          data-market-price="2.62"
           data-rarity="C"
           data-card-text="[Main] Return up to 1 Character with a cost of 7 or less to the owner&#x27;s hand. [Trigger] Activate this card&#x27;s [Main] effect."
           data-card-color="Blue"
@@ -5816,7 +5897,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-avg="2.0"
           data-decks="1"
           data-total="8"
-          data-market-price="2.23"
+          data-market-price="1.73"
           data-rarity="R"
           data-card-text="[Main] Place up to 2 Characters with a cost of 6 or less at the bottom of the owner&#x27;s deck in any order.
 [Trigger] Place up to 1 Character with a cost of 5 or less at the bottom of the owner&#x27;s deck."
@@ -5859,8 +5940,8 @@ Then, add 1 card from the top of your Life cards to your hand.
            data-id="OP15-002"
            data-usage="100"
            data-avg="1.0"
-           data-decks="5"
-           data-total="5"
+           data-decks="12"
+           data-total="12"
            data-market-price="0.32"
            data-rarity="L"
            data-card-text="[When Attacking]/[On Your Opponent&#x27;s Attack] You may trash any number of Event or Stage cards from your hand. This Leader gains +1000 power during this battle for every card trashed.
@@ -5875,7 +5956,7 @@ Then, add 1 card from the top of your Life cards to your hand.
       <div class="leader-meta">
         <h2>Lucy</h2>
         <span class="badge">OP15-002</span>
-        <span class="deck-count">5 tournament decks analysed</span>
+        <span class="deck-count">12 tournament decks analysed</span>
       </div>
     </div>
     </div>
@@ -5888,8 +5969,8 @@ Then, add 1 card from the top of your Life cards to your hand.
           <div class="chart-bars">
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">68</span>
-                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Red: 8 copies" style="height:14px;background:#d3171b;width:100%;"></div><div class="bar-seg" data-tip="Blue: 60 copies" style="height:106px;background:#0078aa;width:100%;"></div></div>
+                  <span class="bar-val">159</span>
+                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Red: 15 copies" style="height:11px;background:#d3171b;width:100%;"></div><div class="bar-seg" data-tip="Blue: 144 copies" style="height:109px;background:#0078aa;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 1</div>
               </div>
@@ -5902,8 +5983,8 @@ Then, add 1 card from the top of your Life cards to your hand.
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">24</span>
-                  <div class="bar" style="height:42px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Blue: 24 copies" style="height:42px;background:#0078aa;width:100%;"></div></div>
+                  <span class="bar-val">64</span>
+                  <div class="bar" style="height:48px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Red: 7 copies" style="height:5px;background:#d3171b;width:100%;"></div><div class="bar-seg" data-tip="Blue: 57 copies" style="height:43px;background:#0078aa;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 4</div>
               </div>
@@ -5916,15 +5997,15 @@ Then, add 1 card from the top of your Life cards to your hand.
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">20</span>
-                  <div class="bar" style="height:35px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Blue: 20 copies" style="height:35px;background:#0078aa;width:100%;"></div></div>
+                  <span class="bar-val">48</span>
+                  <div class="bar" style="height:36px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Blue: 48 copies" style="height:36px;background:#0078aa;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 7</div>
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">5</span>
-                  <div class="bar" style="height:9px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Red: 5 copies" style="height:9px;background:#d3171b;width:100%;"></div></div>
+                  <span class="bar-val">17</span>
+                  <div class="bar" style="height:13px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Red: 12 copies" style="height:9px;background:#d3171b;width:100%;"></div><div class="bar-seg" data-tip="Blue: 5 copies" style="height:4px;background:#0078aa;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 10</div>
               </div>
@@ -5938,8 +6019,8 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-id="OP15-040"
           data-usage="100.0"
           data-avg="4.0"
-          data-decks="5"
-          data-total="5"
+          data-decks="12"
+          data-total="12"
           data-market-price="1.17"
           data-rarity="R"
           data-card-text="[On Play] Look at 3 cards from the top of your deck; reveal up to 1 {Dressrosa} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
@@ -5972,8 +6053,8 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-id="OP15-052"
           data-usage="100.0"
           data-avg="4.0"
-          data-decks="5"
-          data-total="5"
+          data-decks="12"
+          data-total="12"
           data-market-price="0.36"
           data-rarity="UC"
           data-card-text="If your Character with 7000 base power or less would be removed from the field by your opponent&#x27;s effect, you may place 1 of your Characters at the bottom of the owner&#x27;s deck instead."
@@ -6006,8 +6087,8 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-id="OP15-053"
           data-usage="100.0"
           data-avg="4.0"
-          data-decks="5"
-          data-total="5"
+          data-decks="12"
+          data-total="12"
           data-market-price="10.21"
           data-rarity="SR"
           data-card-text="[DON!! x1] This Character gains [Blocker].
@@ -6036,47 +6117,13 @@ Then, add 1 card from the top of your Life cards to your hand.
           </div>
         </div>
         <div class="card" role="button" tabindex="0"
-          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-045_EN.webp"
-          data-name="Cavendish"
-          data-id="OP10-045"
-          data-usage="100.0"
-          data-avg="4.0"
-          data-decks="5"
-          data-total="5"
-          data-market-price="5.22"
-          data-rarity="R"
-          data-card-text="[When Attacking] [Once Per Turn] Draw 2 cards and trash 1 card from your hand."
-          data-card-color="Blue"
-          data-card-type="Character"
-          data-card-cost="4"
-          data-card-power="6000"
-          data-sub-types="Beautiful Pirates Dressrosa"
-          data-counter-amount="0"
-          data-attribute="Slash"
-        >
-          <div class="card-rank">#4</div>
-          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-045_EN.webp"
-               alt="Cavendish" loading="lazy">
-          <div class="card-body">
-            <div class="card-name">Cavendish</div>
-            <div class="card-meta">
-              <span class="badge">OP10-045</span>
-              <span class="badge avg-badge">×4.0 avg</span>
-            </div>
-            <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
-            </div>
-            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
-          </div>
-        </div>
-        <div class="card" role="button" tabindex="0"
           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-046_EN.webp"
           data-name="Sabo"
           data-id="OP15-046"
           data-usage="100.0"
           data-avg="4.0"
-          data-decks="5"
-          data-total="5"
+          data-decks="12"
+          data-total="12"
           data-market-price="5.48"
           data-rarity="SR"
           data-card-text="[Blocker]
@@ -6089,7 +6136,7 @@ Then, add 1 card from the top of your Life cards to your hand.
           data-counter-amount="0"
           data-attribute="Special"
         >
-          <div class="card-rank">#5</div>
+          <div class="card-rank">#4</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-046_EN.webp"
                alt="Sabo" loading="lazy">
           <div class="card-body">
@@ -6105,14 +6152,48 @@ Then, add 1 card from the top of your Life cards to your hand.
           </div>
         </div>
         <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-045_EN.webp"
+          data-name="Cavendish"
+          data-id="OP10-045"
+          data-usage="100.0"
+          data-avg="3.92"
+          data-decks="12"
+          data-total="12"
+          data-market-price="5.74"
+          data-rarity="R"
+          data-card-text="[When Attacking] [Once Per Turn] Draw 2 cards and trash 1 card from your hand."
+          data-card-color="Blue"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="6000"
+          data-sub-types="Beautiful Pirates Dressrosa"
+          data-counter-amount="0"
+          data-attribute="Slash"
+        >
+          <div class="card-rank">#5</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-045_EN.webp"
+               alt="Cavendish" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Cavendish</div>
+            <div class="card-meta">
+              <span class="badge">OP10-045</span>
+              <span class="badge avg-badge">×3.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP09/OP09-118_EN.webp"
           data-name="Gol.D.Roger"
           data-id="OP09-118"
           data-usage="100.0"
           data-avg="1.0"
-          data-decks="5"
-          data-total="5"
-          data-market-price="40.9"
+          data-decks="12"
+          data-total="12"
+          data-market-price="44.45"
           data-rarity="SEC"
           data-card-text="[Rush] (This card can attack on the turn in which it is played.)
 When your opponent activates [Blocker], if either you or your opponent has 0 Life cards, you win the game."
@@ -6143,11 +6224,11 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-015_EN.webp"
           data-name="Belo Betty"
           data-id="OP05-015"
-          data-usage="60.0"
-          data-avg="2.67"
-          data-decks="3"
-          data-total="5"
-          data-market-price="1.31"
+          data-usage="50.0"
+          data-avg="2.5"
+          data-decks="6"
+          data-total="12"
+          data-market-price="1.34"
           data-rarity="R"
           data-card-text="[On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Revolutionary Army] type card other than [Belo Betty] and add it to your hand. Then, place the rest at the bottom of your deck in any order."
           data-card-color="Red"
@@ -6165,22 +6246,22 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
             <div class="card-name">Belo Betty</div>
             <div class="card-meta">
               <span class="badge">OP05-015</span>
-              <span class="badge avg-badge">×2.7 avg</span>
+              <span class="badge avg-badge">×2.5 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:60.0%;background:#a3e635;"></div>
+              <div class="usage-bar" style="width:50.0%;background:#a3e635;"></div>
             </div>
-            <div class="usage-label" style="color:#a3e635;">60.0% of decks</div>
+            <div class="usage-label" style="color:#a3e635;">50.0% of decks</div>
           </div>
         </div>
         <div class="card" role="button" tabindex="0"
           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-049_EN.webp"
           data-name="Sabo"
           data-id="OP10-049"
-          data-usage="40.0"
+          data-usage="41.7"
           data-avg="2.0"
-          data-decks="2"
-          data-total="5"
+          data-decks="5"
+          data-total="12"
           data-market-price="0.39"
           data-rarity="R"
           data-card-text="If your Character with a base cost of 7 or less other than [Sabo] would be removed from the field by your opponent&#x27;s effect, you may return this Character to the owner&#x27;s hand instead."
@@ -6202,20 +6283,124 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
               <span class="badge avg-badge">×2.0 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:40.0%;background:#fbbf24;"></div>
+              <div class="usage-bar" style="width:41.7%;background:#fbbf24;"></div>
             </div>
-            <div class="usage-label" style="color:#fbbf24;">40.0% of decks</div>
+            <div class="usage-label" style="color:#fbbf24;">41.7% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP13/OP13-042_EN.webp"
+          data-name="Edward.Newgate"
+          data-id="OP13-042"
+          data-usage="33.3"
+          data-avg="1.25"
+          data-decks="4"
+          data-total="12"
+          data-market-price="4.23"
+          data-rarity="SR"
+          data-card-text="[Blocker]
+[On Play] Draw 2 cards and trash 1 card from your hand. Then, give your Leader and 1 Character up to 2 rested DON!! cards each."
+          data-card-color="Blue"
+          data-card-type="Character"
+          data-card-cost="10"
+          data-card-power="12000"
+          data-sub-types="The Four Emperors Whitebeard Pirates"
+          data-counter-amount="0"
+          data-attribute="Special"
+        >
+          <div class="card-rank">#9</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP13/OP13-042_EN.webp"
+               alt="Edward.Newgate" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Edward.Newgate</div>
+            <div class="card-meta">
+              <span class="badge">OP13-042</span>
+              <span class="badge avg-badge">×1.2 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:33.3%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">33.3% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-014_EN.webp"
+          data-name="Bartolomeo"
+          data-id="OP15-014"
+          data-usage="16.7"
+          data-avg="2.5"
+          data-decks="2"
+          data-total="12"
+          data-market-price="0.22"
+          data-rarity="R"
+          data-card-text="If this Character would be K.O.&#x27;d, you may trash 1 Event from your hand instead.
+[On Play] Activate up to 1 {Dressrosa} type Event with a base cost of 3 or less from your hand."
+          data-card-color="Red"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="6000"
+          data-sub-types="Dressrosa Barto Club"
+          data-counter-amount="0"
+          data-attribute="Special"
+        >
+          <div class="card-rank">#10</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-014_EN.webp"
+               alt="Bartolomeo" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Bartolomeo</div>
+            <div class="card-meta">
+              <span class="badge">OP15-014</span>
+              <span class="badge avg-badge">×2.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:16.7%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">16.7% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-006_EN.webp"
+          data-name="Cavendish"
+          data-id="OP15-006"
+          data-usage="8.3"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="12"
+          data-market-price="0.2"
+          data-rarity="UC"
+          data-card-text="If you have 4 or more Events in your trash, this Character gains +2000 power."
+          data-card-color="Red"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="4000"
+          data-sub-types="Beautiful Pirates Dressrosa"
+          data-counter-amount="2000"
+          data-attribute="Slash"
+        >
+          <div class="card-rank">#11</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-006_EN.webp"
+               alt="Cavendish" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Cavendish</div>
+            <div class="card-meta">
+              <span class="badge">OP15-006</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:8.3%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">8.3% of decks</div>
           </div>
         </div>
         <div class="card" role="button" tabindex="0"
           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-006_EN.webp"
           data-name="Koala"
           data-id="OP05-006"
-          data-usage="20.0"
+          data-usage="8.3"
           data-avg="2.0"
           data-decks="1"
-          data-total="5"
-          data-market-price="1.36"
+          data-total="12"
+          data-market-price="1.29"
           data-rarity="SR"
           data-card-text="[On Play] If your Leader has the [Revolutionary Army] type, give up to 1 of your opponent&#x27;s Characters -3000 power during this turn."
           data-card-color="Red"
@@ -6226,7 +6411,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-counter-amount="2000"
           data-attribute="Strike"
         >
-          <div class="card-rank">#9</div>
+          <div class="card-rank">#12</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-006_EN.webp"
                alt="Koala" loading="lazy">
           <div class="card-body">
@@ -6236,20 +6421,20 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
               <span class="badge avg-badge">×2.0 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:20.0%;background:#f87171;"></div>
+              <div class="usage-bar" style="width:8.3%;background:#f87171;"></div>
             </div>
-            <div class="usage-label" style="color:#f87171;">20.0% of decks</div>
+            <div class="usage-label" style="color:#f87171;">8.3% of decks</div>
           </div>
         </div>
         <div class="card" role="button" tabindex="0"
           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-051_EN.webp"
           data-name="Boa Hancock"
           data-id="OP07-051"
-          data-usage="20.0"
+          data-usage="8.3"
           data-avg="1.0"
           data-decks="1"
-          data-total="5"
-          data-market-price="12.61"
+          data-total="12"
+          data-market-price="12.04"
           data-rarity="SR"
           data-card-text="[On Play] Up to 1 of your opponent&#x27;s Characters other than [Monkey.D.Luffy] cannot attack until the end of your opponent&#x27;s next turn. Then, place up to 1 Character with a cost of 1 or less at the bottom of the owner&#x27;s deck."
           data-card-color="Blue"
@@ -6260,7 +6445,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-counter-amount="0"
           data-attribute="Special"
         >
-          <div class="card-rank">#10</div>
+          <div class="card-rank">#13</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-051_EN.webp"
                alt="Boa Hancock" loading="lazy">
           <div class="card-body">
@@ -6270,9 +6455,9 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
               <span class="badge avg-badge">×1.0 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:20.0%;background:#f87171;"></div>
+              <div class="usage-bar" style="width:8.3%;background:#f87171;"></div>
             </div>
-            <div class="usage-label" style="color:#f87171;">20.0% of decks</div>
+            <div class="usage-label" style="color:#f87171;">8.3% of decks</div>
           </div>
         </div>
       </div>
@@ -6285,43 +6470,43 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           <div class="chart-bars">
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">12</span>
-                  <div class="bar" style="height:38px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Blue: 12 copies" style="height:38px;background:#0078aa;width:100%;"></div></div>
+                  <span class="bar-val">22</span>
+                  <div class="bar" style="height:29px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Blue: 22 copies" style="height:29px;background:#0078aa;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 1</div>
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">13</span>
-                  <div class="bar" style="height:41px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Red: 13 copies" style="height:41px;background:#d3171b;width:100%;"></div></div>
+                  <span class="bar-val">28</span>
+                  <div class="bar" style="height:37px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Red: 28 copies" style="height:37px;background:#d3171b;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 2</div>
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">5</span>
-                  <div class="bar" style="height:16px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Blue: 5 copies" style="height:16px;background:#0078aa;width:100%;"></div></div>
+                  <span class="bar-val">15</span>
+                  <div class="bar" style="height:20px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Blue: 15 copies" style="height:20px;background:#0078aa;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 3</div>
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">38</span>
-                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Red: 18 copies" style="height:57px;background:#d3171b;width:100%;"></div><div class="bar-seg" data-tip="Blue: 20 copies" style="height:63px;background:#0078aa;width:100%;"></div></div>
+                  <span class="bar-val">92</span>
+                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Red: 44 copies" style="height:57px;background:#d3171b;width:100%;"></div><div class="bar-seg" data-tip="Blue: 48 copies" style="height:63px;background:#0078aa;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 4</div>
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">20</span>
-                  <div class="bar" style="height:63px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Blue: 20 copies" style="height:63px;background:#0078aa;width:100%;"></div></div>
+                  <span class="bar-val">48</span>
+                  <div class="bar" style="height:63px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Blue: 48 copies" style="height:63px;background:#0078aa;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 5</div>
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">32</span>
-                  <div class="bar" style="height:101px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Red: 20 copies" style="height:63px;background:#d3171b;width:100%;"></div><div class="bar-seg" data-tip="Blue: 12 copies" style="height:38px;background:#0078aa;width:100%;"></div></div>
+                  <span class="bar-val">79</span>
+                  <div class="bar" style="height:103px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Red: 48 copies" style="height:63px;background:#d3171b;width:100%;"></div><div class="bar-seg" data-tip="Blue: 31 copies" style="height:40px;background:#0078aa;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 7</div>
               </div>
@@ -6335,8 +6520,8 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-id="OP15-054"
           data-usage="100.0"
           data-avg="4.0"
-          data-decks="5"
-          data-total="5"
+          data-decks="12"
+          data-total="12"
           data-market-price="0.16"
           data-rarity="C"
           data-card-text="[Main] If your Leader is [Lucy], choose one:
@@ -6371,9 +6556,9 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-id="OP10-060"
           data-usage="100.0"
           data-avg="4.0"
-          data-decks="5"
-          data-total="5"
-          data-market-price="0.3"
+          data-decks="12"
+          data-total="12"
+          data-market-price="0.37"
           data-rarity="C"
           data-card-text="[Main] Place up to 1 of your opponent&#x27;s Characters with 6000 power or less at the bottom of the owner&#x27;s deck.
 [Trigger] Activate this card&#x27;s [Main] effect."
@@ -6406,8 +6591,8 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-id="OP15-020"
           data-usage="100.0"
           data-avg="4.0"
-          data-decks="5"
-          data-total="5"
+          data-decks="12"
+          data-total="12"
           data-market-price="1.1"
           data-rarity="R"
           data-card-text="[Main] Your Leader gains +3000 power during this turn and give up to 1 of your opponent&#x27;s Characters -8000 power until the end of your opponent&#x27;s next End Phase. Then, you may trash 2 cards from your hand. If you do, K.O. up to 1 of your opponent&#x27;s Characters with 0 power or less."
@@ -6439,9 +6624,9 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-name="Just Watch Me, Ace!!!"
           data-id="OP15-021"
           data-usage="100.0"
-          data-avg="3.6"
-          data-decks="5"
-          data-total="5"
+          data-avg="3.67"
+          data-decks="12"
+          data-total="12"
           data-market-price="0.25"
           data-rarity="UC"
           data-card-text="If you have 4 or more Events in your trash, give this card in your hand -3 cost.[Main]/[Counter] Give up to 1 of your opponent&#x27;s Characters -3000 power during this turn."
@@ -6460,76 +6645,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
             <div class="card-name">Just Watch Me, Ace!!!</div>
             <div class="card-meta">
               <span class="badge">OP15-021</span>
-              <span class="badge avg-badge">×3.6 avg</span>
-            </div>
-            <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
-            </div>
-            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
-          </div>
-        </div>
-        <div class="card" role="button" tabindex="0"
-          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-019_EN.webp"
-          data-name="Fire Fist"
-          data-id="OP05-019"
-          data-usage="100.0"
-          data-avg="2.6"
-          data-decks="5"
-          data-total="5"
-          data-market-price="0.99"
-          data-rarity="R"
-          data-card-text="[Main] Give up to 1 of your opponent&#x27;s Characters -4000 power during this turn. Then, if you have 2 or less Life cards, K.O. up to 1 of your opponent&#x27;s Characters with 0 power or less. [Trigger] Activate this card&#x27;s [Main] effect."
-          data-card-color="Red"
-          data-card-type="Event"
-          data-card-cost="2"
-          data-card-power=""
-          data-sub-types="Revolutionary Army"
-          data-counter-amount=""
-          data-attribute=""
-        >
-          <div class="card-rank">#5</div>
-          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-019_EN.webp"
-               alt="Fire Fist" loading="lazy">
-          <div class="card-body">
-            <div class="card-name">Fire Fist</div>
-            <div class="card-meta">
-              <span class="badge">OP05-019</span>
-              <span class="badge avg-badge">×2.6 avg</span>
-            </div>
-            <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
-            </div>
-            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
-          </div>
-        </div>
-        <div class="card" role="button" tabindex="0"
-          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-059_EN.webp"
-          data-name="Fo...llow...Me...and...I...Will...Gui...de...You"
-          data-id="OP10-059"
-          data-usage="100.0"
-          data-avg="2.4"
-          data-decks="5"
-          data-total="5"
-          data-market-price="2.25"
-          data-rarity="R"
-          data-card-text="[Main] Look at 5 cards from the top of your deck; reveal up to 1 &quot;Dressrosa&quot; type Character card and add it to your hand. Then, place the rest at the bottom of your deck in any order.
-[Trigger] Activate this card&#x27;s [Main] effect."
-          data-card-color="Blue"
-          data-card-type="Event"
-          data-card-cost="1"
-          data-card-power=""
-          data-sub-types="Straw Hat Crew Dressrosa"
-          data-counter-amount=""
-          data-attribute=""
-        >
-          <div class="card-rank">#6</div>
-          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-059_EN.webp"
-               alt="Fo...llow...Me...and...I...Will...Gui...de...You" loading="lazy">
-          <div class="card-body">
-            <div class="card-name">Fo...llow...Me...and...I...Will...Gui...de...You</div>
-            <div class="card-meta">
-              <span class="badge">OP10-059</span>
-              <span class="badge avg-badge">×2.4 avg</span>
+              <span class="badge avg-badge">×3.7 avg</span>
             </div>
             <div class="usage-bar-wrap">
               <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
@@ -6542,9 +6658,9 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-name="Would You Let Me Eat the Flame-Flame Fruit?"
           data-id="OP15-056"
           data-usage="100.0"
-          data-avg="2.4"
-          data-decks="5"
-          data-total="5"
+          data-avg="2.58"
+          data-decks="12"
+          data-total="12"
           data-market-price="0.18"
           data-rarity="C"
           data-card-text="[Main] Draw 2 cards. Then, your [Lucy] Leader gains [Double Attack] and +3000 power during this turn.
@@ -6558,14 +6674,14 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-counter-amount="0"
           data-attribute=""
         >
-          <div class="card-rank">#7</div>
+          <div class="card-rank">#5</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-056_EN.webp"
                alt="Would You Let Me Eat the Flame-Flame Fruit?" loading="lazy">
           <div class="card-body">
             <div class="card-name">Would You Let Me Eat the Flame-Flame Fruit?</div>
             <div class="card-meta">
               <span class="badge">OP15-056</span>
-              <span class="badge avg-badge">×2.4 avg</span>
+              <span class="badge avg-badge">×2.6 avg</span>
             </div>
             <div class="usage-bar-wrap">
               <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
@@ -6574,13 +6690,118 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           </div>
         </div>
         <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-019_EN.webp"
+          data-name="Fire Fist"
+          data-id="OP05-019"
+          data-usage="100.0"
+          data-avg="2.33"
+          data-decks="12"
+          data-total="12"
+          data-market-price="1.03"
+          data-rarity="R"
+          data-card-text="[Main] Give up to 1 of your opponent&#x27;s Characters -4000 power during this turn. Then, if you have 2 or less Life cards, K.O. up to 1 of your opponent&#x27;s Characters with 0 power or less. [Trigger] Activate this card&#x27;s [Main] effect."
+          data-card-color="Red"
+          data-card-type="Event"
+          data-card-cost="2"
+          data-card-power=""
+          data-sub-types="Revolutionary Army"
+          data-counter-amount=""
+          data-attribute=""
+        >
+          <div class="card-rank">#6</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-019_EN.webp"
+               alt="Fire Fist" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Fire Fist</div>
+            <div class="card-meta">
+              <span class="badge">OP05-019</span>
+              <span class="badge avg-badge">×2.3 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-059_EN.webp"
+          data-name="Fo...llow...Me...and...I...Will...Gui...de...You"
+          data-id="OP10-059"
+          data-usage="75.0"
+          data-avg="2.44"
+          data-decks="9"
+          data-total="12"
+          data-market-price="2.55"
+          data-rarity="R"
+          data-card-text="[Main] Look at 5 cards from the top of your deck; reveal up to 1 &quot;Dressrosa&quot; type Character card and add it to your hand. Then, place the rest at the bottom of your deck in any order.
+[Trigger] Activate this card&#x27;s [Main] effect."
+          data-card-color="Blue"
+          data-card-type="Event"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Straw Hat Crew Dressrosa"
+          data-counter-amount=""
+          data-attribute=""
+        >
+          <div class="card-rank">#7</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-059_EN.webp"
+               alt="Fo...llow...Me...and...I...Will...Gui...de...You" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Fo...llow...Me...and...I...Will...Gui...de...You</div>
+            <div class="card-meta">
+              <span class="badge">OP10-059</span>
+              <span class="badge avg-badge">×2.4 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:75.0%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">75.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-055_EN.webp"
+          data-name="Go Ahead and Use &#x27;Em, Mr. Luffy!!!"
+          data-id="OP15-055"
+          data-usage="25.0"
+          data-avg="3.33"
+          data-decks="3"
+          data-total="12"
+          data-market-price="0.21"
+          data-rarity="R"
+          data-card-text="[Main] Choose one:
+• Draw 2 cards.
+• Up to 1 of your {Dressrosa} type Characters gains [Blocker] until the end of your opponent&#x27;s next End Phase."
+          data-card-color="Blue"
+          data-card-type="Event"
+          data-card-cost="3"
+          data-card-power=""
+          data-sub-types="Dressrosa Barto Club"
+          data-counter-amount="0"
+          data-attribute=""
+        >
+          <div class="card-rank">#8</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-055_EN.webp"
+               alt="Go Ahead and Use &#x27;Em, Mr. Luffy!!!" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Go Ahead and Use &#x27;Em, Mr. Luffy!!!</div>
+            <div class="card-meta">
+              <span class="badge">OP15-055</span>
+              <span class="badge avg-badge">×3.3 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:25.0%;background:#fbbf24;"></div>
+            </div>
+            <div class="usage-label" style="color:#fbbf24;">25.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-060_EN.webp"
           data-name="Boeuf Burst"
           data-id="OP12-060"
-          data-usage="40.0"
+          data-usage="16.7"
           data-avg="2.5"
           data-decks="2"
-          data-total="5"
+          data-total="12"
           data-market-price="0.27"
           data-rarity="R"
           data-card-text="[Main] If your Leader is multicolored, choose one:
@@ -6594,7 +6815,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-counter-amount=""
           data-attribute=""
         >
-          <div class="card-rank">#8</div>
+          <div class="card-rank">#9</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-060_EN.webp"
                alt="Boeuf Burst" loading="lazy">
           <div class="card-body">
@@ -6604,9 +6825,9 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
               <span class="badge avg-badge">×2.5 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:40.0%;background:#fbbf24;"></div>
+              <div class="usage-bar" style="width:16.7%;background:#f87171;"></div>
             </div>
-            <div class="usage-label" style="color:#fbbf24;">40.0% of decks</div>
+            <div class="usage-label" style="color:#f87171;">16.7% of decks</div>
           </div>
         </div>
       </div>
@@ -6619,8 +6840,8 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           <div class="chart-bars">
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">10</span>
-                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Blue: 10 copies" style="height:120px;background:#0078aa;width:100%;"></div></div>
+                  <span class="bar-val">25</span>
+                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Blue: 25 copies" style="height:120px;background:#0078aa;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 1</div>
               </div>
@@ -6632,10 +6853,10 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-057_EN.webp"
           data-name="Dressrosa Kingdom"
           data-id="OP15-057"
-          data-usage="80.0"
+          data-usage="83.3"
           data-avg="2.5"
-          data-decks="4"
-          data-total="5"
+          data-decks="10"
+          data-total="12"
           data-market-price="0.17"
           data-rarity="C"
           data-card-text="[On Play] If your Leader has the {Dressrosa} type, draw 1 card.
@@ -6658,9 +6879,9 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
               <span class="badge avg-badge">×2.5 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:80.0%;background:#34d399;"></div>
+              <div class="usage-bar" style="width:83.3%;background:#34d399;"></div>
             </div>
-            <div class="usage-label" style="color:#34d399;">80.0% of decks</div>
+            <div class="usage-label" style="color:#34d399;">83.3% of decks</div>
           </div>
         </div>
       </div>
@@ -6679,8 +6900,8 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
            data-id="OP15-058"
            data-usage="100"
            data-avg="1.0"
-           data-decks="12"
-           data-total="12"
+           data-decks="33"
+           data-total="33"
            data-market-price="0.2"
            data-rarity="L"
            data-card-text="Under the rules of this game, your DON!! deck consists of 6 cards.
@@ -6695,7 +6916,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
       <div class="leader-meta">
         <h2>Enel</h2>
         <span class="badge">OP15-058</span>
-        <span class="deck-count">12 tournament decks analysed</span>
+        <span class="deck-count">33 tournament decks analysed</span>
       </div>
     </div>
     </div>
@@ -6708,38 +6929,45 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           <div class="chart-bars">
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">152</span>
-                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 152 copies" style="height:120px;background:#6a3677;width:100%;"></div></div>
+                  <span class="bar-val">415</span>
+                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 415 copies" style="height:120px;background:#6a3677;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 1</div>
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">43</span>
-                  <div class="bar" style="height:34px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 43 copies" style="height:34px;background:#6a3677;width:100%;"></div></div>
+                  <span class="bar-val">77</span>
+                  <div class="bar" style="height:22px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 77 copies" style="height:22px;background:#6a3677;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 3</div>
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">37</span>
-                  <div class="bar" style="height:29px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 37 copies" style="height:29px;background:#6a3677;width:100%;"></div></div>
+                  <span class="bar-val">166</span>
+                  <div class="bar" style="height:48px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 166 copies" style="height:48px;background:#6a3677;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 4</div>
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">23</span>
-                  <div class="bar" style="height:18px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 23 copies" style="height:18px;background:#6a3677;width:100%;"></div></div>
+                  <span class="bar-val">65</span>
+                  <div class="bar" style="height:19px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 65 copies" style="height:19px;background:#6a3677;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 5</div>
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">89</span>
-                  <div class="bar" style="height:70px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 89 copies" style="height:70px;background:#6a3677;width:100%;"></div></div>
+                  <span class="bar-val">217</span>
+                  <div class="bar" style="height:63px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 217 copies" style="height:63px;background:#6a3677;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 6</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">2</span>
+                  <div class="bar" style="height:4px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Unknown: 2 copies" style="height:4px;background:#a78bfa;width:100%;"></div></div>
+                </div>
+                <div class="bar-label">Cost ?</div>
               </div>
           </div>
         </div>
@@ -6751,8 +6979,8 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-id="OP15-061"
           data-usage="100.0"
           data-avg="4.0"
-          data-decks="12"
-          data-total="12"
+          data-decks="33"
+          data-total="33"
           data-market-price="0.26"
           data-rarity="R"
           data-card-text="[On Play] DON!! 1: Draw 1 card.
@@ -6785,9 +7013,9 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-name="Enel"
           data-id="OP15-118"
           data-usage="100.0"
-          data-avg="4.0"
-          data-decks="12"
-          data-total="12"
+          data-avg="3.97"
+          data-decks="33"
+          data-total="33"
           data-market-price="48.74"
           data-rarity="SEC"
           data-card-text="If you have 6 or less DON!! cards on your field, this Character cannot be removed from the field by your opponent&#x27;s effects and gains +2000 power.
@@ -6820,10 +7048,10 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-name="Charlotte Pudding"
           data-id="OP12-071"
           data-usage="100.0"
-          data-avg="3.5"
-          data-decks="12"
-          data-total="12"
-          data-market-price="2.13"
+          data-avg="3.79"
+          data-decks="33"
+          data-total="33"
+          data-market-price="2.32"
           data-rarity="R"
           data-card-text="[On Play] Look at 4 cards from the top of your deck; reveal up to 1 [Sanji] or Event card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
           data-card-color="Purple"
@@ -6841,7 +7069,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
             <div class="card-name">Charlotte Pudding</div>
             <div class="card-meta">
               <span class="badge">OP12-071</span>
-              <span class="badge avg-badge">×3.5 avg</span>
+              <span class="badge avg-badge">×3.8 avg</span>
             </div>
             <div class="usage-bar-wrap">
               <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
@@ -6850,85 +7078,83 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           </div>
         </div>
         <div class="card" role="button" tabindex="0"
-          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-066_EN.webp"
-          data-name="Satori"
-          data-id="OP15-066"
-          data-usage="91.7"
-          data-avg="3.91"
-          data-decks="11"
-          data-total="12"
-          data-market-price="0.65"
-          data-rarity="R"
-          data-card-text="[On Play] DON!! 1: Draw 1 card.
-[When Attacking] If you have 6 or less DON!! cards on your field, look at 2 cards from the top of your deck and place them at the top or bottom of your deck in any order."
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-063_EN.webp"
+          data-name="Vinsmoke Reiju"
+          data-id="OP12-063"
+          data-usage="87.9"
+          data-avg="3.45"
+          data-decks="29"
+          data-total="33"
+          data-market-price="4.83"
+          data-rarity="SR"
+          data-card-text="If you have 4 or more Events in your trash, this Character gains +2000 power and +5 cost.
+[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)"
           data-card-color="Purple"
           data-card-type="Character"
-          data-card-cost="1"
-          data-card-power="2000"
-          data-sub-types="Sky Island Vassals"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="The Vinsmoke Family GERMA 66"
           data-counter-amount="1000"
-          data-attribute="Strike"
+          data-attribute="Special"
         >
           <div class="card-rank">#4</div>
-          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-066_EN.webp"
-               alt="Satori" loading="lazy">
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-063_EN.webp"
+               alt="Vinsmoke Reiju" loading="lazy">
           <div class="card-body">
-            <div class="card-name">Satori</div>
+            <div class="card-name">Vinsmoke Reiju</div>
             <div class="card-meta">
-              <span class="badge">OP15-066</span>
-              <span class="badge avg-badge">×3.9 avg</span>
+              <span class="badge">OP12-063</span>
+              <span class="badge avg-badge">×3.5 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:91.7%;background:#34d399;"></div>
+              <div class="usage-bar" style="width:87.9%;background:#34d399;"></div>
             </div>
-            <div class="usage-label" style="color:#34d399;">91.7% of decks</div>
+            <div class="usage-label" style="color:#34d399;">87.9% of decks</div>
           </div>
         </div>
         <div class="card" role="button" tabindex="0"
-          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-071_EN.webp"
-          data-name="Holly"
-          data-id="OP15-071"
-          data-usage="91.7"
-          data-avg="3.91"
-          data-decks="11"
-          data-total="12"
-          data-market-price="0.17"
-          data-rarity="C"
-          data-card-text="All of your [Ohm] cards and this Character gain [Double Attack].
-(This card deals 2 damage.)
-[Opponent&#x27;s Turn] All of your [Ohm] cards&#x27; base power and this Character&#x27;s base power become 6000."
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-067_EN.webp"
+          data-name="Senor Pink"
+          data-id="OP10-067"
+          data-usage="87.9"
+          data-avg="2.24"
+          data-decks="29"
+          data-total="33"
+          data-market-price="0.25"
+          data-rarity="R"
+          data-card-text="[On Play] DON!! 1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Add up to 1 purple Event with a cost of 5 or less from your trash to your hand. Then, set up to 1 of your DON!! cards as active."
           data-card-color="Purple"
           data-card-type="Character"
-          data-card-cost="3"
-          data-card-power="4000"
-          data-sub-types="Animal Sky Island"
-          data-counter-amount="1000"
-          data-attribute="Strike"
+          data-card-cost="5"
+          data-card-power="6000"
+          data-sub-types="Donquixote Pirates"
+          data-counter-amount="0"
+          data-attribute="Special"
         >
           <div class="card-rank">#5</div>
-          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-071_EN.webp"
-               alt="Holly" loading="lazy">
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-067_EN.webp"
+               alt="Senor Pink" loading="lazy">
           <div class="card-body">
-            <div class="card-name">Holly</div>
+            <div class="card-name">Senor Pink</div>
             <div class="card-meta">
-              <span class="badge">OP15-071</span>
-              <span class="badge avg-badge">×3.9 avg</span>
+              <span class="badge">OP10-067</span>
+              <span class="badge avg-badge">×2.2 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:91.7%;background:#34d399;"></div>
+              <div class="usage-bar" style="width:87.9%;background:#34d399;"></div>
             </div>
-            <div class="usage-label" style="color:#34d399;">91.7% of decks</div>
+            <div class="usage-label" style="color:#34d399;">87.9% of decks</div>
           </div>
         </div>
         <div class="card" role="button" tabindex="0"
           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP07/OP07-064_EN.webp"
           data-name="Sanji"
           data-id="OP07-064"
-          data-usage="91.7"
-          data-avg="2.36"
-          data-decks="11"
-          data-total="12"
-          data-market-price="3.41"
+          data-usage="81.8"
+          data-avg="2.19"
+          data-decks="27"
+          data-total="33"
+          data-market-price="3.34"
           data-rarity="SR"
           data-card-text="If the number of DON!! cards on your field is at least 2 less than the number on your opponent&#x27;s field, give this card in your hand -3 cost. [Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)"
           data-card-color="Purple"
@@ -6946,91 +7172,22 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
             <div class="card-name">Sanji</div>
             <div class="card-meta">
               <span class="badge">OP07-064</span>
-              <span class="badge avg-badge">×2.4 avg</span>
+              <span class="badge avg-badge">×2.2 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:91.7%;background:#34d399;"></div>
+              <div class="usage-bar" style="width:81.8%;background:#34d399;"></div>
             </div>
-            <div class="usage-label" style="color:#34d399;">91.7% of decks</div>
-          </div>
-        </div>
-        <div class="card" role="button" tabindex="0"
-          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-063_EN.webp"
-          data-name="Vinsmoke Reiju"
-          data-id="OP12-063"
-          data-usage="66.7"
-          data-avg="3.25"
-          data-decks="8"
-          data-total="12"
-          data-market-price="4.53"
-          data-rarity="SR"
-          data-card-text="If you have 4 or more Events in your trash, this Character gains +2000 power and +5 cost.
-[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)"
-          data-card-color="Purple"
-          data-card-type="Character"
-          data-card-cost="4"
-          data-card-power="5000"
-          data-sub-types="The Vinsmoke Family GERMA 66"
-          data-counter-amount="1000"
-          data-attribute="Special"
-        >
-          <div class="card-rank">#7</div>
-          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-063_EN.webp"
-               alt="Vinsmoke Reiju" loading="lazy">
-          <div class="card-body">
-            <div class="card-name">Vinsmoke Reiju</div>
-            <div class="card-meta">
-              <span class="badge">OP12-063</span>
-              <span class="badge avg-badge">×3.2 avg</span>
-            </div>
-            <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:66.7%;background:#a3e635;"></div>
-            </div>
-            <div class="usage-label" style="color:#a3e635;">66.7% of decks</div>
-          </div>
-        </div>
-        <div class="card" role="button" tabindex="0"
-          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-067_EN.webp"
-          data-name="Senor Pink"
-          data-id="OP10-067"
-          data-usage="66.7"
-          data-avg="2.88"
-          data-decks="8"
-          data-total="12"
-          data-market-price="0.3"
-          data-rarity="R"
-          data-card-text="[On Play] DON!! 1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Add up to 1 purple Event with a cost of 5 or less from your trash to your hand. Then, set up to 1 of your DON!! cards as active."
-          data-card-color="Purple"
-          data-card-type="Character"
-          data-card-cost="5"
-          data-card-power="6000"
-          data-sub-types="Donquixote Pirates"
-          data-counter-amount="0"
-          data-attribute="Special"
-        >
-          <div class="card-rank">#8</div>
-          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-067_EN.webp"
-               alt="Senor Pink" loading="lazy">
-          <div class="card-body">
-            <div class="card-name">Senor Pink</div>
-            <div class="card-meta">
-              <span class="badge">OP10-067</span>
-              <span class="badge avg-badge">×2.9 avg</span>
-            </div>
-            <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:66.7%;background:#a3e635;"></div>
-            </div>
-            <div class="usage-label" style="color:#a3e635;">66.7% of decks</div>
+            <div class="usage-label" style="color:#34d399;">81.8% of decks</div>
           </div>
         </div>
         <div class="card" role="button" tabindex="0"
           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-067_EN.webp"
           data-name="Shura"
           data-id="OP15-067"
-          data-usage="58.3"
-          data-avg="2.71"
-          data-decks="7"
-          data-total="12"
+          data-usage="78.8"
+          data-avg="3.42"
+          data-decks="26"
+          data-total="33"
           data-market-price="0.53"
           data-rarity="R"
           data-card-text="If you have 6 or less DON!! cards on your field, this Character gains [Rush].
@@ -7044,29 +7201,135 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-counter-amount="1000"
           data-attribute="Slash"
         >
-          <div class="card-rank">#9</div>
+          <div class="card-rank">#7</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-067_EN.webp"
                alt="Shura" loading="lazy">
           <div class="card-body">
             <div class="card-name">Shura</div>
             <div class="card-meta">
               <span class="badge">OP15-067</span>
-              <span class="badge avg-badge">×2.7 avg</span>
+              <span class="badge avg-badge">×3.4 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:58.3%;background:#a3e635;"></div>
+              <div class="usage-bar" style="width:78.8%;background:#a3e635;"></div>
             </div>
-            <div class="usage-label" style="color:#a3e635;">58.3% of decks</div>
+            <div class="usage-label" style="color:#a3e635;">78.8% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-066_EN.webp"
+          data-name="Satori"
+          data-id="OP15-066"
+          data-usage="72.7"
+          data-avg="2.88"
+          data-decks="24"
+          data-total="33"
+          data-market-price="0.65"
+          data-rarity="R"
+          data-card-text="[On Play] DON!! 1: Draw 1 card.
+[When Attacking] If you have 6 or less DON!! cards on your field, look at 2 cards from the top of your deck and place them at the top or bottom of your deck in any order."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="2000"
+          data-sub-types="Sky Island Vassals"
+          data-counter-amount="1000"
+          data-attribute="Strike"
+        >
+          <div class="card-rank">#8</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-066_EN.webp"
+               alt="Satori" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Satori</div>
+            <div class="card-meta">
+              <span class="badge">OP15-066</span>
+              <span class="badge avg-badge">×2.9 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:72.7%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">72.7% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-071_EN.webp"
+          data-name="Holly"
+          data-id="OP15-071"
+          data-usage="66.7"
+          data-avg="3.45"
+          data-decks="22"
+          data-total="33"
+          data-market-price="0.17"
+          data-rarity="C"
+          data-card-text="All of your [Ohm] cards and this Character gain [Double Attack].
+(This card deals 2 damage.)
+[Opponent&#x27;s Turn] All of your [Ohm] cards&#x27; base power and this Character&#x27;s base power become 6000."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="4000"
+          data-sub-types="Animal Sky Island"
+          data-counter-amount="1000"
+          data-attribute="Strike"
+        >
+          <div class="card-rank">#9</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-071_EN.webp"
+               alt="Holly" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Holly</div>
+            <div class="card-meta">
+              <span class="badge">OP15-071</span>
+              <span class="badge avg-badge">×3.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:66.7%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">66.7% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP09/OP09-072_EN.webp"
+          data-name="Franky"
+          data-id="OP09-072"
+          data-usage="66.7"
+          data-avg="2.41"
+          data-decks="22"
+          data-total="33"
+          data-market-price="0.36"
+          data-rarity="SR"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)
+[On Play] DON!! 2, You may trash 1 card from your hand: Draw 2 cards."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="5000"
+          data-sub-types="Straw Hat Crew"
+          data-counter-amount="1000"
+          data-attribute="Strike"
+        >
+          <div class="card-rank">#10</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP09/OP09-072_EN.webp"
+               alt="Franky" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Franky</div>
+            <div class="card-meta">
+              <span class="badge">OP09-072</span>
+              <span class="badge avg-badge">×2.4 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:66.7%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">66.7% of decks</div>
           </div>
         </div>
         <div class="card" role="button" tabindex="0"
           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-060_EN.webp"
           data-name="Enel"
           data-id="OP15-060"
-          data-usage="58.3"
-          data-avg="2.14"
-          data-decks="7"
-          data-total="12"
+          data-usage="48.5"
+          data-avg="1.69"
+          data-decks="16"
+          data-total="33"
           data-market-price="1.85"
           data-rarity="SR"
           data-card-text="If you have 6 or less DON!! cards on your field, this Character cannot be removed from the field by your opponent&#x27;s effects and gains +2000 power.
@@ -7079,54 +7342,122 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-counter-amount="0"
           data-attribute="Special"
         >
-          <div class="card-rank">#10</div>
+          <div class="card-rank">#11</div>
           <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-060_EN.webp"
                alt="Enel" loading="lazy">
           <div class="card-body">
             <div class="card-name">Enel</div>
             <div class="card-meta">
               <span class="badge">OP15-060</span>
-              <span class="badge avg-badge">×2.1 avg</span>
+              <span class="badge avg-badge">×1.7 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:58.3%;background:#a3e635;"></div>
+              <div class="usage-bar" style="width:48.5%;background:#fbbf24;"></div>
             </div>
-            <div class="usage-label" style="color:#a3e635;">58.3% of decks</div>
+            <div class="usage-label" style="color:#fbbf24;">48.5% of decks</div>
           </div>
         </div>
         <div class="card" role="button" tabindex="0"
-          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP09/OP09-072_EN.webp"
-          data-name="Franky"
-          data-id="OP09-072"
-          data-usage="33.3"
-          data-avg="2.75"
-          data-decks="4"
-          data-total="12"
-          data-market-price="0.33"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST10/ST10-010_EN.webp"
+          data-name="Trafalgar Law"
+          data-id="ST10-010"
+          data-usage="21.2"
+          data-avg="1.86"
+          data-decks="7"
+          data-total="33"
+          data-market-price="4.61"
           data-rarity="SR"
-          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)
-[On Play] DON!! 2, You may trash 1 card from your hand: Draw 2 cards."
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.) [On Play] DON!! -1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): If your opponent has 7 or more cards in their hand, trash 2 cards from your opponent&#x27;s hand."
           data-card-color="Purple"
           data-card-type="Character"
           data-card-cost="4"
           data-card-power="5000"
-          data-sub-types="Straw Hat Crew"
+          data-sub-types="Heart Pirates"
           data-counter-amount="1000"
-          data-attribute="Strike"
+          data-attribute="Slash"
         >
-          <div class="card-rank">#11</div>
-          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP09/OP09-072_EN.webp"
-               alt="Franky" loading="lazy">
+          <div class="card-rank">#12</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST10/ST10-010_EN.webp"
+               alt="Trafalgar Law" loading="lazy">
           <div class="card-body">
-            <div class="card-name">Franky</div>
+            <div class="card-name">Trafalgar Law</div>
             <div class="card-meta">
-              <span class="badge">OP09-072</span>
-              <span class="badge avg-badge">×2.8 avg</span>
+              <span class="badge">ST10-010</span>
+              <span class="badge avg-badge">×1.9 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:33.3%;background:#fbbf24;"></div>
+              <div class="usage-bar" style="width:21.2%;background:#f87171;"></div>
             </div>
-            <div class="usage-label" style="color:#fbbf24;">33.3% of decks</div>
+            <div class="usage-label" style="color:#f87171;">21.2% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/P/P-045_EN.webp"
+          data-name="Roronoa Zoro"
+          data-id="P-045"
+          data-usage="3.0"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="33"
+          data-market-price=""
+          data-rarity=""
+          data-card-text=""
+          data-card-color=""
+          data-card-type=""
+          data-card-cost=""
+          data-card-power=""
+          data-sub-types=""
+          data-counter-amount=""
+          data-attribute=""
+        >
+          <div class="card-rank">#13</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/P/P-045_EN.webp"
+               alt="Roronoa Zoro" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Roronoa Zoro</div>
+            <div class="card-meta">
+              <span class="badge">P-045</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:3.0%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">3.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-070_EN.webp"
+          data-name="Sanji"
+          data-id="OP12-070"
+          data-usage="3.0"
+          data-avg="1.0"
+          data-decks="1"
+          data-total="33"
+          data-market-price="0.16"
+          data-rarity="R"
+          data-card-text="This Character gains +1000 power for every 5 Events in your trash.
+If this Character would be removed from the field by your opponent&#x27;s effect, you may return 1 DON!! card from your field to your DON!! deck instead."
+          data-card-color="Purple"
+          data-card-type="Character"
+          data-card-cost="3"
+          data-card-power="5000"
+          data-sub-types="Alabasta Straw Hat Crew"
+          data-counter-amount="0"
+          data-attribute="Strike"
+        >
+          <div class="card-rank">#14</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-070_EN.webp"
+               alt="Sanji" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Sanji</div>
+            <div class="card-meta">
+              <span class="badge">OP12-070</span>
+              <span class="badge avg-badge">×1.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:3.0%;background:#f87171;"></div>
+            </div>
+            <div class="usage-label" style="color:#f87171;">3.0% of decks</div>
           </div>
         </div>
       </div>
@@ -7139,15 +7470,15 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           <div class="chart-bars">
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">226</span>
-                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 226 copies" style="height:120px;background:#6a3677;width:100%;"></div></div>
+                  <span class="bar-val">617</span>
+                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 617 copies" style="height:120px;background:#6a3677;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 0</div>
               </div>
               <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">30</span>
-                  <div class="bar" style="height:16px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 30 copies" style="height:16px;background:#6a3677;width:100%;"></div></div>
+                  <span class="bar-val">91</span>
+                  <div class="bar" style="height:18px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Purple: 91 copies" style="height:18px;background:#6a3677;width:100%;"></div></div>
                 </div>
                 <div class="bar-label">Cost 2</div>
               </div>
@@ -7161,8 +7492,8 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-id="OP15-076"
           data-usage="100.0"
           data-avg="4.0"
-          data-decks="12"
-          data-total="12"
+          data-decks="33"
+          data-total="33"
           data-market-price="0.22"
           data-rarity="UC"
           data-card-text="[Main] DON!! 1: If your Leader is [Enel], draw 1 card. Then, give up to 1 of your opponent&#x27;s Characters 1000 power during this turn.
@@ -7196,8 +7527,8 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-id="OP15-078"
           data-usage="100.0"
           data-avg="4.0"
-          data-decks="12"
-          data-total="12"
+          data-decks="33"
+          data-total="33"
           data-market-price="5.35"
           data-rarity="SR"
           data-card-text="[Main] DON!! 2: Draw 1 card. Then, rest up to 1 of your opponent&#x27;s Characters with 5000 power or less.
@@ -7230,9 +7561,9 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-name="El Thor"
           data-id="OP15-075"
           data-usage="100.0"
-          data-avg="3.92"
-          data-decks="12"
-          data-total="12"
+          data-avg="3.97"
+          data-decks="33"
+          data-total="33"
           data-market-price="0.18"
           data-rarity="UC"
           data-card-text="[Main] DON!! 1: If your Leader is [Enel], up to 1 of your Leader or Character cards gains +1000 power during this turn. Then, K.O. up to 1 of your opponent&#x27;s Characters with 3000 power or less.
@@ -7252,7 +7583,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
             <div class="card-name">El Thor</div>
             <div class="card-meta">
               <span class="badge">OP15-075</span>
-              <span class="badge avg-badge">×3.9 avg</span>
+              <span class="badge avg-badge">×4.0 avg</span>
             </div>
             <div class="usage-bar-wrap">
               <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
@@ -7265,9 +7596,9 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-name="Lightning Dragon"
           data-id="OP15-077"
           data-usage="100.0"
-          data-avg="3.92"
-          data-decks="12"
-          data-total="12"
+          data-avg="3.97"
+          data-decks="33"
+          data-total="33"
           data-market-price="0.38"
           data-rarity="R"
           data-card-text="[Main] DON!! 1: Draw 1 card. Then, up to 1 of your opponent&#x27;s rested Characters with 6000 power or less will not become active in your opponent&#x27;s next Refresh Phase."
@@ -7286,7 +7617,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
             <div class="card-name">Lightning Dragon</div>
             <div class="card-meta">
               <span class="badge">OP15-077</span>
-              <span class="badge avg-badge">×3.9 avg</span>
+              <span class="badge avg-badge">×4.0 avg</span>
             </div>
             <div class="usage-bar-wrap">
               <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
@@ -7299,10 +7630,10 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-name="Gamma Knife"
           data-id="OP05-077"
           data-usage="100.0"
-          data-avg="2.5"
-          data-decks="12"
-          data-total="12"
-          data-market-price="0.23"
+          data-avg="2.76"
+          data-decks="33"
+          data-total="33"
+          data-market-price="0.25"
           data-rarity="C"
           data-card-text="[Main] DON!! -1 (You may return the specified number of DON!! cards from your field to your DON!! deck.): Give up to 1 of your opponent&#x27;s Characters -5000 power during this turn. [Trigger] Add up to 1 DON!! card from your DON!! deck and set it as active."
           data-card-color="Purple"
@@ -7320,7 +7651,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
             <div class="card-name">Gamma Knife</div>
             <div class="card-meta">
               <span class="badge">OP05-077</span>
-              <span class="badge avg-badge">×2.5 avg</span>
+              <span class="badge avg-badge">×2.8 avg</span>
             </div>
             <div class="usage-bar-wrap">
               <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
@@ -7333,10 +7664,10 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-name="Divine Departure"
           data-id="OP13-076"
           data-usage="100.0"
-          data-avg="2.08"
-          data-decks="12"
-          data-total="12"
-          data-market-price="1.82"
+          data-avg="1.48"
+          data-decks="33"
+          data-total="33"
+          data-market-price="1.7"
           data-rarity="R"
           data-card-text="[Main] You may rest 5 of your DON!! cards: If you have any DON!! cards given, give up to 1 of your opponent&#x27;s Characters 8000 power during this turn.
 [Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +3000 power during this battle."
@@ -7355,7 +7686,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
             <div class="card-name">Divine Departure</div>
             <div class="card-meta">
               <span class="badge">OP13-076</span>
-              <span class="badge avg-badge">×2.1 avg</span>
+              <span class="badge avg-badge">×1.5 avg</span>
             </div>
             <div class="usage-bar-wrap">
               <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
@@ -7367,10 +7698,10 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-074_EN.webp"
           data-name="Varie"
           data-id="OP15-074"
-          data-usage="58.3"
-          data-avg="1.57"
-          data-decks="7"
-          data-total="12"
+          data-usage="63.6"
+          data-avg="2.0"
+          data-decks="21"
+          data-total="33"
           data-market-price="0.17"
           data-rarity="UC"
           data-card-text="[Main] DON!! 1: If your Leader is [Enel], draw 1 card. Then, up to 1 of your Characters gains +2 cost until the end of your opponent&#x27;s next End Phase. [Counter] Up to 1 of your [Enel] cards gains +2000 power during this battle."
@@ -7389,12 +7720,738 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
             <div class="card-name">Varie</div>
             <div class="card-meta">
               <span class="badge">OP15-074</span>
-              <span class="badge avg-badge">×1.6 avg</span>
+              <span class="badge avg-badge">×2.0 avg</span>
             </div>
             <div class="usage-bar-wrap">
-              <div class="usage-bar" style="width:58.3%;background:#a3e635;"></div>
+              <div class="usage-bar" style="width:63.6%;background:#a3e635;"></div>
             </div>
-            <div class="usage-label" style="color:#a3e635;">58.3% of decks</div>
+            <div class="usage-label" style="color:#a3e635;">63.6% of decks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="leader-section" id="op15-098">
+    <div class="section-header">
+      
+    <div class="leader-hero">
+      <img class="leader-img card-trigger" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-098_EN.webp"
+           alt="Monkey.D.Luffy" loading="lazy"
+           role="button" tabindex="0"
+           data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-098_EN.webp"
+           data-name="Monkey.D.Luffy"
+           data-id="OP15-098"
+           data-usage="100"
+           data-avg="1.0"
+           data-decks="2"
+           data-total="2"
+           data-market-price="0.28"
+           data-rarity="L"
+           data-card-text="If your {Sky Island} type Character with 6000 base power or more would be removed from the field by your opponent, you may add 1 card from the top of your Life cards to your hand instead."
+           data-card-color="Black"
+           data-card-type="Leader"
+           data-card-cost=""
+           data-card-power="5000"
+           data-sub-types="Straw Hat Crew Sky Island"
+           data-counter-amount="0"
+           data-attribute="Strike">
+      <div class="leader-meta">
+        <h2>Monkey.D.Luffy</h2>
+        <span class="badge">OP15-098</span>
+        <span class="deck-count">2 tournament decks analysed</span>
+      </div>
+    </div>
+    </div>
+    
+    <div class="type-section">
+      <h3 class="type-heading">Character</h3>
+      <details class="chart-details" id="op15-098-character-chart">
+        <summary class="chart-toggle">Cost distribution</summary>
+        <div class="chart">
+          <div class="chart-bars">
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">8</span>
+                  <div class="bar" style="height:30px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Yellow: 8 copies" style="height:30px;background:#f6e846;width:100%;"></div></div>
+                </div>
+                <div class="bar-label">Cost 1</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">15</span>
+                  <div class="bar" style="height:56px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Yellow: 15 copies" style="height:56px;background:#f6e846;width:100%;"></div></div>
+                </div>
+                <div class="bar-label">Cost 2</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">20</span>
+                  <div class="bar" style="height:75px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Yellow: 20 copies" style="height:75px;background:#f6e846;width:100%;"></div></div>
+                </div>
+                <div class="bar-label">Cost 4</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">32</span>
+                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Yellow: 32 copies" style="height:120px;background:#f6e846;width:100%;"></div></div>
+                </div>
+                <div class="bar-label">Cost 5</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">8</span>
+                  <div class="bar" style="height:30px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Yellow: 8 copies" style="height:30px;background:#f6e846;width:100%;"></div></div>
+                </div>
+                <div class="bar-label">Cost 7</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">2</span>
+                  <div class="bar" style="height:8px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Yellow: 2 copies" style="height:8px;background:#f6e846;width:100%;"></div></div>
+                </div>
+                <div class="bar-label">Cost 8</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">3</span>
+                  <div class="bar" style="height:11px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Yellow: 3 copies" style="height:11px;background:#f6e846;width:100%;"></div></div>
+                </div>
+                <div class="bar-label">Cost 10</div>
+              </div>
+          </div>
+        </div>
+      </details>
+      <div class="cards-grid">
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-108_EN.webp"
+          data-name="Nami"
+          data-id="OP15-108"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="2"
+          data-total="2"
+          data-market-price="0.63"
+          data-rarity="R"
+          data-card-text="[On Play] Look at 3 cards from the top of your deck; reveal up to 1 {Sky Island} type card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="1"
+          data-card-power="2000"
+          data-sub-types="Straw Hat Crew Sky Island"
+          data-counter-amount="2000"
+          data-attribute="Special"
+        >
+          <div class="card-rank">#1</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-108_EN.webp"
+               alt="Nami" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Nami</div>
+            <div class="card-meta">
+              <span class="badge">OP15-108</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-106_EN.webp"
+          data-name="Shura"
+          data-id="OP05-106"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="2"
+          data-total="2"
+          data-market-price="1.24"
+          data-rarity="R"
+          data-card-text="[On Play] Look at 5 cards from the top of your deck; reveal up to 1 [Sky Island] type card other than [Shura] and add it to your hand. Then, place the rest at the bottom of your deck in any order. [Trigger] Play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="2000"
+          data-sub-types="Sky Island Vassals"
+          data-counter-amount="1000"
+          data-attribute="Slash"
+        >
+          <div class="card-rank">#2</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-106_EN.webp"
+               alt="Shura" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Shura</div>
+            <div class="card-meta">
+              <span class="badge">OP05-106</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST29/ST29-009_EN.webp"
+          data-name="Nico Robin"
+          data-id="ST29-009"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="2"
+          data-total="2"
+          data-market-price="3.44"
+          data-rarity="C"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)
+[Trigger] If your Leader is [Monkey.D.Luffy], play this card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="2000"
+          data-sub-types="Straw Hat Crew Egghead"
+          data-counter-amount="2000"
+          data-attribute="Strike"
+        >
+          <div class="card-rank">#3</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/ST29/ST29-009_EN.webp"
+               alt="Nico Robin" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Nico Robin</div>
+            <div class="card-meta">
+              <span class="badge">ST29-009</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-113_EN.webp"
+          data-name="Roronoa Zoro"
+          data-id="OP15-113"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="2"
+          data-total="2"
+          data-market-price="6.73"
+          data-rarity="SR"
+          data-card-text="[On Play] You may trash 1 card from your hand: Add up to 1 card from the top of your deck to the top of your Life cards."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="6000"
+          data-sub-types="Straw Hat Crew Sky Island"
+          data-counter-amount="0"
+          data-attribute="Slash"
+        >
+          <div class="card-rank">#4</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-113_EN.webp"
+               alt="Roronoa Zoro" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Roronoa Zoro</div>
+            <div class="card-meta">
+              <span class="badge">OP15-113</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-114_EN.webp"
+          data-name="Wyper"
+          data-id="OP15-114"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="2"
+          data-total="2"
+          data-market-price="1.65"
+          data-rarity="SR"
+          data-card-text="[On Play] You may turn 1 card from the top of your Life cards face-up: Give all of your opponent&#x27;s Characters 2000 power during this turn. Then, K.O. all of your opponent&#x27;s Characters with 0 power or less.
+[Activate: Main] [Once Per Turn] Give up to 1 rested DON!! card to 1 of your {Sky Island} type Leader or Character cards."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="6000"
+          data-sub-types="Sky Island Shandian Warrior"
+          data-counter-amount="1000"
+          data-attribute="Ranged"
+        >
+          <div class="card-rank">#5</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-114_EN.webp"
+               alt="Wyper" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Wyper</div>
+            <div class="card-meta">
+              <span class="badge">OP15-114</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-119_EN.webp"
+          data-name="Monkey.D.Luffy"
+          data-id="OP15-119"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="2"
+          data-total="2"
+          data-market-price="33.9"
+          data-rarity="SEC"
+          data-card-text="If you have 6 or more DON!! cards on your field, this Character gains [Rush].
+When your opponent activates an Event or [Blocker], reveal up to 1 card from the top of your Life cards. This Character gains +1000 power during this turn per 1 cost on the revealed card."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="7000"
+          data-sub-types="Straw Hat Crew Sky Island"
+          data-counter-amount="0"
+          data-attribute="Strike"
+        >
+          <div class="card-rank">#6</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-119_EN.webp"
+               alt="Monkey.D.Luffy" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Monkey.D.Luffy</div>
+            <div class="card-meta">
+              <span class="badge">OP15-119</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB04/EB04-058_EN.webp"
+          data-name="Borsalino"
+          data-id="EB04-058"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="2"
+          data-total="2"
+          data-market-price="26.52"
+          data-rarity="SR"
+          data-card-text="[Blocker] (After your opponent declares an attack, you may rest this card to make it the new target of the attack.)
+[On Play] If you have 2 or less Life cards, add up to 1 card from the top of your deck to the top of your Life cards."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="6000"
+          data-sub-types="Navy Egghead"
+          data-counter-amount="1000"
+          data-attribute="Special"
+        >
+          <div class="card-rank">#7</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB04/EB04-058_EN.webp"
+               alt="Borsalino" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Borsalino</div>
+            <div class="card-meta">
+              <span class="badge">EB04-058</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-109_EN.webp"
+          data-name="Nico Robin"
+          data-id="OP15-109"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="2"
+          data-total="2"
+          data-market-price="0.36"
+          data-rarity="R"
+          data-card-text="[On Play] You may add 1 card from the top of your Life cards to your hand: If your Leader has the {Straw Hat Crew} type, add up to 1 card from the top of your deck to the top of your Life cards. Then, play up to 1 {Sky Island} type Character card with a cost of 5 or less from your hand."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="7"
+          data-card-power="7000"
+          data-sub-types="Straw Hat Crew Sky Island"
+          data-counter-amount="1000"
+          data-attribute="Strike"
+        >
+          <div class="card-rank">#8</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-109_EN.webp"
+               alt="Nico Robin" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Nico Robin</div>
+            <div class="card-meta">
+              <span class="badge">OP15-109</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP11/OP11-106_EN.webp"
+          data-name="Zeus"
+          data-id="OP11-106"
+          data-usage="100.0"
+          data-avg="3.5"
+          data-decks="2"
+          data-total="2"
+          data-market-price="1.78"
+          data-rarity="R"
+          data-card-text="[On Play] You may add 1 card from the top or bottom of your Life cards to your hand: K.O. up to 1 of your opponent&#x27;s Characters with a cost of 5 or less."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="2"
+          data-card-power="2000"
+          data-sub-types="Big Mom Pirates Homies"
+          data-counter-amount="2000"
+          data-attribute="Special"
+        >
+          <div class="card-rank">#9</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP11/OP11-106_EN.webp"
+               alt="Zeus" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Zeus</div>
+            <div class="card-meta">
+              <span class="badge">OP11-106</span>
+              <span class="badge avg-badge">×3.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-102_EN.webp"
+          data-name="Gedatsu"
+          data-id="OP05-102"
+          data-usage="100.0"
+          data-avg="2.5"
+          data-decks="2"
+          data-total="2"
+          data-market-price="0.25"
+          data-rarity="R"
+          data-card-text="[On Play] K.O. up to 1 of your opponent&#x27;s Characters with a cost equal to or less than the number of your opponent&#x27;s Life cards."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="6000"
+          data-sub-types="Sky Island Vassals"
+          data-counter-amount="1000"
+          data-attribute="Strike"
+        >
+          <div class="card-rank">#10</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-102_EN.webp"
+               alt="Gedatsu" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Gedatsu</div>
+            <div class="card-meta">
+              <span class="badge">OP05-102</span>
+              <span class="badge avg-badge">×2.5 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB03/EB03-056_EN.webp"
+          data-name="Belo Betty"
+          data-id="EB03-056"
+          data-usage="100.0"
+          data-avg="2.0"
+          data-decks="2"
+          data-total="2"
+          data-market-price="0.07"
+          data-rarity="C"
+          data-card-text="[On Play] You may turn 1 card from the top of your Life cards face-up: K.O. up to 1 of your opponent&#x27;s Characters with a base cost of 3 or less."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="4"
+          data-card-power="3000"
+          data-sub-types="Revolutionary Army"
+          data-counter-amount="2000"
+          data-attribute="Special"
+        >
+          <div class="card-rank">#11</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB03/EB03-056_EN.webp"
+               alt="Belo Betty" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Belo Betty</div>
+            <div class="card-meta">
+              <span class="badge">EB03-056</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-099_EN.webp"
+          data-name="Kalgara"
+          data-id="OP12-099"
+          data-usage="50.0"
+          data-avg="3.0"
+          data-decks="1"
+          data-total="2"
+          data-market-price="0.18"
+          data-rarity="R"
+          data-card-text="[Your Turn] When a card is removed from your or your opponent&#x27;s Life cards, draw 1 card. Then, you cannot draw cards using your own effects during this turn."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="5"
+          data-card-power="6000"
+          data-sub-types="Sky Island Shandian Warrior Jaya"
+          data-counter-amount="1000"
+          data-attribute="Slash"
+        >
+          <div class="card-rank">#12</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP12/OP12-099_EN.webp"
+               alt="Kalgara" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Kalgara</div>
+            <div class="card-meta">
+              <span class="badge">OP12-099</span>
+              <span class="badge avg-badge">×3.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:50.0%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">50.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB02/EB02-052_EN.webp"
+          data-name="Enel"
+          data-id="EB02-052"
+          data-usage="50.0"
+          data-avg="3.0"
+          data-decks="1"
+          data-total="2"
+          data-market-price="24.3"
+          data-rarity="SR"
+          data-card-text="If your Leader has the &quot;Sky Island&quot; type, this Character gains [Rush].
+[When Attacking] You may trash 1 card from your hand: If you have 1 or less Life cards, add up to 1 card from the top of your deck to the top of your Life cards. Then, this Character gains +1000 power during this turn."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="10"
+          data-card-power="11000"
+          data-sub-types="Sky Island"
+          data-counter-amount="0"
+          data-attribute="Special"
+        >
+          <div class="card-rank">#13</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/EB02/EB02-052_EN.webp"
+               alt="Enel" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Enel</div>
+            <div class="card-meta">
+              <span class="badge">EB02-052</span>
+              <span class="badge avg-badge">×3.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:50.0%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">50.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-112_EN.webp"
+          data-name="Eustass&quot;Captain&quot;Kid"
+          data-id="OP10-112"
+          data-usage="50.0"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="2"
+          data-market-price="0.82"
+          data-rarity="SR"
+          data-card-text="[On Play] You may rest this Character: Trash up to 1 card from the top of your opponent&#x27;s Life cards.
+[End of Your Turn] If your opponent has 2 or less Life cards, draw 1 card and trash 1 card from your hand."
+          data-card-color="Yellow"
+          data-card-type="Character"
+          data-card-cost="8"
+          data-card-power="9000"
+          data-sub-types="Kid Pirates Supernovas"
+          data-counter-amount="0"
+          data-attribute="Special"
+        >
+          <div class="card-rank">#14</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP10/OP10-112_EN.webp"
+               alt="Eustass&quot;Captain&quot;Kid" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Eustass&quot;Captain&quot;Kid</div>
+            <div class="card-meta">
+              <span class="badge">OP10-112</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:50.0%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">50.0% of decks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="type-section">
+      <h3 class="type-heading">Event</h3>
+      <details class="chart-details" id="op15-098-event-chart">
+        <summary class="chart-toggle">Cost distribution</summary>
+        <div class="chart">
+          <div class="chart-bars">
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">2</span>
+                  <div class="bar" style="height:30px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Yellow: 2 copies" style="height:30px;background:#f6e846;width:100%;"></div></div>
+                </div>
+                <div class="bar-label">Cost 0</div>
+              </div>
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">8</span>
+                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Yellow: 8 copies" style="height:120px;background:#f6e846;width:100%;"></div></div>
+                </div>
+                <div class="bar-label">Cost 1</div>
+              </div>
+          </div>
+        </div>
+      </details>
+      <div class="cards-grid">
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-116_EN.webp"
+          data-name="Gum-Gum Golden Rifle"
+          data-id="OP15-116"
+          data-usage="100.0"
+          data-avg="4.0"
+          data-decks="2"
+          data-total="2"
+          data-market-price="0.23"
+          data-rarity="R"
+          data-card-text="[Main] If your Leader has the {Straw Hat Crew} type, trash 1 card from the top of your Life cards. Then, add up to 1 card from the top of your deck to the top of your Life cards and trash 1 card from your hand.
+[Counter] Your Leader gains +4000 power during this battle."
+          data-card-color="Yellow"
+          data-card-type="Event"
+          data-card-cost="1"
+          data-card-power=""
+          data-sub-types="Straw Hat Crew Sky Island"
+          data-counter-amount="0"
+          data-attribute=""
+        >
+          <div class="card-rank">#1</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP15/OP15-116_EN.webp"
+               alt="Gum-Gum Golden Rifle" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Gum-Gum Golden Rifle</div>
+            <div class="card-meta">
+              <span class="badge">OP15-116</span>
+              <span class="badge avg-badge">×4.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:100.0%;background:#34d399;"></div>
+            </div>
+            <div class="usage-label" style="color:#34d399;">100.0% of decks</div>
+          </div>
+        </div>
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-115_EN.webp"
+          data-name="You&#x27;re the One Who Should Disappear."
+          data-id="OP06-115"
+          data-usage="50.0"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="2"
+          data-market-price="1.75"
+          data-rarity="R"
+          data-card-text="[Counter] You may trash 1 card from your hand: Up to 1 of your Leader or Character cards gains +3000 power during this battle.
+[Trigger] If you have 0 Life cards, you may add up to 1 card from the top of your deck to the top of your Life cards. Then, trash 1 card from your hand."
+          data-card-color="Yellow"
+          data-card-type="Event"
+          data-card-cost="0"
+          data-card-power=""
+          data-sub-types="Sky Island"
+          data-counter-amount=""
+          data-attribute=""
+        >
+          <div class="card-rank">#2</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP06/OP06-115_EN.webp"
+               alt="You&#x27;re the One Who Should Disappear." loading="lazy">
+          <div class="card-body">
+            <div class="card-name">You&#x27;re the One Who Should Disappear.</div>
+            <div class="card-meta">
+              <span class="badge">OP06-115</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:50.0%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">50.0% of decks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="type-section">
+      <h3 class="type-heading">Stage</h3>
+      <details class="chart-details" id="op15-098-stage-chart">
+        <summary class="chart-toggle">Cost distribution</summary>
+        <div class="chart">
+          <div class="chart-bars">
+              <div class="bar-group">
+                <div class="bar-wrap">
+                  <span class="bar-val">2</span>
+                  <div class="bar" style="height:120px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;"><div class="bar-seg" data-tip="Yellow: 2 copies" style="height:120px;background:#f6e846;width:100%;"></div></div>
+                </div>
+                <div class="bar-label">Cost 1</div>
+              </div>
+          </div>
+        </div>
+      </details>
+      <div class="cards-grid">
+        <div class="card" role="button" tabindex="0"
+          data-image="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-117_EN.webp"
+          data-name="Upper Yard"
+          data-id="OP05-117"
+          data-usage="50.0"
+          data-avg="2.0"
+          data-decks="1"
+          data-total="2"
+          data-market-price="0.19"
+          data-rarity="UC"
+          data-card-text="[On Play] Look at the top 5 cards of your deck; reveal up to 1 [Sky Island] type card and add it to your hand. Then, place the rest at the bottom of your deck in any order."
+          data-card-color="Yellow"
+          data-card-type="Stage"
+          data-card-cost="1"
+          data-card-power="NULL"
+          data-sub-types="Sky Island"
+          data-counter-amount="0"
+          data-attribute="NULL"
+        >
+          <div class="card-rank">#1</div>
+          <img class="card-img" src="https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece/OP05/OP05-117_EN.webp"
+               alt="Upper Yard" loading="lazy">
+          <div class="card-body">
+            <div class="card-name">Upper Yard</div>
+            <div class="card-meta">
+              <span class="badge">OP05-117</span>
+              <span class="badge avg-badge">×2.0 avg</span>
+            </div>
+            <div class="usage-bar-wrap">
+              <div class="usage-bar" style="width:50.0%;background:#a3e635;"></div>
+            </div>
+            <div class="usage-label" style="color:#a3e635;">50.0% of decks</div>
           </div>
         </div>
       </div>
@@ -7518,6 +8575,27 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') backdrop.classList.remove('open');
     });
+
+    /* ── Hamburger / sidebar ── */
+    const hamburger       = document.getElementById('hamburger');
+    const sidebar         = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+    function openSidebar() {
+      sidebar.classList.add('open');
+      sidebarBackdrop.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      sidebarBackdrop.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    hamburger.addEventListener('click', openSidebar);
+    sidebarBackdrop.addEventListener('click', closeSidebar);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+    sidebar.querySelectorAll('a').forEach(a => a.addEventListener('click', closeSidebar));
   </script>
 </body>
 </html>
