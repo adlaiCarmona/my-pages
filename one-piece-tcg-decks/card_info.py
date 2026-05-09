@@ -13,7 +13,8 @@ Usage:
 import time
 import requests
 
-_API_BASE = "https://www.optcgapi.com/api/sets/card"
+_API_BASE_SETS  = "https://www.optcgapi.com/api/sets/card"
+_API_BASE_DECKS = "https://www.optcgapi.com/api/decks/card"
 _CACHE: dict[str, dict | None] = {}
 _REQUEST_DELAY = 0.3  # seconds — be polite to the free API
 
@@ -47,7 +48,8 @@ def get_card_info(card_id: str) -> dict | None:
     if card_id in _CACHE:
         return _CACHE[card_id]
 
-    url = f"{_API_BASE}/{card_id}"
+    api_base = _API_BASE_DECKS if card_id.startswith("ST") else _API_BASE_SETS
+    url = f"{api_base}/{card_id}"
     try:
         resp = requests.get(url, timeout=15)
         time.sleep(_REQUEST_DELAY)

@@ -24,7 +24,7 @@ jobs:
         run: pip install -r one-piece-tcg-decks/requirements.txt
 
       - name: Run fetch script
-        run: python fetch_top_cards_for_leader.py
+        run: python fetch_top_cards_for_leader.py -l 50
         working-directory: one-piece-tcg-decks
 
       - name: Commit and push

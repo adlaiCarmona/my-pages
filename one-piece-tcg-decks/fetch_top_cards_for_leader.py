@@ -11,6 +11,7 @@ For each leader card ID:
 """
 
 import html as html_module
+import hashlib
 import json
 import re
 import time
@@ -25,6 +26,7 @@ from card_info import get_card_info
 BASE_URL = "https://onepiece.limitlesstcg.com"
 CDN_BASE = "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/one-piece"
 CACHE_DIR = Path(__file__).parent / "cache"
+DECKLIST_CACHE_DIR = CACHE_DIR / "decklists"
 LEADERS_FILE = Path(__file__).parent / "leaders.json"
 HEADERS = {
     "User-Agent": (
@@ -42,6 +44,26 @@ def get_html(url: str) -> BeautifulSoup:
     resp.raise_for_status()
     time.sleep(REQUEST_DELAY)
     return BeautifulSoup(resp.text, "html.parser")
+
+
+def _deck_cache_path(deck_url: str) -> Path:
+    """Return the cache file path for a given deck URL."""
+    key = hashlib.sha1(deck_url.encode()).hexdigest()
+    return DECKLIST_CACHE_DIR / f"{key}.json"
+
+
+def load_cached_decklist(deck_url: str) -> dict | None:
+    """Return the cached parsed decklist for *deck_url*, or None if not cached."""
+    path = _deck_cache_path(deck_url)
+    if path.exists():
+        return json.loads(path.read_text())
+    return None
+
+
+def save_cached_decklist(deck_url: str, data: dict) -> None:
+    """Persist a parsed decklist to the deck-level cache."""
+    DECKLIST_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    _deck_cache_path(deck_url).write_text(json.dumps(data, ensure_ascii=False))
 
 
 def card_image_url(card_id: str) -> str:
@@ -228,55 +250,6 @@ def aggregate_stats(all_decklists: list[dict]) -> dict:
     return output
 
 
-def process_leader(leader_id: str) -> None:
-    cache_file = CACHE_DIR / f"{leader_id}.json"
-
-    print(f"\n{'='*60}")
-    print(f"Leader: {leader_id}")
-    print(f"{'='*60}")
-
-    print("  Fetching deck URLs...")
-    deck_urls = get_deck_urls_for_leader(leader_id)
-    print(f"  Found {len(deck_urls)} deck(s)")
-
-    if not deck_urls:
-        print("  Skipping – no decklists found.")
-        return
-
-    all_decklists = []
-    for i, url in enumerate(deck_urls, 1):
-        print(f"  [{i}/{len(deck_urls)}] Parsing {url}")
-        try:
-            parsed = parse_decklist(url)
-            all_decklists.append(parsed)
-        except Exception as exc:
-            print(f"    [error] {exc}")
-
-    print("  Aggregating stats...")
-    stats = aggregate_stats(all_decklists)
-
-    result = {
-        "leader_id": leader_id,
-        "total_decks": len(all_decklists),
-        "card_stats": stats,
-    }
-
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    cache_file.write_text(json.dumps(result, indent=2, ensure_ascii=False))
-    print(f"  Saved -> {cache_file}")
-
-    # Print a quick summary
-    for card_type, cards in stats.items():
-        if card_type.lower() == "leader":
-            continue
-        print(f"\n  --- {card_type} ---")
-        for card in cards[:10]:
-            print(
-                f"    {card['usage_pct']:5.1f}%  x{card['avg_copies_when_played']:.1f}  "
-                f"{card['card_name']} ({card['card_id']})"
-            )
-
-
 def _da(value) -> str:
     """Render a data-attribute value: empty string when None."""
     if value is None:
@@ -368,22 +341,72 @@ def build_html(all_results: list[dict]) -> str:
 
         for card_type in ordered_types:
             cards = card_stats[card_type]
-            # usage bar chart: top-15 cards by usage_pct
-            chart_cards = cards[:15]
-            max_pct = max((c["usage_pct"] for c in chart_cards), default=1)
+            # cost distribution chart: aggregate total_copies by card_cost × card_color
+            # Fixed order: bottom → top of each stacked bar
+            COLOR_ORDER = [
+                ("red",    "#d3171b"),
+                ("green",  "#018761"),
+                ("blue",   "#0078aa"),
+                ("purple", "#6a3677"),
+                ("black",  "#000000"),
+                ("yellow", "#f6e846"),
+                ("multi",  "#ffffff"),
+                ("unknown","#a78bfa"),
+            ]
+            COLOR_NAME_TO_HEX = {name: hex_ for name, hex_ in COLOR_ORDER}
+            HEX_TO_NAME = {hex_: name for name, hex_ in COLOR_ORDER}
+            KNOWN_COLORS = {name for name, _ in COLOR_ORDER[:6]}  # red..yellow
+
+            # cost_color_totals[cost_key][color_name] = total_copies
+            cost_color_totals: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
+            for c in cards:
+                cost = c.get("card_cost")
+                cost_key = str(cost) if cost is not None and cost != "" else "?"
+                raw_color = (c.get("card_color") or "").strip()
+                color_parts = [p.strip().lower() for p in re.split(r"[/,;]", raw_color) if p.strip()]
+                if len(color_parts) == 1 and color_parts[0] in KNOWN_COLORS:
+                    color_name = color_parts[0]
+                elif color_parts:
+                    color_name = "multi"
+                else:
+                    color_name = "unknown"
+                cost_color_totals[cost_key][color_name] += c["total_copies"]
+
+            # Sort by cost numerically (unknown costs go last)
+            def cost_sort_key(k):
+                try:
+                    return (0, int(k))
+                except (ValueError, TypeError):
+                    return (1, k)
+
+            sorted_costs = sorted(cost_color_totals.items(), key=lambda x: cost_sort_key(x[0]))
+            max_count = max((sum(color_map.values()) for _, color_map in sorted_costs), default=1)
 
             bar_items = ""
-            for c in chart_cards:
-                bar_h = max(4, round(c["usage_pct"] / max_pct * 120))
-                colour = pct_color(c["usage_pct"])
-                short_name = c["card_name"][:14] + "…" if len(c["card_name"]) > 15 else c["card_name"]
+            for cost_key, color_map in sorted_costs:
+                total_count = sum(color_map.values())
+                bar_h = max(4, round(total_count / max_count * 120))
+                # Build stacked segments in fixed order (bottom → top)
+                segments = ""
+                for color_name, color_hex in COLOR_ORDER:
+                    copies = color_map.get(color_name, 0)
+                    if copies == 0:
+                        continue
+                    seg_h = max(1, round(copies / total_count * bar_h))
+                    label = color_name.capitalize()
+                    tip = f"{label}: {copies} cop{'y' if copies == 1 else 'ies'}"
+                    border = "border:1px solid rgba(255,255,255,0.25);" if color_hex in ("#000000", "#ffffff") else ""
+                    segments += (
+                        f'<div class="bar-seg" data-tip="{html_module.escape(tip)}" '
+                        f'style="height:{seg_h}px;background:{color_hex};width:100%;{border}"></div>'
+                    )
                 bar_items += f"""
-              <div class="bar-group" title="{html_module.escape(c['card_name'])} ({c['card_id']}) — {c['usage_pct']}%">
+              <div class="bar-group">
                 <div class="bar-wrap">
-                  <span class="bar-val">{c['usage_pct']}%</span>
-                  <div class="bar" style="height:{bar_h}px;background:{colour};"></div>
+                  <span class="bar-val">{total_count}</span>
+                  <div class="bar" style="height:{bar_h}px;overflow:hidden;display:flex;flex-direction:column-reverse;border-radius:4px 4px 0 0;">{segments}</div>
                 </div>
-                <div class="bar-label">{html_module.escape(short_name)}</div>
+                <div class="bar-label">Cost {html_module.escape(cost_key)}</div>
               </div>"""
 
             # Card grid
@@ -432,7 +455,7 @@ def build_html(all_results: list[dict]) -> str:
     <div class="type-section">
       <h3 class="type-heading">{html_module.escape(card_type)}</h3>
       <details class="chart-details" id="{chart_id}">
-        <summary class="chart-toggle">Usage chart (top {len(chart_cards)})</summary>
+        <summary class="chart-toggle">Cost distribution</summary>
         <div class="chart">
           <div class="chart-bars">{bar_items}
           </div>
@@ -453,6 +476,8 @@ def build_html(all_results: list[dict]) -> str:
 
     # ── overlay markup ────────────────────────────────────────────────────────
     overlay = """
+  <div class="bar-tooltip" id="bar-tooltip"></div>
+
   <div class="overlay-backdrop" id="overlay">
     <div class="overlay">
       <button class="overlay-close" id="overlay-close">✕</button>
@@ -651,9 +676,29 @@ def build_html(all_results: list[dict]) -> str:
       width: 100%;
       border-radius: 4px 4px 0 0;
       min-height: 4px;
-      transition: opacity .15s;
     }}
-    .bar-group:hover .bar {{ opacity: .75; }}
+    .bar-seg {{
+      transition: filter .15s;
+      cursor: default;
+      position: relative;
+    }}
+    .bar-seg:hover {{ filter: brightness(1.35); }}
+
+    /* Segment tooltip */
+    .bar-tooltip {{
+      position: fixed;
+      background: #1c1c28;
+      border: 1px solid #2a2a3a;
+      color: #e0e0e0;
+      font-size: .72rem;
+      padding: .3rem .6rem;
+      border-radius: 6px;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 300;
+      display: none;
+    }}
+    .bar-tooltip.visible {{ display: block; }}
     .bar-val {{
       font-size: .65rem;
       font-weight: 700;
@@ -869,6 +914,24 @@ def build_html(all_results: list[dict]) -> str:
 {overlay}
 
   <script>
+    // ── Bar segment tooltip ──────────────────────────────────────────────
+    const barTooltip = document.getElementById('bar-tooltip');
+    document.addEventListener('mouseover', e => {{
+      const seg = e.target.closest('.bar-seg');
+      if (!seg) return;
+      barTooltip.textContent = seg.dataset.tip || '';
+      barTooltip.classList.add('visible');
+    }});
+    document.addEventListener('mouseout', e => {{
+      if (!e.target.closest('.bar-seg')) return;
+      barTooltip.classList.remove('visible');
+    }});
+    document.addEventListener('mousemove', e => {{
+      if (!barTooltip.classList.contains('visible')) return;
+      barTooltip.style.left = (e.clientX + 12) + 'px';
+      barTooltip.style.top  = (e.clientY - 28) + 'px';
+    }});
+
     // ── Card / leader click → overlay ────────────────────────────────────
     const backdrop  = document.getElementById('overlay');
     const oImg      = document.getElementById('overlay-img');
@@ -954,8 +1017,14 @@ def build_html(all_results: list[dict]) -> str:
 """
 
 
-def process_leader(leader_id: str) -> dict | None:
-    """Process one leader and return the result dict, or None if skipped."""
+def process_leader(leader_id: str, limit: int | None = None, force: bool = False) -> dict | None:
+    """Process one leader and return the result dict, or None if skipped.
+
+    Args:
+        leader_id: The leader card ID to process.
+        limit: Maximum number of decklists to evaluate. None means no limit.
+        force: If True, ignore deck-level cache and re-scrape all decklists.
+    """
     cache_file = CACHE_DIR / f"{leader_id}.json"
 
     print(f"\n{'='*60}")
@@ -970,14 +1039,30 @@ def process_leader(leader_id: str) -> dict | None:
         print("  Skipping – no decklists found.")
         return None
 
+    if limit is not None:
+        deck_urls = deck_urls[:limit]
+        print(f"  Limited to {len(deck_urls)} deck(s)")
+
     all_decklists = []
+    cached_count = 0
     for i, url in enumerate(deck_urls, 1):
-        print(f"  [{i}/{len(deck_urls)}] Parsing {url}")
+        if not force:
+            cached = load_cached_decklist(url)
+            if cached is not None:
+                all_decklists.append(cached)
+                cached_count += 1
+                continue
+
+        print(f"  [{i}/{len(deck_urls)}] Scraping {url}")
         try:
             parsed = parse_decklist(url)
+            save_cached_decklist(url, parsed)
             all_decklists.append(parsed)
         except Exception as exc:
             print(f"    [error] {exc}")
+
+    new_count = len(all_decklists) - cached_count
+    print(f"  {cached_count} deck(s) loaded from cache, {new_count} newly scraped")
 
     print("  Aggregating stats...")
     stats = aggregate_stats(all_decklists)
@@ -1020,13 +1105,33 @@ def process_leader(leader_id: str) -> dict | None:
 
 
 def main() -> None:
+    import argparse
+    parser = argparse.ArgumentParser(description="Fetch top cards for each leader.")
+    parser.add_argument(
+        "--limit", "-l",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Maximum number of decklists to evaluate per leader (default: no limit)",
+    )
+    parser.add_argument(
+        "--force", "-f",
+        action="store_true",
+        help="Ignore cached results and re-scrape all leaders",
+    )
+    args = parser.parse_args()
+
     leaders: list[str] = json.loads(LEADERS_FILE.read_text())
     print(f"Processing {len(leaders)} leader(s): {', '.join(leaders)}")
+    if args.limit is not None:
+        print(f"Decklist limit per leader: {args.limit}")
+    if args.force:
+        print("Force mode: ignoring cache")
 
     all_results = []
     for leader_id in leaders:
         try:
-            result = process_leader(leader_id)
+            result = process_leader(leader_id, limit=args.limit, force=args.force)
             if result:
                 all_results.append(result)
         except Exception as exc:
