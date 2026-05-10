@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import argparse
 
 # Set slugs are loaded from sets.json (kebab-case, e.g. "adventure-on-kamis-island")
 _sets_path = os.path.join(os.path.dirname(__file__), "sets.json")
@@ -57,14 +58,16 @@ def cache_path(set_name: str) -> str:
     return os.path.join(CACHE_DIR, f"{set_name}.json")
 
 
-def fetch_top_cards(set_name: str) -> list[dict]:
+def fetch_top_cards(set_name: str, force_fetch: bool = False) -> list[dict]:
     path = cache_path(set_name)
 
-    if os.path.exists(path):
+    if not force_fetch and os.path.exists(path):
         print(f"  (loaded from cache: {path})")
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
     else:
+        if force_fetch:
+            print(f"  (force fetch — skipping cache)")
         payload = build_payload(set_name)
         response = requests.post(URL, headers=HEADERS, json=payload)
         response.raise_for_status()
@@ -1104,6 +1107,14 @@ def build_html(sets_data: list[dict]) -> str:
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Fetch top One Piece TCG cards and build index.html")
+    parser.add_argument(
+        "--no-cache", action="store_true",
+        help="Ignore cached data and fetch fresh results from the API"
+    )
+    args = parser.parse_args()
+    force_fetch = args.no_cache
+
     if not SETS:
         print("No sets defined. Add set name slugs to the SETS array.")
         return
@@ -1116,7 +1127,7 @@ def main():
         print(f"{'=' * 60}")
 
         try:
-            cards = fetch_top_cards(set_name)
+            cards = fetch_top_cards(set_name, force_fetch=force_fetch)
         except requests.HTTPError as e:
             print(f"  HTTP error fetching '{set_name}': {e}")
             continue
