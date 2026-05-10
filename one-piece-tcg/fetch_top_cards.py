@@ -114,6 +114,30 @@ IMAGE_BASE = "https://tcgplayer-cdn.tcgplayer.com/product"
 IMAGE_SIZE = "400x400"
 OUTPUT_HTML = os.path.join(_HERE, "index.html")
 
+# Maps set slug → set ID prefix (e.g. "OP01").
+# Slugs not listed here (or mapped to "") will show no prefix.
+SET_IDS = {
+    "romance-dawn":                                 "OP01",
+    "paramount-war":                                "OP02",
+    "pillars-of-strength":                          "OP03",
+    "kingdoms-of-intrigue":                         "OP04",
+    "awakening-of-the-new-era":                     "OP05",
+    "wings-of-the-captain":                         "OP06",
+    "500-years-in-the-future":                      "OP07",
+    "two-legends":                                  "OP08",
+    "emperors-in-the-new-world":                    "OP09",
+    "royal-blood":                                  "OP10",
+    "a-fist-of-divine-speed":                       "OP11",
+    "legacy-of-the-master":                         "OP12",
+    "carrying-on-his-will":                         "OP13",
+    "the-azure-seas-seven":                         "OP14",
+    "adventure-on-kamis-island":                    "OP15",
+    "the-time-of-battle":                           "OP16",
+    # Extra boosters — add IDs when known
+    "extra-booster-anime-25th-collection":          "EB02",
+    "extra-booster-one-piece-heroines-edition":     "EB03",
+}
+
 
 def card_image_url(product_id, size=IMAGE_SIZE) -> str:
     pid = int(product_id) if product_id else 0
@@ -1144,8 +1168,10 @@ def main():
         print(f"\n  Top {len(card_rows)} cards total value:  ${total:.2f}")
         print(f"  Average price:              ${avg:.2f}")
 
-        # Derive a display name from the slug
-        display_name = result.get("setName", set_name.replace("-", " ").title())
+        # Derive a display name from the slug, prefixed with the set ID if known
+        base_name = result.get("setName", set_name.replace("-", " ").title())
+        set_id = SET_IDS.get(set_name, "")
+        display_name = f"{set_id} – {base_name}" if set_id else base_name
         sets_data.append({
             "slug":  set_name,
             "name":  display_name,
@@ -1155,6 +1181,19 @@ def main():
         })
 
     if sets_data:
+        def set_sort_key(s):
+            sid = SET_IDS.get(s["slug"], "").upper()
+            if sid.startswith("OP"):
+                return (0, sid)
+            elif sid.startswith("EB"):
+                return (1, sid)
+            elif sid:
+                return (2, sid)
+            else:
+                return (3, s["slug"])
+
+        sets_data.sort(key=set_sort_key)
+
         html = build_html(sets_data)
         with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
             f.write(html)
