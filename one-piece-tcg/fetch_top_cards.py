@@ -286,6 +286,26 @@ def build_html(sets_data: list[dict]) -> str:
                 f'</div>'
             )
 
+        # ── Rarity filter tags for this set ────────────────────────
+        RARITY_ORDER = ["C", "UC", "R", "SR", "SEC", "SP", "L", "PR", "TR", "DON!!"]
+        present_rarities = []
+        seen = set()
+        for r in RARITY_ORDER:
+            if any(c["rarity_db"] == r for c in s["cards"]) and r not in seen:
+                present_rarities.append(r)
+                seen.add(r)
+        # also catch any unknown rarities not in the ordered list
+        for c in s["cards"]:
+            r = c["rarity_db"] or ""
+            if r and r not in seen:
+                present_rarities.append(r)
+                seen.add(r)
+
+        rarity_tags_html = "".join(
+            f'<button class="rf-tag active" data-r="{r}" data-slug="{s["slug"]}">{r}</button>'
+            for r in present_rarities
+        )
+
         set_sections += f"""
   <section class="set-section" id="{s['slug']}">
     <div class="set-header">
@@ -295,6 +315,7 @@ def build_html(sets_data: list[dict]) -> str:
         <span class="set-total">Total: ${s['total']:.2f}</span>
         <span class="set-avg">Avg: ${s['avg']:.2f}</span>
       </div>
+      <div class="rarity-filters" data-slug="{s['slug']}">{rarity_tags_html}</div>
     </div>
     <div class="price-buckets">{summary_pills}</div>
     <details class="chart-details">
@@ -467,6 +488,40 @@ def build_html(sets_data: list[dict]) -> str:
       color: #6b6b8a;
     }}
     .set-total, .set-avg {{ color: #c4c4d4; }}
+
+    /* ── Rarity filters ── */
+    .rarity-filters {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      padding: .4rem 0 .2rem;
+      width: 100%;
+    }}
+    .rf-tag {{
+      font-size: .7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 5px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      user-select: none;
+      opacity: 0.45;
+      transition: opacity .15s, border-color .15s;
+    }}
+    .rf-tag.active {{
+      opacity: 1;
+      border-color: rgba(255,255,255,.18);
+    }}
+    .rf-tag[data-r="C"]     {{ background:#1a2a1a; color:#6ee7b7; }}
+    .rf-tag[data-r="UC"]    {{ background:#1a1f2e; color:#93c5fd; }}
+    .rf-tag[data-r="R"]     {{ background:#1e2a3a; color:#60a5fa; }}
+    .rf-tag[data-r="SR"]    {{ background:#2a1e3a; color:#c084fc; }}
+    .rf-tag[data-r="SEC"]   {{ background:#2e1f4a; color:#e879f9; }}
+    .rf-tag[data-r="SP"]    {{ background:#2a1a1a; color:#f87171; }}
+    .rf-tag[data-r="L"]     {{ background:#2a2210; color:#fbbf24; }}
+    .rf-tag[data-r="PR"]    {{ background:#1a2a2a; color:#34d399; }}
+    .rf-tag[data-r="TR"]    {{ background:#201a1a; color:#fb923c; }}
+    .rf-tag[data-r="DON!!"] {{ background:#1f1a10; color:#facc15; }}
 
     /* ── Price buckets ── */
     .price-buckets {{
@@ -1075,6 +1130,24 @@ def build_html(sets_data: list[dict]) -> str:
     document.querySelectorAll('.card').forEach(card => {{
       card.addEventListener('click', () => openOverlay(card));
       card.addEventListener('keydown', e => {{ if (e.key === 'Enter' || e.key === ' ') openOverlay(card); }});
+    }});
+
+    /* ── Rarity filters ── */
+    function applyRarityFilter(slug) {{
+      const section = document.getElementById(slug);
+      const activeTags = [...document.querySelectorAll(`.rf-tag[data-slug="${{slug}}"].active`)];
+      const activeRarities = new Set(activeTags.map(t => t.dataset.r));
+      section.querySelectorAll('.card').forEach(card => {{
+        const r = card.dataset.rarityDb || '';
+        card.style.display = activeRarities.size === 0 || activeRarities.has(r) ? '' : 'none';
+      }});
+    }}
+
+    document.querySelectorAll('.rf-tag').forEach(tag => {{
+      tag.addEventListener('click', () => {{
+        tag.classList.toggle('active');
+        applyRarityFilter(tag.dataset.slug);
+      }});
     }});
 
     ovClose.addEventListener('click', closeOverlay);

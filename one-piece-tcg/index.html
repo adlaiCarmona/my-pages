@@ -106,6 +106,40 @@
     }
     .set-total, .set-avg { color: #c4c4d4; }
 
+    /* ── Rarity filters ── */
+    .rarity-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      padding: .4rem 0 .2rem;
+      width: 100%;
+    }
+    .rf-tag {
+      font-size: .7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 5px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      user-select: none;
+      opacity: 0.45;
+      transition: opacity .15s, border-color .15s;
+    }
+    .rf-tag.active {
+      opacity: 1;
+      border-color: rgba(255,255,255,.18);
+    }
+    .rf-tag[data-r="C"]     { background:#1a2a1a; color:#6ee7b7; }
+    .rf-tag[data-r="UC"]    { background:#1a1f2e; color:#93c5fd; }
+    .rf-tag[data-r="R"]     { background:#1e2a3a; color:#60a5fa; }
+    .rf-tag[data-r="SR"]    { background:#2a1e3a; color:#c084fc; }
+    .rf-tag[data-r="SEC"]   { background:#2e1f4a; color:#e879f9; }
+    .rf-tag[data-r="SP"]    { background:#2a1a1a; color:#f87171; }
+    .rf-tag[data-r="L"]     { background:#2a2210; color:#fbbf24; }
+    .rf-tag[data-r="PR"]    { background:#1a2a2a; color:#34d399; }
+    .rf-tag[data-r="TR"]    { background:#201a1a; color:#fb923c; }
+    .rf-tag[data-r="DON!!"] { background:#1f1a10; color:#facc15; }
+
     /* ── Price buckets ── */
     .price-buckets {
       display: flex;
@@ -622,6 +656,7 @@
         <span class="set-total">Total: $5921.32</span>
         <span class="set-avg">Avg: $118.43</span>
       </div>
+      <div class="rarity-filters" data-slug="romance-dawn"><button class="rf-tag active" data-r="C" data-slug="romance-dawn">C</button><button class="rf-tag active" data-r="UC" data-slug="romance-dawn">UC</button><button class="rf-tag active" data-r="R" data-slug="romance-dawn">R</button><button class="rf-tag active" data-r="SR" data-slug="romance-dawn">SR</button><button class="rf-tag active" data-r="SEC" data-slug="romance-dawn">SEC</button><button class="rf-tag active" data-r="L" data-slug="romance-dawn">L</button><button class="rf-tag active" data-r="DON!!" data-slug="romance-dawn">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">26</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">9</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">4</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">6</span></div><div class="bucket"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#f87171">2</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">3</span></div></div>
     <details class="chart-details">
@@ -2611,6 +2646,7 @@
         <span class="set-total">Total: $2671.56</span>
         <span class="set-avg">Avg: $53.43</span>
       </div>
+      <div class="rarity-filters" data-slug="paramount-war"><button class="rf-tag active" data-r="C" data-slug="paramount-war">C</button><button class="rf-tag active" data-r="UC" data-slug="paramount-war">UC</button><button class="rf-tag active" data-r="R" data-slug="paramount-war">R</button><button class="rf-tag active" data-r="SR" data-slug="paramount-war">SR</button><button class="rf-tag active" data-r="SEC" data-slug="paramount-war">SEC</button><button class="rf-tag active" data-r="L" data-slug="paramount-war">L</button><button class="rf-tag active" data-r="DON!!" data-slug="paramount-war">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">30</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">14</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">1</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">4</span></div><div class="bucket bucket-empty"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#44445a">0</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">1</span></div></div>
     <details class="chart-details">
@@ -4557,6 +4593,7 @@
         <span class="set-total">Total: $2187.00</span>
         <span class="set-avg">Avg: $43.74</span>
       </div>
+      <div class="rarity-filters" data-slug="pillars-of-strength"><button class="rf-tag active" data-r="UC" data-slug="pillars-of-strength">UC</button><button class="rf-tag active" data-r="R" data-slug="pillars-of-strength">R</button><button class="rf-tag active" data-r="SR" data-slug="pillars-of-strength">SR</button><button class="rf-tag active" data-r="SEC" data-slug="pillars-of-strength">SEC</button><button class="rf-tag active" data-r="L" data-slug="pillars-of-strength">L</button><button class="rf-tag active" data-r="DON!!" data-slug="pillars-of-strength">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">30</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">12</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">4</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">2</span></div><div class="bucket"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#f87171">1</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">1</span></div></div>
     <details class="chart-details">
@@ -6517,6 +6554,7 @@
         <span class="set-total">Total: $2327.47</span>
         <span class="set-avg">Avg: $46.55</span>
       </div>
+      <div class="rarity-filters" data-slug="kingdoms-of-intrigue"><button class="rf-tag active" data-r="C" data-slug="kingdoms-of-intrigue">C</button><button class="rf-tag active" data-r="UC" data-slug="kingdoms-of-intrigue">UC</button><button class="rf-tag active" data-r="R" data-slug="kingdoms-of-intrigue">R</button><button class="rf-tag active" data-r="SR" data-slug="kingdoms-of-intrigue">SR</button><button class="rf-tag active" data-r="SEC" data-slug="kingdoms-of-intrigue">SEC</button><button class="rf-tag active" data-r="L" data-slug="kingdoms-of-intrigue">L</button><button class="rf-tag active" data-r="DON!!" data-slug="kingdoms-of-intrigue">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">33</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">9</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">4</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">2</span></div><div class="bucket bucket-empty"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#44445a">0</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">2</span></div></div>
     <details class="chart-details">
@@ -8483,6 +8521,7 @@
         <span class="set-total">Total: $14715.53</span>
         <span class="set-avg">Avg: $294.31</span>
       </div>
+      <div class="rarity-filters" data-slug="awakening-of-the-new-era"><button class="rf-tag active" data-r="R" data-slug="awakening-of-the-new-era">R</button><button class="rf-tag active" data-r="SR" data-slug="awakening-of-the-new-era">SR</button><button class="rf-tag active" data-r="SEC" data-slug="awakening-of-the-new-era">SEC</button><button class="rf-tag active" data-r="L" data-slug="awakening-of-the-new-era">L</button><button class="rf-tag active" data-r="DON!!" data-slug="awakening-of-the-new-era">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">25</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">13</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">2</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">5</span></div><div class="bucket bucket-empty"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#44445a">0</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">5</span></div></div>
     <details class="chart-details">
@@ -10439,6 +10478,7 @@
         <span class="set-total">Total: $3508.88</span>
         <span class="set-avg">Avg: $70.18</span>
       </div>
+      <div class="rarity-filters" data-slug="wings-of-the-captain"><button class="rf-tag active" data-r="UC" data-slug="wings-of-the-captain">UC</button><button class="rf-tag active" data-r="R" data-slug="wings-of-the-captain">R</button><button class="rf-tag active" data-r="SR" data-slug="wings-of-the-captain">SR</button><button class="rf-tag active" data-r="SEC" data-slug="wings-of-the-captain">SEC</button><button class="rf-tag active" data-r="L" data-slug="wings-of-the-captain">L</button><button class="rf-tag active" data-r="TR" data-slug="wings-of-the-captain">TR</button><button class="rf-tag active" data-r="DON!!" data-slug="wings-of-the-captain">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">25</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">15</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">5</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">3</span></div><div class="bucket"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#f87171">1</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">1</span></div></div>
     <details class="chart-details">
@@ -12386,6 +12426,7 @@
         <span class="set-total">Total: $3266.83</span>
         <span class="set-avg">Avg: $65.34</span>
       </div>
+      <div class="rarity-filters" data-slug="500-years-in-the-future"><button class="rf-tag active" data-r="R" data-slug="500-years-in-the-future">R</button><button class="rf-tag active" data-r="SR" data-slug="500-years-in-the-future">SR</button><button class="rf-tag active" data-r="SEC" data-slug="500-years-in-the-future">SEC</button><button class="rf-tag active" data-r="L" data-slug="500-years-in-the-future">L</button><button class="rf-tag active" data-r="TR" data-slug="500-years-in-the-future">TR</button><button class="rf-tag active" data-r="DON!!" data-slug="500-years-in-the-future">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">25</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">17</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">5</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">1</span></div><div class="bucket"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#f87171">1</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">1</span></div></div>
     <details class="chart-details">
@@ -14340,6 +14381,7 @@
         <span class="set-total">Total: $1971.98</span>
         <span class="set-avg">Avg: $39.44</span>
       </div>
+      <div class="rarity-filters" data-slug="two-legends"><button class="rf-tag active" data-r="C" data-slug="two-legends">C</button><button class="rf-tag active" data-r="UC" data-slug="two-legends">UC</button><button class="rf-tag active" data-r="R" data-slug="two-legends">R</button><button class="rf-tag active" data-r="SR" data-slug="two-legends">SR</button><button class="rf-tag active" data-r="SEC" data-slug="two-legends">SEC</button><button class="rf-tag active" data-r="L" data-slug="two-legends">L</button><button class="rf-tag active" data-r="TR" data-slug="two-legends">TR</button><button class="rf-tag active" data-r="DON!!" data-slug="two-legends">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">32</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">11</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">2</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">3</span></div><div class="bucket"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#f87171">1</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">1</span></div></div>
     <details class="chart-details">
@@ -16269,6 +16311,7 @@
         <span class="set-total">Total: $10720.73</span>
         <span class="set-avg">Avg: $214.41</span>
       </div>
+      <div class="rarity-filters" data-slug="emperors-in-the-new-world"><button class="rf-tag active" data-r="R" data-slug="emperors-in-the-new-world">R</button><button class="rf-tag active" data-r="SR" data-slug="emperors-in-the-new-world">SR</button><button class="rf-tag active" data-r="SEC" data-slug="emperors-in-the-new-world">SEC</button><button class="rf-tag active" data-r="L" data-slug="emperors-in-the-new-world">L</button><button class="rf-tag active" data-r="TR" data-slug="emperors-in-the-new-world">TR</button><button class="rf-tag active" data-r="DON!!" data-slug="emperors-in-the-new-world">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">18</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">15</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">3</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">6</span></div><div class="bucket bucket-empty"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#44445a">0</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">8</span></div></div>
     <details class="chart-details">
@@ -18208,6 +18251,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
         <span class="set-total">Total: $1981.28</span>
         <span class="set-avg">Avg: $39.63</span>
       </div>
+      <div class="rarity-filters" data-slug="royal-blood"><button class="rf-tag active" data-r="C" data-slug="royal-blood">C</button><button class="rf-tag active" data-r="R" data-slug="royal-blood">R</button><button class="rf-tag active" data-r="SR" data-slug="royal-blood">SR</button><button class="rf-tag active" data-r="SEC" data-slug="royal-blood">SEC</button><button class="rf-tag active" data-r="L" data-slug="royal-blood">L</button><button class="rf-tag active" data-r="TR" data-slug="royal-blood">TR</button><button class="rf-tag active" data-r="DON!!" data-slug="royal-blood">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">23</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">20</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">3</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">3</span></div><div class="bucket bucket-empty"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#44445a">0</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">1</span></div></div>
     <details class="chart-details">
@@ -20145,6 +20189,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
         <span class="set-total">Total: $10309.12</span>
         <span class="set-avg">Avg: $206.18</span>
       </div>
+      <div class="rarity-filters" data-slug="a-fist-of-divine-speed"><button class="rf-tag active" data-r="UC" data-slug="a-fist-of-divine-speed">UC</button><button class="rf-tag active" data-r="R" data-slug="a-fist-of-divine-speed">R</button><button class="rf-tag active" data-r="SR" data-slug="a-fist-of-divine-speed">SR</button><button class="rf-tag active" data-r="SEC" data-slug="a-fist-of-divine-speed">SEC</button><button class="rf-tag active" data-r="L" data-slug="a-fist-of-divine-speed">L</button><button class="rf-tag active" data-r="TR" data-slug="a-fist-of-divine-speed">TR</button><button class="rf-tag active" data-r="DON!!" data-slug="a-fist-of-divine-speed">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">23</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">15</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">3</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">5</span></div><div class="bucket"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#f87171">1</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">3</span></div></div>
     <details class="chart-details">
@@ -22093,6 +22138,7 @@ When your opponent activates [Blocker], if either you or your opponent has 0 Lif
         <span class="set-total">Total: $4389.46</span>
         <span class="set-avg">Avg: $87.79</span>
       </div>
+      <div class="rarity-filters" data-slug="legacy-of-the-master"><button class="rf-tag active" data-r="R" data-slug="legacy-of-the-master">R</button><button class="rf-tag active" data-r="SR" data-slug="legacy-of-the-master">SR</button><button class="rf-tag active" data-r="SEC" data-slug="legacy-of-the-master">SEC</button><button class="rf-tag active" data-r="L" data-slug="legacy-of-the-master">L</button><button class="rf-tag active" data-r="TR" data-slug="legacy-of-the-master">TR</button><button class="rf-tag active" data-r="DON!!" data-slug="legacy-of-the-master">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">17</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">22</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">4</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">4</span></div><div class="bucket bucket-empty"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#44445a">0</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">3</span></div></div>
     <details class="chart-details">
@@ -24039,6 +24085,7 @@ If this Character would be removed from the field by your opponent&#x27;s effect
         <span class="set-total">Total: $29805.53</span>
         <span class="set-avg">Avg: $596.11</span>
       </div>
+      <div class="rarity-filters" data-slug="carrying-on-his-will"><button class="rf-tag active" data-r="R" data-slug="carrying-on-his-will">R</button><button class="rf-tag active" data-r="SR" data-slug="carrying-on-his-will">SR</button><button class="rf-tag active" data-r="SEC" data-slug="carrying-on-his-will">SEC</button><button class="rf-tag active" data-r="L" data-slug="carrying-on-his-will">L</button><button class="rf-tag active" data-r="TR" data-slug="carrying-on-his-will">TR</button></div>
     </div>
     <div class="price-buckets"><div class="bucket bucket-empty"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#44445a">0</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">24</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">6</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">4</span></div><div class="bucket"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#f87171">4</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">12</span></div></div>
     <details class="chart-details">
@@ -25994,6 +26041,7 @@ If you have 9 or less DON!! cards on your field, give this Leader 2000 power."
         <span class="set-total">Total: $7393.46</span>
         <span class="set-avg">Avg: $147.87</span>
       </div>
+      <div class="rarity-filters" data-slug="the-azure-seas-seven"><button class="rf-tag active" data-r="R" data-slug="the-azure-seas-seven">R</button><button class="rf-tag active" data-r="SR" data-slug="the-azure-seas-seven">SR</button><button class="rf-tag active" data-r="SEC" data-slug="the-azure-seas-seven">SEC</button><button class="rf-tag active" data-r="L" data-slug="the-azure-seas-seven">L</button><button class="rf-tag active" data-r="TR" data-slug="the-azure-seas-seven">TR</button><button class="rf-tag active" data-r="DON!!" data-slug="the-azure-seas-seven">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">9</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">25</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">7</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">4</span></div><div class="bucket bucket-empty"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#44445a">0</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">5</span></div></div>
     <details class="chart-details">
@@ -27943,6 +27991,7 @@ If you have 9 or less DON!! cards on your field, give this Leader 2000 power."
         <span class="set-total">Total: $5468.31</span>
         <span class="set-avg">Avg: $109.37</span>
       </div>
+      <div class="rarity-filters" data-slug="adventure-on-kamis-island"><button class="rf-tag active" data-r="R" data-slug="adventure-on-kamis-island">R</button><button class="rf-tag active" data-r="SR" data-slug="adventure-on-kamis-island">SR</button><button class="rf-tag active" data-r="SEC" data-slug="adventure-on-kamis-island">SEC</button><button class="rf-tag active" data-r="L" data-slug="adventure-on-kamis-island">L</button><button class="rf-tag active" data-r="PR" data-slug="adventure-on-kamis-island">PR</button><button class="rf-tag active" data-r="TR" data-slug="adventure-on-kamis-island">TR</button><button class="rf-tag active" data-r="DON!!" data-slug="adventure-on-kamis-island">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">7</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">23</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">8</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">7</span></div><div class="bucket"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#f87171">2</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">3</span></div></div>
     <details class="chart-details">
@@ -29898,6 +29947,7 @@ When your opponent activates an Event or [Blocker], reveal up to 1 card from the
         <span class="set-total">Total: $16507.11</span>
         <span class="set-avg">Avg: $330.14</span>
       </div>
+      <div class="rarity-filters" data-slug="extra-booster-anime-25th-collection"><button class="rf-tag active" data-r="R" data-slug="extra-booster-anime-25th-collection">R</button><button class="rf-tag active" data-r="SR" data-slug="extra-booster-anime-25th-collection">SR</button><button class="rf-tag active" data-r="SEC" data-slug="extra-booster-anime-25th-collection">SEC</button><button class="rf-tag active" data-r="L" data-slug="extra-booster-anime-25th-collection">L</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">4</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">14</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">3</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">6</span></div><div class="bucket"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#f87171">11</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">12</span></div></div>
     <details class="chart-details">
@@ -31835,6 +31885,7 @@ When your opponent activates an Event or [Blocker], reveal up to 1 card from the
         <span class="set-total">Total: $6386.46</span>
         <span class="set-avg">Avg: $127.73</span>
       </div>
+      <div class="rarity-filters" data-slug="extra-booster-one-piece-heroines-edition"><button class="rf-tag active" data-r="C" data-slug="extra-booster-one-piece-heroines-edition">C</button><button class="rf-tag active" data-r="R" data-slug="extra-booster-one-piece-heroines-edition">R</button><button class="rf-tag active" data-r="SR" data-slug="extra-booster-one-piece-heroines-edition">SR</button><button class="rf-tag active" data-r="SEC" data-slug="extra-booster-one-piece-heroines-edition">SEC</button><button class="rf-tag active" data-r="L" data-slug="extra-booster-one-piece-heroines-edition">L</button><button class="rf-tag active" data-r="DON!!" data-slug="extra-booster-one-piece-heroines-edition">DON!!</button></div>
     </div>
     <div class="price-buckets"><div class="bucket"><span class="bucket-label">$0–10</span><span class="bucket-count" style="color:#34d399">20</span></div><div class="bucket"><span class="bucket-label">$10–50</span><span class="bucket-count" style="color:#a3e635">15</span></div><div class="bucket"><span class="bucket-label">$50–100</span><span class="bucket-count" style="color:#fbbf24">4</span></div><div class="bucket"><span class="bucket-label">$100–250</span><span class="bucket-count" style="color:#fb923c">4</span></div><div class="bucket"><span class="bucket-label">$250–500</span><span class="bucket-count" style="color:#f87171">3</span></div><div class="bucket"><span class="bucket-label">$500+</span><span class="bucket-count" style="color:#c084fc">4</span></div></div>
     <details class="chart-details">
@@ -33888,6 +33939,24 @@ When your opponent activates an Event or [Blocker], reveal up to 1 card from the
     document.querySelectorAll('.card').forEach(card => {
       card.addEventListener('click', () => openOverlay(card));
       card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openOverlay(card); });
+    });
+
+    /* ── Rarity filters ── */
+    function applyRarityFilter(slug) {
+      const section = document.getElementById(slug);
+      const activeTags = [...document.querySelectorAll(`.rf-tag[data-slug="${slug}"].active`)];
+      const activeRarities = new Set(activeTags.map(t => t.dataset.r));
+      section.querySelectorAll('.card').forEach(card => {
+        const r = card.dataset.rarityDb || '';
+        card.style.display = activeRarities.size === 0 || activeRarities.has(r) ? '' : 'none';
+      });
+    }
+
+    document.querySelectorAll('.rf-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        tag.classList.toggle('active');
+        applyRarityFilter(tag.dataset.slug);
+      });
     });
 
     ovClose.addEventListener('click', closeOverlay);
