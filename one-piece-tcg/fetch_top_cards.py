@@ -2,6 +2,7 @@ import requests
 import json
 import os
 import argparse
+from datetime import datetime, timezone
 
 # Set slugs are loaded from sets.json (kebab-case, e.g. "adventure-on-kamis-island")
 _sets_path = os.path.join(os.path.dirname(__file__), "sets.json")
@@ -116,6 +117,7 @@ def get_card_info(result: dict) -> dict:
 IMAGE_BASE = "https://tcgplayer-cdn.tcgplayer.com/product"
 IMAGE_SIZE = "400x400"
 OUTPUT_HTML = os.path.join(_HERE, "index.html")
+PRICE_HISTORY_FILE = os.path.join(_HERE, "price_history.json")
 
 # Maps set slug → set ID prefix (e.g. "OP01").
 # Slugs not listed here (or mapped to "") will show no prefix.
@@ -168,7 +170,33 @@ def price_buckets(cards: list[dict]) -> list[tuple[str, int]]:
     return results
 
 
-def build_html(sets_data: list[dict]) -> str:
+def load_price_history() -> dict:
+    """Load the previous price snapshot. Returns dict: {product_id_str: {"price": float, "scan_date": str}}"""
+    if os.path.exists(PRICE_HISTORY_FILE):
+        with open(PRICE_HISTORY_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+
+def save_price_history(sets_data: list[dict], scan_date: str) -> None:
+    """Save current prices and ranks keyed by product_id for next-run comparison."""
+    history = {}
+    for s in sets_data:
+        for card in s["cards"]:
+            pid = str(int(card["product_id"])) if card["product_id"] else ""
+            if pid:
+                history[pid] = {
+                    "price": card["price"],
+                    "rank": card["rank"],
+                    "name": card["name"],
+                    "scan_date": scan_date,
+                }
+    with open(PRICE_HISTORY_FILE, "w", encoding="utf-8") as f:
+        json.dump(history, f, indent=2)
+    print(f"  Price history saved to: {PRICE_HISTORY_FILE}")
+
+
+def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     set_nav = "\n".join(
         f'<li><a href="#{s["slug"]}">{s["name"]}</a>'
         f'<span class="nav-total">${s["total"]:.2f}</span></li>'
@@ -182,6 +210,36 @@ def build_html(sets_data: list[dict]) -> str:
             price_cls = "price-high" if card["price"] >= 50 else ("price-mid" if card["price"] >= 10 else "price-low")
             import html as _html
             desc_escaped = _html.escape(card['description'], quote=True)
+
+            # Price change badge
+            delta = card.get("price_change")
+            if delta is None:
+                delta_html = ""
+                delta_data = ""
+            elif delta > 0:
+                delta_html = f'<div class="price-delta delta-up">▲ ${delta:.2f}</div>'
+                delta_data = f"data-price-change=\"+{delta:.2f}\""
+            elif delta < 0:
+                delta_html = f'<div class="price-delta delta-down">▼ ${abs(delta):.2f}</div>'
+                delta_data = f"data-price-change=\"{delta:.2f}\""
+            else:
+                delta_html = '<div class="price-delta delta-flat">— no change</div>'
+                delta_data = "data-price-change=\"0\""
+
+            # Rank change badge
+            rc = card.get("rank_change")
+            if rc is None:
+                rank_delta_html = '<div class="rank-delta rank-new">NEW</div>'
+                rank_data = "data-rank-change=\"new\""
+            elif rc > 0:
+                rank_delta_html = f'<div class="rank-delta rank-up">▲ {rc} rank</div>'
+                rank_data = f"data-rank-change=\"+{rc}\""
+            elif rc < 0:
+                rank_delta_html = f'<div class="rank-delta rank-down">▼ {abs(rc)} rank</div>'
+                rank_data = f"data-rank-change=\"{rc}\""
+            else:
+                rank_delta_html = ""
+                rank_data = "data-rank-change=\"0\""
             cards_html += f"""
         <div class="card" role="button" tabindex="0"
           data-name="{_html.escape(card['name'], quote=True)}"
@@ -200,6 +258,8 @@ def build_html(sets_data: list[dict]) -> str:
           data-color="{_html.escape(card['color'], quote=True)}"
           data-description="{desc_escaped}"
           data-product-id="{int(card['product_id']) if card['product_id'] else ''}"
+          {delta_data}
+          {rank_data}
         >
           <div class="card-rank">#{i}</div>
           <img
@@ -217,6 +277,8 @@ def build_html(sets_data: list[dict]) -> str:
             </div>
             <div class="card-id">ID: {int(card['product_id']) if card['product_id'] else 'N/A'}</div>
             <div class="card-price {price_cls}">${card['price']:.2f}</div>
+            {delta_html}
+            {rank_delta_html}
           </div>
         </div>"""
 
@@ -380,6 +442,10 @@ def build_html(sets_data: list[dict]) -> str:
   </section>"""
 
     grand_total = sum(s["total"] for s in sets_data)
+
+    last_scan_html = ""
+    if last_scan_date:
+        last_scan_html = f'<div class="last-scan">Last price scan:<br>{last_scan_date}</div>'
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -710,6 +776,32 @@ def build_html(sets_data: list[dict]) -> str:
     .price-mid  {{ color: #fbbf24; }}
     .price-low  {{ color: #34d399; }}
 
+    .price-delta {{
+      font-size: .68rem;
+      font-weight: 600;
+      margin-top: .1rem;
+    }}
+    .delta-up   {{ color: #f87171; }}
+    .delta-down {{ color: #34d399; }}
+    .delta-flat {{ color: #6b6b8a; }}
+
+    .rank-delta {{
+      font-size: .62rem;
+      font-weight: 600;
+    }}
+    .rank-up   {{ color: #a78bfa; }}
+    .rank-down {{ color: #6b6b8a; }}
+    .rank-new  {{ color: #fbbf24; }}
+
+    .last-scan {{
+      margin: .6rem 1.2rem 0;
+      padding-top: .6rem;
+      border-top: 1px solid #2a2a3a;
+      font-size: .72rem;
+      color: #6b6b8a;
+      line-height: 1.5;
+    }}
+
     /* ── Site header (mobile only) ── */
     .site-header {{
       display: none;
@@ -1011,6 +1103,7 @@ def build_html(sets_data: list[dict]) -> str:
       {set_nav}
     </ul>
     <div class="grand-total">Grand total: ${grand_total:.2f}</div>
+    {last_scan_html}
   </nav>
 
   <main class="main">
@@ -1024,6 +1117,8 @@ def build_html(sets_data: list[dict]) -> str:
       <div class="overlay-img-col">
         <img class="overlay-img" id="ov-img" src="" alt="" />
         <div class="overlay-price price-high" id="ov-price"></div>
+        <div class="price-delta" id="ov-delta" style="display:none;text-align:center;"></div>
+        <div class="rank-delta" id="ov-rank-delta" style="display:none;text-align:center;"></div>
       </div>
       <div class="overlay-info-col">
         <div class="overlay-name" id="ov-name"></div>
@@ -1080,6 +1175,48 @@ def build_html(sets_data: list[dict]) -> str:
       priceEl.textContent = price;
       const p = parseFloat(price.replace('$',''));
       priceEl.className = 'overlay-price ' + (p >= 50 ? 'price-high' : p >= 10 ? 'price-mid' : 'price-low');
+
+      // Price change
+      const deltaEl = document.getElementById('ov-delta');
+      if (d.priceChange !== undefined && d.priceChange !== '') {{
+        const dv = parseFloat(d.priceChange);
+        if (dv > 0) {{
+          deltaEl.textContent = '▲ $' + dv.toFixed(2) + ' since last scan';
+          deltaEl.className = 'price-delta delta-up';
+        }} else if (dv < 0) {{
+          deltaEl.textContent = '▼ $' + Math.abs(dv).toFixed(2) + ' since last scan';
+          deltaEl.className = 'price-delta delta-down';
+        }} else {{
+          deltaEl.textContent = '— no change since last scan';
+          deltaEl.className = 'price-delta delta-flat';
+        }}
+        deltaEl.style.display = '';
+      }} else {{
+        deltaEl.textContent = '';
+        deltaEl.style.display = 'none';
+      }}
+
+      // Rank change
+      const rankEl = document.getElementById('ov-rank-delta');
+      const rc = d.rankChange;
+      if (rc === 'new') {{
+        rankEl.textContent = 'NEW to ranking';
+        rankEl.className = 'rank-delta rank-new';
+        rankEl.style.display = '';
+      }} else if (rc !== undefined && rc !== '' && rc !== '0') {{
+        const rv = parseInt(rc, 10);
+        if (rv > 0) {{
+          rankEl.textContent = '▲ ' + rv + ' rank';
+          rankEl.className = 'rank-delta rank-up';
+        }} else {{
+          rankEl.textContent = '▼ ' + Math.abs(rv) + ' rank';
+          rankEl.className = 'rank-delta rank-down';
+        }}
+        rankEl.style.display = '';
+      }} else {{
+        rankEl.textContent = '';
+        rankEl.style.display = 'none';
+      }}
 
       // Badges
       const badges = document.getElementById('ov-badges');
@@ -1192,6 +1329,18 @@ def main():
         print("No sets defined. Add set name slugs to the SETS array.")
         return
 
+    # Load previous price history for comparison
+    price_history = load_price_history()
+    last_scan_date: str | None = None
+    if price_history:
+        # Find the most recent scan date across all records
+        dates = [v["scan_date"] for v in price_history.values() if "scan_date" in v]
+        if dates:
+            last_scan_date = max(dates)
+        print(f"Loaded price history ({len(price_history)} cards). Last scan: {last_scan_date}")
+    else:
+        print("No previous price history found — this will be the first baseline.")
+
     sets_data = []
 
     for set_name in SETS:
@@ -1229,23 +1378,36 @@ def main():
                 f"${price:>8.2f}"
             )
             total += price
+            pid_str = str(int(info["productId"])) if info["productId"] else ""
+            prev = price_history.get(pid_str)
+            if prev is not None:
+                price_change = round(price - prev["price"], 2)
+                # rank_change: positive means moved UP (lower number = higher rank)
+                prev_rank = prev.get("rank")
+                rank_change = (prev_rank - i) if prev_rank is not None else None
+            else:
+                price_change = None
+                rank_change = None
             card_rows.append({
-                "name":        name,
-                "price":       price,
-                "product_id":  info["productId"],
-                "number":      info["number"],
-                "rarity_db":   info["rarityDbName"],
-                "rarity_name": info["rarityName"],
-                "image_url":   card_image_url(info["productId"]),
-                "card_type":   info["cardType"],
-                "life":        info["life"],
-                "counter":     info["counter"],
-                "power":       info["power"],
-                "cost":        info["cost"],
-                "subtypes":    info["subtypes"],
-                "attribute":   info["attribute"],
-                "color":       info["color"],
-                "description": info["description"],
+                "name":         name,
+                "price":        price,
+                "price_change": price_change,
+                "rank":         i,
+                "rank_change":  rank_change,
+                "product_id":   info["productId"],
+                "number":       info["number"],
+                "rarity_db":    info["rarityDbName"],
+                "rarity_name":  info["rarityName"],
+                "image_url":    card_image_url(info["productId"]),
+                "card_type":    info["cardType"],
+                "life":         info["life"],
+                "counter":      info["counter"],
+                "power":        info["power"],
+                "cost":         info["cost"],
+                "subtypes":     info["subtypes"],
+                "attribute":    info["attribute"],
+                "color":        info["color"],
+                "description":  info["description"],
             })
 
         avg = total / len(card_rows) if card_rows else 0.0
@@ -1278,10 +1440,14 @@ def main():
 
         sets_data.sort(key=set_sort_key)
 
-        html = build_html(sets_data)
+        now_str = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+        html = build_html(sets_data, last_scan_date=last_scan_date)
         with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
             f.write(html)
         print(f"\nHTML report saved to: {OUTPUT_HTML}")
+
+        save_price_history(sets_data, now_str)
+        print(f"Price history updated at: {now_str}")
 
 
 if __name__ == "__main__":
