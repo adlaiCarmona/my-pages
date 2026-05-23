@@ -842,8 +842,20 @@ def main():
             f.write(html)
         print(f"\nHTML report saved to: {OUTPUT_HTML}")
 
-        save_price_history(sets_data, now_str)
-        print(f"Price history updated at: {now_str}")
+        today = datetime.now(timezone.utc).date()
+        if last_scan_date is None:
+            last_scan_day = None
+        else:
+            try:
+                last_scan_day = datetime.strptime(last_scan_date[:10], "%Y-%m-%d").date()
+            except ValueError:
+                last_scan_day = None
+
+        if last_scan_day != today:
+            save_price_history(sets_data, now_str)
+            print(f"Price history updated at: {now_str}")
+        else:
+            print(f"Price history unchanged (already scanned today: {today})")
 
 
 if __name__ == "__main__":
