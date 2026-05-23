@@ -179,8 +179,9 @@ def load_price_history() -> dict:
 
 
 def save_price_history(sets_data: list[dict], scan_date: str) -> None:
-    """Save current prices and ranks keyed by product_id for next-run comparison."""
+    """Save current prices, ranks, and set totals keyed by product_id for next-run comparison."""
     history = {}
+    # Per-card entries
     for s in sets_data:
         for card in s["cards"]:
             pid = str(int(card["product_id"])) if card["product_id"] else ""
@@ -191,15 +192,28 @@ def save_price_history(sets_data: list[dict], scan_date: str) -> None:
                     "name": card["name"],
                     "scan_date": scan_date,
                 }
+    # Per-set totals stored under a reserved key
+    history["_sets"] = {
+        s["slug"]: {"total": s["total"], "scan_date": scan_date}
+        for s in sets_data
+    }
     with open(PRICE_HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(history, f, indent=2)
     print(f"  Price history saved to: {PRICE_HISTORY_FILE}")
 
 
 def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
+    def total_delta_nav(s):
+        tc = s.get("total_change")
+        if tc is None or tc == 0:
+            return ""
+        cls = "total-delta-up" if tc > 0 else "total-delta-down"
+        sign = "+" if tc > 0 else ""
+        return f'<span class="nav-total-delta {cls}">{sign}${tc:.2f}</span>'
+
     set_nav = "\n".join(
         f'<li><a href="#{s["slug"]}">{s["name"]}</a>'
-        f'<span class="nav-total">${s["total"]:.2f}</span></li>'
+        f'<span class="nav-total">${s["total"]:.2f}{total_delta_nav(s)}</span></li>'
         for s in sets_data
     )
 
@@ -368,13 +382,21 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
             for r in present_rarities
         )
 
+        tc = s.get("total_change")
+        if tc is not None and tc != 0:
+            tc_cls = "total-delta total-delta-up" if tc > 0 else "total-delta total-delta-down"
+            tc_sign = "+" if tc > 0 else ""
+            total_change_html = f'<span class="{tc_cls}">({tc_sign}${tc:.2f})</span>'
+        else:
+            total_change_html = ""
+
         set_sections += f"""
   <section class="set-section" id="{s['slug']}">
     <div class="set-header">
       <h2>{s['name']}</h2>
       <div class="set-stats">
         <span>Top {len(s['cards'])} cards</span>
-        <span class="set-total">Total: ${s['total']:.2f}</span>
+        <span class="set-total">Total: ${s['total']:.2f} {total_change_html}</span>
         <span class="set-avg">Avg: ${s['avg']:.2f}</span>
       </div>
       <div class="rarity-filters" data-slug="{s['slug']}">{rarity_tags_html}</div>
@@ -455,12 +477,78 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
   <title>TCG Top Cards</title>
   <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">
   <style>
+    :root {{
+      /* ── Background layers ── */
+      --bg-base:        #0f0f13;
+      --bg-surface:     #17171f;
+      --bg-raised:      #1c1c28;
+      --bg-hover:       #22222e;
+      --bg-card-img:    #111118;
+
+      /* ── Borders ── */
+      --border:         #2a2a3a;
+      --border-input:   #3a3a5a;
+      --border-accent:  rgba(255,255,255,.18);
+
+      /* ── Text ── */
+      --text-primary:   #e0e0e0;
+      --text-secondary: #c4c4d4;
+      --text-muted:     #6b6b8a;
+      --text-faint:     #44445a;
+      --text-white:     #fff;
+
+      /* ── Accent / brand ── */
+      --accent:         #a78bfa;
+      --accent-dim:     #888;
+
+      /* ── Semantic colours ── */
+      --color-up:       #34d399;   /* price / total increase */
+      --color-down:     #f87171;   /* price / total decrease */
+      --color-flat:     #6b6b8a;
+      --color-new:      #fbbf24;   /* new-to-ranking */
+      --color-rank-up:  #a78bfa;   /* rank improvement */
+      --color-profit:   #34d399;
+      --color-loss:     #f87171;
+
+      /* ── Price tiers ── */
+      --price-high:     #f87171;
+      --price-mid:      #fbbf24;
+      --price-low:      #34d399;
+
+      /* ── Rarity tag colours ── */
+      --r-c-bg:    #1a2a1a; --r-c-fg:    #6ee7b7;
+      --r-uc-bg:   #1a1f2e; --r-uc-fg:   #93c5fd;
+      --r-r-bg:    #1e2a3a; --r-r-fg:    #60a5fa;
+      --r-sr-bg:   #2a1e3a; --r-sr-fg:   #c084fc;
+      --r-sec-bg:  #2e1f4a; --r-sec-fg:  #e879f9;
+      --r-sp-bg:   #2a1a1a; --r-sp-fg:   #f87171;
+      --r-l-bg:    #2a2210; --r-l-fg:    #fbbf24;
+      --r-pr-bg:   #1a2a2a; --r-pr-fg:   #34d399;
+      --r-tr-bg:   #201a1a; --r-tr-fg:   #fb923c;
+      --r-don-bg:  #1f1a10; --r-don-fg:  #facc15;
+
+      /* ── Overlay badge colours ── */
+      --badge-color-bg: #1e2a3a; --badge-color-fg: #60a5fa;
+      --badge-type-bg:  #2a1e3a; --badge-type-fg:  #c084fc;
+
+      /* ── Hit-chip type colours ── */
+      --hit-sp-bg:      #1e2a3a; --hit-sp-type-bg:  #1e3a5a; --hit-sp-type-fg:  #60a5fa;
+      --hit-sec-bg:     #2a1e3a; --hit-sec-type-bg: #3a1e5a; --hit-sec-type-fg: #c084fc;
+      --hit-alt-bg:     #1e2e2a; --hit-alt-type-bg: #1a3a30; --hit-alt-type-fg: #34d399;
+      --hit-manga-bg:   #2e1f4a; --hit-manga-bd:    #7c3aed;
+      --hit-manga-type-bg: #4a1e7a; --hit-manga-type-fg: #e879f9;
+
+      /* ── Misc ── */
+      --overlay-scrim:  rgba(0,0,0,.75);
+      --sidebar-scrim:  rgba(0,0,0,.5);
+    }}
+
     *, *::before, *::after {{ box-sizing: border-box; margin: 0; padding: 0; }}
 
     body {{
       font-family: system-ui, sans-serif;
-      background: #0f0f13;
-      color: #e0e0e0;
+      background: var(--bg-base);
+      color: var(--text-primary);
       min-height: 100vh;
     }}
 
@@ -470,8 +558,8 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
        top: 0; left: 0;
        width: 240px;
        height: 100vh;
-       background: #17171f;
-       border-right: 1px solid #2a2a3a;
+       background: var(--bg-surface);
+       border-right: 1px solid var(--border);
        overflow-y: auto;
        padding: 1.5rem 0;
        z-index: 100;
@@ -486,9 +574,9 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
      .sidebar h1 {{
        font-size: 1rem;
        font-weight: 700;
-       color: #a78bfa;
+       color: var(--accent);
        padding: 0 1.2rem 1rem;
-       border-bottom: 1px solid #2a2a3a;
+       border-bottom: 1px solid var(--border);
        margin-bottom: .8rem;
      }}
     .sidebar ul {{ list-style: none; }}
@@ -499,24 +587,24 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       padding: .1rem .4rem .1rem 1.2rem;
     }}
     .sidebar a {{
-      color: #c4c4d4;
+      color: var(--text-secondary);
       text-decoration: none;
       font-size: .85rem;
       flex: 1;
       padding: .35rem 0;
     }}
-    .sidebar a:hover {{ color: #a78bfa; }}
+    .sidebar a:hover {{ color: var(--accent); }}
     .nav-total {{
       font-size: .75rem;
-      color: #6b6b8a;
+      color: var(--text-muted);
       white-space: nowrap;
     }}
     .grand-total {{
       margin: 1rem 1.2rem 0;
       padding-top: .8rem;
-      border-top: 1px solid #2a2a3a;
+      border-top: 1px solid var(--border);
       font-size: .8rem;
-      color: #a78bfa;
+      color: var(--accent);
     }}
 
     /* ── Main content ── */
@@ -534,26 +622,26 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       position: sticky;
       top: 0;
       z-index: 40;
-      background: #0f0f13;
+      background: var(--bg-base);
       display: flex;
       align-items: baseline;
       gap: 1.5rem;
       flex-wrap: wrap;
       margin-bottom: 1.2rem;
       padding: .6rem 0;
-      border-bottom: 2px solid #2a2a3a;
+      border-bottom: 2px solid var(--border);
     }}
     .set-header h2 {{
       font-size: 1.3rem;
-      color: #a78bfa;
+      color: var(--accent);
     }}
     .set-stats {{
       display: flex;
       gap: 1rem;
       font-size: .82rem;
-      color: #6b6b8a;
+      color: var(--text-muted);
     }}
-    .set-total, .set-avg {{ color: #c4c4d4; }}
+    .set-total, .set-avg {{ color: var(--text-secondary); }}
 
     /* ── Rarity filters ── */
     .rarity-filters {{
@@ -576,18 +664,18 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     }}
     .rf-tag.active {{
       opacity: 1;
-      border-color: rgba(255,255,255,.18);
+      border-color: var(--border-accent);
     }}
-    .rf-tag[data-r="C"]     {{ background:#1a2a1a; color:#6ee7b7; }}
-    .rf-tag[data-r="UC"]    {{ background:#1a1f2e; color:#93c5fd; }}
-    .rf-tag[data-r="R"]     {{ background:#1e2a3a; color:#60a5fa; }}
-    .rf-tag[data-r="SR"]    {{ background:#2a1e3a; color:#c084fc; }}
-    .rf-tag[data-r="SEC"]   {{ background:#2e1f4a; color:#e879f9; }}
-    .rf-tag[data-r="SP"]    {{ background:#2a1a1a; color:#f87171; }}
-    .rf-tag[data-r="L"]     {{ background:#2a2210; color:#fbbf24; }}
-    .rf-tag[data-r="PR"]    {{ background:#1a2a2a; color:#34d399; }}
-    .rf-tag[data-r="TR"]    {{ background:#201a1a; color:#fb923c; }}
-    .rf-tag[data-r="DON!!"] {{ background:#1f1a10; color:#facc15; }}
+    .rf-tag[data-r="C"]     {{ background: var(--r-c-bg);   color: var(--r-c-fg);   }}
+    .rf-tag[data-r="UC"]    {{ background: var(--r-uc-bg);  color: var(--r-uc-fg);  }}
+    .rf-tag[data-r="R"]     {{ background: var(--r-r-bg);   color: var(--r-r-fg);   }}
+    .rf-tag[data-r="SR"]    {{ background: var(--r-sr-bg);  color: var(--r-sr-fg);  }}
+    .rf-tag[data-r="SEC"]   {{ background: var(--r-sec-bg); color: var(--r-sec-fg); }}
+    .rf-tag[data-r="SP"]    {{ background: var(--r-sp-bg);  color: var(--r-sp-fg);  }}
+    .rf-tag[data-r="L"]     {{ background: var(--r-l-bg);   color: var(--r-l-fg);   }}
+    .rf-tag[data-r="PR"]    {{ background: var(--r-pr-bg);  color: var(--r-pr-fg);  }}
+    .rf-tag[data-r="TR"]    {{ background: var(--r-tr-bg);  color: var(--r-tr-fg);  }}
+    .rf-tag[data-r="DON!!"] {{ background: var(--r-don-bg); color: var(--r-don-fg); }}
 
     /* ── Price buckets ── */
     .price-buckets {{
@@ -600,8 +688,8 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       display: flex;
       flex-direction: column;
       align-items: center;
-      background: #1c1c28;
-      border: 1px solid #2a2a3a;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
       border-radius: 8px;
       padding: .4rem .8rem;
       min-width: 72px;
@@ -609,7 +697,7 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     .bucket-empty {{ opacity: .35; }}
     .bucket-label {{
       font-size: .65rem;
-      color: #6b6b8a;
+      color: var(--text-muted);
       white-space: nowrap;
     }}
     .bucket-count {{
@@ -621,7 +709,7 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     /* ── Collapsible chart ── */
     .chart-details {{
       margin-bottom: 1.2rem;
-      border: 1px solid #2a2a3a;
+      border: 1px solid var(--border);
       border-radius: 8px;
       overflow: hidden;
     }}
@@ -630,10 +718,10 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       align-items: center;
       gap: .5rem;
       padding: .55rem 1rem;
-      background: #1c1c28;
+      background: var(--bg-raised);
       cursor: pointer;
       font-size: .8rem;
-      color: #a78bfa;
+      color: var(--accent);
       user-select: none;
       list-style: none;
     }}
@@ -644,11 +732,11 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       transition: transform .2s;
     }}
     .chart-details[open] .chart-toggle::before {{ transform: rotate(90deg); }}
-    .chart-toggle:hover {{ background: #22222e; }}
+    .chart-toggle:hover {{ background: var(--bg-hover); }}
 
     .chart {{
       padding: 1.2rem 1rem 1rem;
-      background: #17171f;
+      background: var(--bg-surface);
     }}
     .chart-bars {{
       display: flex;
@@ -682,11 +770,11 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     .bar-val {{
       font-size: .7rem;
       font-weight: 700;
-      color: #c4c4d4;
+      color: var(--text-secondary);
     }}
     .bar-label {{
       font-size: .62rem;
-      color: #6b6b8a;
+      color: var(--text-muted);
       margin-top: .35rem;
       text-align: center;
       white-space: nowrap;
@@ -700,8 +788,8 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     }}
 
     .card {{
-      background: #1c1c28;
-      border: 1px solid #2a2a3a;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
       border-radius: 10px;
       overflow: hidden;
       display: flex;
@@ -712,14 +800,14 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     }}
     .card:hover {{
       transform: translateY(-3px);
-      border-color: #a78bfa;
+      border-color: var(--accent);
     }}
 
     .card-rank {{
       position: absolute;
       top: 6px; left: 6px;
       background: rgba(0,0,0,.65);
-      color: #a78bfa;
+      color: var(--accent);
       font-size: .7rem;
       font-weight: 700;
       padding: 2px 6px;
@@ -730,7 +818,7 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       width: 100%;
       aspect-ratio: 1 / 1;
       object-fit: contain;
-      background: #111118;
+      background: var(--bg-card-img);
       display: block;
     }}
 
@@ -744,7 +832,7 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     .card-name {{
       font-size: .78rem;
       font-weight: 600;
-      color: #e0e0e0;
+      color: var(--text-primary);
       line-height: 1.3;
     }}
 
@@ -756,49 +844,60 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     }}
 
     .badge {{
-      background: #2a2a3a;
+      background: var(--border);
       color: #a0a0c0;
       font-size: .65rem;
       padding: 1px 5px;
       border-radius: 4px;
     }}
-    .rarity {{ background: #2e1f4a; color: #c084fc; }}
-    .rarity-name {{ font-size: .65rem; color: #6b6b8a; }}
+    .rarity {{ background: var(--r-sec-bg); color: var(--r-sr-fg); }}
+    .rarity-name {{ font-size: .65rem; color: var(--text-muted); }}
+    .badge-color {{ background: var(--badge-color-bg); color: var(--badge-color-fg); }}
+    .badge-type  {{ background: var(--badge-type-bg);  color: var(--badge-type-fg);  }}
 
-    .card-id {{ font-size: .62rem; color: #44445a; }}
+    .card-id {{ font-size: .62rem; color: var(--text-faint); }}
 
     .card-price {{
       font-size: 1rem;
       font-weight: 700;
       margin-top: .1rem;
     }}
-    .price-high {{ color: #f87171; }}
-    .price-mid  {{ color: #fbbf24; }}
-    .price-low  {{ color: #34d399; }}
+    .price-high {{ color: var(--price-high); }}
+    .price-mid  {{ color: var(--price-mid);  }}
+    .price-low  {{ color: var(--price-low);  }}
 
     .price-delta {{
       font-size: .68rem;
       font-weight: 600;
       margin-top: .1rem;
     }}
-    .delta-up   {{ color: #f87171; }}
-    .delta-down {{ color: #34d399; }}
-    .delta-flat {{ color: #6b6b8a; }}
+    .delta-up   {{ color: var(--color-up);   }}
+    .delta-down {{ color: var(--color-down); }}
+    .delta-flat {{ color: var(--color-flat); }}
 
     .rank-delta {{
       font-size: .62rem;
       font-weight: 600;
     }}
-    .rank-up   {{ color: #a78bfa; }}
-    .rank-down {{ color: #6b6b8a; }}
-    .rank-new  {{ color: #fbbf24; }}
+    .rank-up   {{ color: var(--color-rank-up); }}
+    .rank-down {{ color: var(--color-flat);    }}
+    .rank-new  {{ color: var(--color-new);     }}
+
+    .total-delta {{
+      font-size: .72rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }}
+    .total-delta-up   {{ color: var(--color-up);   }}
+    .total-delta-down {{ color: var(--color-down); }}
+    .nav-total-delta  {{ font-size: .68rem; font-weight: 600; }}
 
     .last-scan {{
       margin: .6rem 1.2rem 0;
       padding-top: .6rem;
-      border-top: 1px solid #2a2a3a;
+      border-top: 1px solid var(--border);
       font-size: .72rem;
-      color: #6b6b8a;
+      color: var(--text-muted);
       line-height: 1.5;
     }}
 
@@ -808,8 +907,8 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       position: fixed;
       top: 0; left: 0; right: 0;
       height: 52px;
-      background: #17171f;
-      border-bottom: 1px solid #2a2a3a;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
       z-index: 200;
       align-items: center;
       padding: 0 1rem;
@@ -825,7 +924,7 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     /* ── Hamburger button ── */
     .hamburger {{
       background: none;
-      border: 1px solid #2a2a3a;
+      border: 1px solid var(--border);
       border-radius: 7px;
       padding: .4rem .5rem;
       cursor: pointer;
@@ -839,7 +938,7 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       display: block;
       width: 20px;
       height: 2px;
-      background: #a78bfa;
+      background: var(--accent);
       border-radius: 2px;
     }}
 
@@ -848,7 +947,7 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.5);
+      background: var(--sidebar-scrim);
       z-index: 99;
       opacity: 0;
       pointer-events: none;
@@ -877,7 +976,7 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.75);
+      background: var(--overlay-scrim);
       z-index: 200;
       align-items: center;
       justify-content: center;
@@ -885,8 +984,8 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     }}
     .overlay-backdrop.open {{ display: flex; }}
     .overlay {{
-      background: #17171f;
-      border: 1px solid #2a2a3a;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
       border-radius: 14px;
       max-width: 780px;
       width: 100%;
@@ -923,7 +1022,7 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     .overlay-name {{
       font-size: 1.1rem;
       font-weight: 700;
-      color: #fff;
+      color: var(--text-white);
       line-height: 1.3;
     }}
     .overlay-badges {{
@@ -937,8 +1036,8 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       gap: .5rem;
     }}
     .overlay-stat {{
-      background: #1c1c28;
-      border: 1px solid #2a2a3a;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
       border-radius: 7px;
       padding: .4rem .7rem;
       display: flex;
@@ -947,20 +1046,20 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     }}
     .overlay-stat-label {{
       font-size: .6rem;
-      color: #6b6b8a;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: .05em;
     }}
     .overlay-stat-value {{
       font-size: .9rem;
       font-weight: 600;
-      color: #e0e0e0;
+      color: var(--text-primary);
     }}
     .overlay-desc {{
       font-size: .8rem;
       color: #b0b0c8;
       line-height: 1.6;
-      border-top: 1px solid #2a2a3a;
+      border-top: 1px solid var(--border);
       padding-top: .7rem;
     }}
     .overlay-close {{
@@ -969,14 +1068,14 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       right: .9rem;
       background: none;
       border: none;
-      color: #6b6b8a;
+      color: var(--text-muted);
       font-size: 1.3rem;
       cursor: pointer;
       line-height: 1;
       padding: 2px 6px;
       border-radius: 4px;
     }}
-    .overlay-close:hover {{ color: #e0e0e0; background: #2a2a3a; }}
+    .overlay-close:hover {{ color: var(--text-primary); background: var(--border); }}
     @media (max-width: 560px) {{
       .overlay {{ flex-direction: column; }}
       .overlay-img-col {{ flex: none; align-self: center; }}
@@ -989,26 +1088,26 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       align-items: center;
       gap: .75rem;
       font-size: .85rem;
-      color: #c4c4d4;
+      color: var(--text-secondary);
       padding-bottom: .6rem;
-      border-bottom: 1px solid #2a2a3a;
+      border-bottom: 1px solid var(--border);
     }}
-    .box-price-row label {{ color: #a78bfa; font-weight: 600; }}
+    .box-price-row label {{ color: var(--accent); font-weight: 600; }}
     .box-price-input {{
-      background: #0f0f13;
-      border: 1px solid #3a3a5a;
+      background: var(--bg-base);
+      border: 1px solid var(--border-input);
       border-radius: 6px;
-      color: #e0e0e0;
+      color: var(--text-primary);
       font-size: .9rem;
       padding: .3rem .6rem;
       width: 100px;
       outline: none;
     }}
-    .box-price-input:focus {{ border-color: #a78bfa; }}
+    .box-price-input:focus {{ border-color: var(--accent); }}
     .breakeven-details {{ margin-top: .5rem; }}
     .breakeven-panel {{
       padding: 1.2rem;
-      background: #17171f;
+      background: var(--bg-surface);
       display: flex;
       flex-direction: column;
       gap: 1rem;
@@ -1019,17 +1118,17 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       gap: .6rem;
     }}
     .be-stat {{
-      background: #1c1c28;
-      border: 1px solid #2a2a3a;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
       border-radius: 8px;
       padding: .5rem .8rem;
       display: flex;
       flex-direction: column;
       gap: .15rem;
     }}
-    .be-label {{ font-size: .65rem; color: #6b6b8a; }}
-    .be-value {{ font-size: .95rem; font-weight: 700; color: #c4c4d4; }}
-    .be-ev    {{ color: #a78bfa; }}
+    .be-label {{ font-size: .65rem; color: var(--text-muted); }}
+    .be-value {{ font-size: .95rem; font-weight: 700; color: var(--text-secondary); }}
+    .be-ev    {{ color: var(--accent); }}
 
     .be-result-row {{
       display: flex;
@@ -1039,8 +1138,8 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
     .be-result-box {{
       flex: 1;
       min-width: 120px;
-      background: #1c1c28;
-      border: 1px solid #2a2a3a;
+      background: var(--bg-raised);
+      border: 1px solid var(--border);
       border-radius: 8px;
       padding: .6rem 1rem;
       display: flex;
@@ -1048,15 +1147,15 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       gap: .2rem;
       text-align: center;
     }}
-    .be-result-label {{ font-size: .65rem; color: #6b6b8a; }}
-    .be-result-value {{ font-size: 1.1rem; font-weight: 700; color: #e0e0e0; }}
-    .be-ev-display   {{ color: #a78bfa; }}
-    .be-profit  {{ border-color: #34d399 !important; }}
-    .be-profit .be-result-value {{ color: #34d399; }}
-    .be-loss    {{ border-color: #f87171 !important; }}
-    .be-loss .be-result-value   {{ color: #f87171; }}
+    .be-result-label {{ font-size: .65rem; color: var(--text-muted); }}
+    .be-result-value {{ font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }}
+    .be-ev-display   {{ color: var(--accent); }}
+    .be-profit  {{ border-color: var(--color-profit) !important; }}
+    .be-profit .be-result-value {{ color: var(--color-profit); }}
+    .be-loss    {{ border-color: var(--color-loss) !important; }}
+    .be-loss .be-result-value   {{ color: var(--color-loss); }}
 
-    .be-hit-title {{ font-size: .7rem; color: #6b6b8a; margin-bottom: .4rem; }}
+    .be-hit-title {{ font-size: .7rem; color: var(--text-muted); margin-bottom: .4rem; }}
     .be-hit-cards {{ display: flex; flex-wrap: wrap; gap: .35rem; }}
     .be-hit-chip {{
       display: inline-flex;
@@ -1065,8 +1164,8 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       border-radius: 5px;
       font-size: .68rem;
       padding: 2px 7px;
-      color: #c4c4d4;
-      background: #2a2a3a;
+      color: var(--text-secondary);
+      background: var(--border);
     }}
     .be-hit-type {{
       font-style: normal;
@@ -1075,17 +1174,17 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       padding: 1px 4px;
       border-radius: 3px;
       background: #3a3a50;
-      color: #888;
+      color: var(--accent-dim);
     }}
-    .be-hit-price {{ color: #a78bfa; font-style: normal; }}
-    .be-type-sp            {{ background: #1e2a3a; }}
-    .be-type-sp            .be-hit-type {{ background: #1e3a5a; color: #60a5fa; }}
-    .be-type-sec           {{ background: #2a1e3a; }}
-    .be-type-sec           .be-hit-type {{ background: #3a1e5a; color: #c084fc; }}
-    .be-type-alt-art       {{ background: #1e2e2a; }}
-    .be-type-alt-art       .be-hit-type {{ background: #1a3a30; color: #34d399; }}
-    .be-type-manga         {{ background: #2e1f4a; border: 1px solid #7c3aed; }}
-    .be-type-manga         .be-hit-type {{ background: #4a1e7a; color: #e879f9; }}
+    .be-hit-price {{ color: var(--accent); font-style: normal; }}
+    .be-type-sp      {{ background: var(--hit-sp-bg); }}
+    .be-type-sp      .be-hit-type {{ background: var(--hit-sp-type-bg);  color: var(--hit-sp-type-fg);  }}
+    .be-type-sec     {{ background: var(--hit-sec-bg); }}
+    .be-type-sec     .be-hit-type {{ background: var(--hit-sec-type-bg); color: var(--hit-sec-type-fg); }}
+    .be-type-alt-art {{ background: var(--hit-alt-bg); }}
+    .be-type-alt-art .be-hit-type {{ background: var(--hit-alt-type-bg); color: var(--hit-alt-type-fg); }}
+    .be-type-manga   {{ background: var(--hit-manga-bg); border: 1px solid var(--hit-manga-bd); }}
+    .be-type-manga   .be-hit-type {{ background: var(--hit-manga-type-bg); color: var(--hit-manga-type-fg); }}
   </style>
 </head>
 <body>
@@ -1224,8 +1323,8 @@ def build_html(sets_data: list[dict], last_scan_date: str | None = None) -> str:
       if (d.number)    badges.innerHTML += `<span class="badge">${{d.number}}</span>`;
       if (d.rarityDb)  badges.innerHTML += `<span class="badge rarity">${{d.rarityDb}}</span>`;
       if (d.rarityName) badges.innerHTML += `<span class="rarity-name">${{d.rarityName}}</span>`;
-      if (d.color)     badges.innerHTML += `<span class="badge" style="background:#1e2a3a;color:#60a5fa">${{d.color}}</span>`;
-      if (d.cardType)  badges.innerHTML += `<span class="badge" style="background:#2a1e3a;color:#c084fc">${{d.cardType}}</span>`;
+      if (d.color)     badges.innerHTML += `<span class="badge badge-color">${{d.color}}</span>`;
+      if (d.cardType)  badges.innerHTML += `<span class="badge badge-type">${{d.cardType}}</span>`;
 
       // Stats grid
       const stats = [
@@ -1414,16 +1513,22 @@ def main():
         print(f"\n  Top {len(card_rows)} cards total value:  ${total:.2f}")
         print(f"  Average price:              ${avg:.2f}")
 
+        # Set total change vs previous run
+        prev_sets = price_history.get("_sets", {})
+        prev_set_total = prev_sets.get(set_name, {}).get("total")
+        total_change = round(total - prev_set_total, 2) if prev_set_total is not None else None
+
         # Derive a display name from the slug, prefixed with the set ID if known
         base_name = result.get("setName", set_name.replace("-", " ").title())
         set_id = SET_IDS.get(set_name, "")
         display_name = f"{set_id} – {base_name}" if set_id else base_name
         sets_data.append({
-            "slug":  set_name,
-            "name":  display_name,
-            "cards": card_rows,
-            "total": total,
-            "avg":   avg,
+            "slug":         set_name,
+            "name":         display_name,
+            "cards":        card_rows,
+            "total":        total,
+            "total_change": total_change,
+            "avg":          avg,
         })
 
     if sets_data:
