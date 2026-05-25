@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TCG Top Cards</title>
+  <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <img class="site-header-logo" src="../common/one-piece-full-logo.webp" alt="One Piece TCG" />
+    <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+  <nav class="sidebar" id="sidebar">
+    <img class="sidebar-logo" src="../common/one-piece-full-logo.webp" alt="One Piece TCG" />
+    <h1>TCG Top Cards</h1>
+    <ul>
+      {set_nav}
+    </ul>
+    <div class="grand-total">Grand total: {grand_total}</div>
+    {last_scan_html}
+  </nav>
+
+  <main class="main">
+    {set_sections}
+  </main>
+
+  <!-- Card detail overlay -->
+  <div class="overlay-backdrop" id="overlay-backdrop" role="dialog" aria-modal="true">
+    <div class="overlay" id="overlay">
+      <button class="overlay-close" id="overlay-close" aria-label="Close">✕</button>
+      <div class="overlay-img-col">
+        <img class="overlay-img" id="ov-img" src="" alt="" />
+        <div class="overlay-price price-high" id="ov-price"></div>
+        <div class="price-delta" id="ov-delta" style="display:none;text-align:center;"></div>
+        <div class="rank-delta" id="ov-rank-delta" style="display:none;text-align:center;"></div>
+      </div>
+      <div class="overlay-info-col">
+        <div class="overlay-name" id="ov-name"></div>
+        <div class="overlay-badges" id="ov-badges"></div>
+        <div class="overlay-stats" id="ov-stats"></div>
+        <div class="overlay-desc" id="ov-desc"></div>
+        <div class="ov-chart-wrap" id="ov-chart-wrap">
+          <canvas class="ov-chart-canvas" id="ov-chart"></canvas>
+          <div class="ov-chart-footer" id="ov-chart-footer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PRICE_HISTORY = {price_history_json};
+  </script>
+  <script src="app.js"></script>
+</body>
+</html>

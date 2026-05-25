@@ -705,3 +705,36 @@ body {
 .be-type-alt-art .be-hit-type { background: var(--hit-alt-type-bg); color: var(--hit-alt-type-fg); }
 .be-type-manga   { background: var(--hit-manga-bg); border: 1px solid var(--hit-manga-bd); }
 .be-type-manga   .be-hit-type { background: var(--hit-manga-type-bg); color: var(--hit-manga-type-fg); }
+
+/* ── Overlay price history chart ── */
+.ov-chart-wrap {
+  margin-top: .6rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 60px;
+  position: relative;
+}
+.ov-chart-wrap.ov-chart-error::after {
+  content: "Price history unavailable";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  inset: 0;
+  font-size: .75rem;
+  color: var(--text-faint);
+}
+.ov-chart-canvas {
+  display: block;
+  width: 100%;
+  background: var(--bg-raised);
+}
+.ov-chart-footer {
+  background: var(--bg-raised);
+  font-size: .65rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: .3rem 0 .4rem;
+  border-top: 1px solid var(--border);
+}
