@@ -1,0 +1,33 @@
+name: Update Futbol Libre
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 13 * * *" # Runs every day at 5 AM PST (UTC-8)
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: pip install -r futbol-libre/requirements.txt
+
+      - name: Run scraper
+        run: python scrape.py --output index.html
+        working-directory: futbol-libre
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add futbol-libre/index.html
+          git diff --cached --quiet || git commit -m "chore: update futbol-libre index.html"
+          git push
