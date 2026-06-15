@@ -13,10 +13,11 @@ jobs:
 
       - name: Regenerate index.html
         run: |
-          # Collect subdirectories, excluding hidden ones
+          # Collect subdirectories, excluding hidden ones and 'common'
           dirs=()
           for d in */; do
             name="${d%/}"
+            [[ "$name" == "common" ]] && continue
             dirs+=("$name")
           done
 
