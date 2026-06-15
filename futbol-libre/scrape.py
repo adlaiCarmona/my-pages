@@ -15,6 +15,7 @@ import argparse
 import base64
 import sys
 import urllib.parse
+from datetime import datetime, timezone, timedelta
 
 try:
     import requests
@@ -56,6 +57,58 @@ def decode_r_param(href: str) -> str:
     return href
 
 
+def _is_bst(now_utc: datetime) -> bool:
+    """BST (UTC+1): last Sunday in March 01:00 UTC -> last Sunday in October 01:00 UTC."""
+    year = now_utc.year
+    # Last Sunday in March
+    march_last = datetime(year, 4, 1, 1, 0, tzinfo=timezone.utc) - timedelta(days=1)
+    bst_start = march_last - timedelta(days=(march_last.weekday() + 1) % 7)
+    # Last Sunday in October
+    oct_last = datetime(year, 11, 1, 1, 0, tzinfo=timezone.utc) - timedelta(days=1)
+    bst_end = oct_last - timedelta(days=(oct_last.weekday() + 1) % 7)
+    return bst_start <= now_utc < bst_end
+
+
+def _is_pdt(now_utc: datetime) -> bool:
+    """PDT (UTC-7): second Sunday in March 02:00 -> first Sunday in November 02:00."""
+    year = now_utc.year
+    # Second Sunday in March
+    march1 = datetime(year, 3, 1, 2, 0, tzinfo=timezone.utc)
+    first_sun_march = march1 + timedelta(days=(6 - march1.weekday()) % 7)
+    pdt_start = first_sun_march + timedelta(weeks=1)
+    # First Sunday in November
+    nov1 = datetime(year, 11, 1, 2, 0, tzinfo=timezone.utc)
+    pdt_end = nov1 + timedelta(days=(6 - nov1.weekday()) % 7)
+    return pdt_start <= now_utc < pdt_end
+
+
+def london_to_pacific(time_str: str) -> str:
+    """
+    Convert a 24-hour London local time string (e.g. '20:00') to Pacific time.
+    London is GMT (UTC+0) in winter and BST (UTC+1) in summer.
+    Pacific is PST (UTC-8) in winter and PDT (UTC-7) in summer.
+    Returns a string like '20:00 BST / 12:00 PDT'.
+    """
+    try:
+        now_utc = datetime.now(timezone.utc)
+        year, month, day = now_utc.year, now_utc.month, now_utc.day
+
+        london_offset = 1 if _is_bst(now_utc) else 0
+        london_label = "BST" if london_offset else "GMT"
+
+        pacific_offset = -7 if _is_pdt(now_utc) else -8
+        pacific_label = "PDT" if pacific_offset == -7 else "PST"
+
+        h, m = map(int, time_str.split(":"))
+        # Convert London local -> UTC -> Pacific
+        london_dt = datetime(year, month, day, h, m, tzinfo=timezone.utc) - timedelta(hours=london_offset)
+        pacific_dt = london_dt + timedelta(hours=pacific_offset)
+        pacific_str = pacific_dt.strftime("%H:%M")
+        return f"{time_str} {london_label} / {pacific_str} {pacific_label}"
+    except Exception:
+        return time_str
+
+
 def parse_agenda(html: str) -> tuple[str, list[dict]]:
     """
     Returns (date_text, games) where each game is:
@@ -91,6 +144,8 @@ def parse_agenda(html: str) -> tuple[str, list[dict]]:
         time_text = time_span.get_text(strip=True) if time_span else ""
         if time_span:
             time_span.decompose()
+        if time_text:
+            time_text = london_to_pacific(time_text)
 
         title = main_a.get_text(strip=True)
 
