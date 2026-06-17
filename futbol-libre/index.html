@@ -1,120 +1,144 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Agenda Deportiva</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agenda Deportiva</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f2f3f5;
-      color: #1a1a1a;
-    }
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f2f3f5;
+        color: #1a1a1a;
+      }
 
-    header {
-      background: #0d1b2a;
-      color: #fff;
-      text-align: center;
-      padding: 1rem 1.25rem;
-      font-size: 1rem;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      border-bottom: 3px solid #4caf50;
-    }
+      header {
+        background: #0d1b2a;
+        color: #fff;
+        text-align: center;
+        padding: 1rem 1.25rem;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        border-bottom: 3px solid #4caf50;
+      }
 
-    .container {
-      max-width: 680px;
-      margin: 1.25rem auto;
-      padding: 0 0.75rem 2rem;
-    }
+      .container {
+        max-width: 680px;
+        margin: 1.25rem auto;
+        padding: 0 0.75rem 2rem;
+      }
 
-    .game-card {
-      background: #fff;
-      border-radius: 8px;
-      margin-bottom: 0.6rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,.1);
-      overflow: hidden;
-    }
+      .game-card {
+        background: #fff;
+        border-radius: 8px;
+        margin-bottom: 0.6rem;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
 
-    .game-header {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-      padding: 0.8rem 1rem;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      text-align: left;
-      font-size: 0.9rem;
-      transition: background 0.15s;
-    }
-    .game-header:hover { background: #f0f6ff; }
+      .game-header {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.8rem 1rem;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        text-align: left;
+        font-size: 0.9rem;
+        transition: background 0.15s;
+      }
+      .game-header:hover {
+        background: #f0f6ff;
+      }
 
-    .time {
-      flex-shrink: 0;
-      background: #0d1b2a;
-      color: #fff;
-      padding: 0.18rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.78rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
+      .time {
+        flex-shrink: 0;
+        background: #0d1b2a;
+        color: #fff;
+        padding: 0.18rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        white-space: nowrap;
+      }
 
-    .title {
-      flex: 1;
-      font-weight: 600;
-    }
+      .title {
+        flex: 1;
+        font-weight: 600;
+      }
 
-    .arrow {
-      color: #aaa;
-      font-size: 0.7rem;
-      transition: transform 0.2s;
-    }
-    .arrow.open { transform: rotate(90deg); }
+      .arrow {
+        color: #aaa;
+        font-size: 0.7rem;
+        transition: transform 0.2s;
+      }
+      .arrow.open {
+        transform: rotate(90deg);
+      }
 
-    .streams {
-      padding: 0.4rem 0.9rem 0.7rem;
-      background: #f9f9fb;
-    }
+      .streams {
+        padding: 0.4rem 0.9rem 0.7rem;
+        background: #f9f9fb;
+      }
 
-    .stream-link {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.45rem 0.7rem;
-      margin-bottom: 0.35rem;
-      background: #fff;
-      border: 1px solid #e0e4e8;
-      border-radius: 5px;
-      text-decoration: none;
-      color: #0055cc;
-      font-size: 0.84rem;
-      transition: background 0.15s, border-color 0.15s;
-    }
-    .stream-link:hover { background: #e6f0ff; border-color: #0055cc; }
+      .stream-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.45rem 0.7rem;
+        margin-bottom: 0.35rem;
+        background: #fff;
+        border: 1px solid #e0e4e8;
+        border-radius: 5px;
+        text-decoration: none;
+        color: #0055cc;
+        font-size: 0.84rem;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+      .stream-link:hover {
+        background: #e6f0ff;
+        border-color: #0055cc;
+      }
 
-    .channel { font-weight: 600; }
-    .quality { font-size: 0.75rem; color: #888; margin-left: 0.5rem; }
+      .channel {
+        font-weight: 600;
+      }
+      .quality {
+        font-size: 0.75rem;
+        color: #888;
+        margin-left: 0.5rem;
+      }
 
-    .no-streams { color: #aaa; font-size: 0.82rem; padding: 0.3rem 0; }
-  </style>
-</head>
-<body>
-  <header>Agenda - Miércoles 17 de Junio de 2026</header>
-  <div class="container">
-
-    <div class="game-card">
-      <button class="game-header" onclick="toggle(this)">
-        <span class="time">18:00 BST / 10:00 PDT</span>
-        <span class="title">Copa Mundial: Portugal vs RD del Congo</span>
-        <span class="arrow">&#9654;</span>
-      </button>
-      <div class="streams" hidden>
-        <a class="stream-link" href="https://latamvidzfy.org/dsportsar.php" target="_blank" rel="noopener noreferrer"><span class="channel">DirecTV Sports</span><span class="quality">Calidad 1080p</span></a>
+      .no-streams {
+        color: #aaa;
+        font-size: 0.82rem;
+        padding: 0.3rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <header>Agenda - Miércoles 17 de Junio de 2026</header>
+    <div class="container">
+      <div class="game-card">
+        <button class="game-header" onclick="toggle(this)">
+          <span class="time">18:00 BST / 10:00 PDT</span>
+          <span class="title">Copa Mundial: Portugal vs RD del Congo</span>
+          <span class="arrow">&#9654;</span>
+        </button>
+        <div class="streams" hidden>
+          <!-- <a class="stream-link" href="https://latamvidzfy.org/dsportsar.php" target="_blank" rel="noopener noreferrer"><span class="channel">DirecTV Sports</span><span class="quality">Calidad 1080p</span></a>
 <a class="stream-link" href="https://latamvidzs.org/canal.php?stream=dsports" target="_blank" rel="noopener noreferrer"><span class="channel">DirecTV Sports | OP 2</span><span class="quality">Calidad 720p</span></a>
 <a class="stream-link" href="https://latamvidzfy.org/m6fr.php" target="_blank" rel="noopener noreferrer"><span class="channel">Canal M6</span><span class="quality">Calidad 1080p</span></a>
 <a class="stream-link" href="https://latamvidzfy.org/universo.php" target="_blank" rel="noopener noreferrer"><span class="channel">Universo</span><span class="quality">Calidad 1080p</span></a>
@@ -124,56 +148,56 @@
 <a class="stream-link" href="https://latamvidzfy.org/vrtcanvas.php" target="_blank" rel="noopener noreferrer"><span class="channel">VRT Canvas</span><span class="quality">Calidad 1080p</span></a>
 <a class="stream-link" href="https://latamvidzfy.org/fox1.php" target="_blank" rel="noopener noreferrer"><span class="channel">FOX One</span><span class="quality">Calidad 1080p</span></a>
 <a class="stream-link" href="https://latamvidzfy.org/telemundo.php" target="_blank" rel="noopener noreferrer"><span class="channel">Telemundo</span><span class="quality">Calidad 1080p</span></a>
-<a class="stream-link" href="https://latamvidzfy.org/caze1.php" target="_blank" rel="noopener noreferrer"><span class="channel">CazeTV</span><span class="quality">Calidad 1080p</span></a>
+<a class="stream-link" href="https://latamvidzfy.org/caze1.php" target="_blank" rel="noopener noreferrer"><span class="channel">CazeTV</span><span class="quality">Calidad 1080p</span></a> -->
+        </div>
       </div>
-    </div>
 
-    <div class="game-card">
-      <button class="game-header" onclick="toggle(this)">
-        <span class="time">21:00 BST / 13:00 PDT</span>
-        <span class="title">Copa Mundial: Inglaterra vs Croacia</span>
-        <span class="arrow">&#9654;</span>
-      </button>
-      <div class="streams" hidden>
-        <a class="stream-link" href="https://latamvidzs.org/canal.php?stream=dsports" target="_blank" rel="noopener noreferrer"><span class="channel">DirecTV Sports</span><span class="quality">Calidad 720p</span></a>
+      <div class="game-card">
+        <button class="game-header" onclick="toggle(this)">
+          <span class="time">21:00 BST / 13:00 PDT</span>
+          <span class="title">Copa Mundial: Inglaterra vs Croacia</span>
+          <span class="arrow">&#9654;</span>
+        </button>
+        <div class="streams" hidden>
+          <!-- <a class="stream-link" href="https://latamvidzs.org/canal.php?stream=dsports" target="_blank" rel="noopener noreferrer"><span class="channel">DirecTV Sports</span><span class="quality">Calidad 720p</span></a> -->
+        </div>
       </div>
-    </div>
 
-    <div class="game-card">
-      <button class="game-header" onclick="toggle(this)">
-        <span class="time">00:00 BST / 16:00 PDT</span>
-        <span class="title">Copa Mundial: Ghana vs Panamá</span>
-        <span class="arrow">&#9654;</span>
-      </button>
-      <div class="streams" hidden>
-        <a class="stream-link" href="https://latamvidzs.org/canal.php?stream=tycsports" target="_blank" rel="noopener noreferrer"><span class="channel">TyC Sports</span><span class="quality">Calidad 720p</span></a>
+      <div class="game-card">
+        <button class="game-header" onclick="toggle(this)">
+          <span class="time">00:00 BST / 16:00 PDT</span>
+          <span class="title">Copa Mundial: Ghana vs Panamá</span>
+          <span class="arrow">&#9654;</span>
+        </button>
+        <div class="streams" hidden>
+          <!-- <a class="stream-link" href="https://latamvidzs.org/canal.php?stream=tycsports" target="_blank" rel="noopener noreferrer"><span class="channel">TyC Sports</span><span class="quality">Calidad 720p</span></a> -->
+        </div>
       </div>
-    </div>
 
-    <div class="game-card">
-      <button class="game-header" onclick="toggle(this)">
-        <span class="time">03:00 BST / 19:00 PDT</span>
-        <span class="title">Copa Mundial: Uzbekistán vs Colombia</span>
-        <span class="arrow">&#9654;</span>
-      </button>
-      <div class="streams" hidden>
-        <a class="stream-link" href="https://latamvidzs.org/canal.php?stream=dsports" target="_blank" rel="noopener noreferrer"><span class="channel">DirecTV Sports</span><span class="quality">Calidad 720p</span></a>
+      <div class="game-card">
+        <button class="game-header" onclick="toggle(this)">
+          <span class="time">03:00 BST / 19:00 PDT</span>
+          <span class="title">Copa Mundial: Uzbekistán vs Colombia</span>
+          <span class="arrow">&#9654;</span>
+        </button>
+        <div class="streams" hidden>
+          <!-- <a class="stream-link" href="https://latamvidzs.org/canal.php?stream=dsports" target="_blank" rel="noopener noreferrer"><span class="channel">DirecTV Sports</span><span class="quality">Calidad 720p</span></a> -->
+        </div>
       </div>
     </div>
-  </div>
-  <script>
-    function toggle(btn) {
-      var panel = btn.nextElementSibling;
-      var arrow = btn.querySelector('.arrow');
-      var hidden = panel.hasAttribute('hidden');
-      if (hidden) {
-        panel.removeAttribute('hidden');
-        arrow.classList.add('open');
-      } else {
-        panel.setAttribute('hidden', '');
-        arrow.classList.remove('open');
+    <script>
+      function toggle(btn) {
+        var panel = btn.nextElementSibling;
+        var arrow = btn.querySelector(".arrow");
+        var hidden = panel.hasAttribute("hidden");
+        if (hidden) {
+          panel.removeAttribute("hidden");
+          arrow.classList.add("open");
+        } else {
+          panel.setAttribute("hidden", "");
+          arrow.classList.remove("open");
+        }
       }
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>

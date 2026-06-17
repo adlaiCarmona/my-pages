@@ -2,8 +2,8 @@ name: Update Futbol Libre
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 14,17,20,23,2,5 * * *" # 6AM,9AM,12PM,3PM,6PM,9PM PST (UTC-8)
+  # schedule:
+  #   - cron: "0 14,17,20,23,2,5 * * *" # 6AM,9AM,12PM,3PM,6PM,9PM PST (UTC-8)
 
 jobs:
   update:
