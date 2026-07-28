@@ -340,6 +340,7 @@
     .tooltip-breakdown .row span { font-weight: 600; }
     .tooltip-breakdown .row.contrib span { color: #4ade80; }
     .tooltip-breakdown .row.interest span { color: #818cf8; }
+    .delta { font-size: 0.72rem; opacity: 0.75; margin-left: 3px; }
   </style>
 </head>
 <body>
@@ -716,6 +717,13 @@ function fmtMoney(v) {
   return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
+function fmtDelta(current, previous) {
+  if (previous === undefined || previous === null) return '';
+  const diff = current - previous;
+  const sign = diff >= 0 ? '+' : '−';
+  return `(${sign}${fmtMoney(Math.abs(diff)).replace('$', '')})`; 
+}
+
 function fmtYears(y) {
   if (y === null) return 'Not reached';
   const yrs = Math.floor(y);
@@ -950,30 +958,39 @@ function renderChart(canvasId, series, legendDefs, goal, tooltipId, legendId) {
 
     if (series.length === 1) {
       // Single plan mode
-      const pt = series[0].data.find(d => d.year === year);
+      const pt   = series[0].data.find(d => d.year === year);
+      const prev = series[0].data.find(d => d.year === year - 1);
       if (pt) {
-        valEls[0].innerHTML = `Balance: <span>${fmtMoney(pt.balance)}</span>`;
+        const balDelta     = prev ? fmtDelta(pt.balance, prev.balance) : '';
+        const intDelta     = prev ? fmtDelta(pt.balance - pt.contributions, prev.balance - prev.contributions) : '';
+        const contribDelta = prev ? fmtDelta(pt.contributions, prev.contributions) : '';
+
+        valEls[0].innerHTML = `Balance: <span>${fmtMoney(pt.balance)}</span><span class="delta">${balDelta}</span>`;
         const interestEl = tooltip.querySelector('.s-interest');
         const contribEl  = tooltip.querySelector('.s-contrib');
-        if (interestEl) interestEl.textContent = fmtMoney(pt.balance - pt.contributions);
-        if (contribEl)  contribEl.textContent  = fmtMoney(pt.contributions);
+        if (interestEl) interestEl.innerHTML = `${fmtMoney(pt.balance - pt.contributions)}<span class="delta">${intDelta}</span>`;
+        if (contribEl)  contribEl.innerHTML  = `${fmtMoney(pt.contributions)}<span class="delta">${contribDelta}</span>`;
       }
     } else {
       // Compare mode — two series
       const labels = ['Plan A', 'Plan B'];
-      const breakdownIds = ['c-breakdown-a', 'c-breakdown-b'];
       const interestClasses = ['c-a-interest', 'c-b-interest'];
       const contribClasses  = ['c-a-contrib',  'c-b-contrib'];
 
       series.forEach((s, i) => {
-        const pt = s.data.find(d => d.year === year);
+        const pt   = s.data.find(d => d.year === year);
+        const prev = s.data.find(d => d.year === year - 1);
         if (pt && valEls[i]) {
           valEls[i].style.display = '';
-          valEls[i].innerHTML = `${labels[i]}: <span>${fmtMoney(pt.balance)}</span>`;
+          const balDelta     = prev ? fmtDelta(pt.balance, prev.balance) : '';
+          const intDelta     = prev ? fmtDelta(pt.balance - pt.contributions, prev.balance - prev.contributions) : '';
+          const contribDelta = prev ? fmtDelta(pt.contributions, prev.contributions) : '';
+
+          valEls[i].innerHTML = `${labels[i]}: <span>${fmtMoney(pt.balance)}</span><span class="delta">${balDelta}</span>`;
           const intEl = tooltip.querySelector('.' + interestClasses[i]);
           const ctEl  = tooltip.querySelector('.' + contribClasses[i]);
-          if (intEl) intEl.textContent = fmtMoney(pt.balance - pt.contributions);
-          if (ctEl)  ctEl.textContent  = fmtMoney(pt.contributions);
+          if (intEl) intEl.innerHTML = `${fmtMoney(pt.balance - pt.contributions)}<span class="delta">${intDelta}</span>`;
+          if (ctEl)  ctEl.innerHTML  = `${fmtMoney(pt.contributions)}<span class="delta">${contribDelta}</span>`;
         }
       });
     }
