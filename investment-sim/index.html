@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Investment Simulator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #222535;
+      --border: #2e3249;
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --text: #e2e4f0;
+      --muted: #7c7f9a;
+      --green: #4ade80;
+      --yellow: #facc15;
+      --red: #f87171;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 32px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      padding: 8px 22px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .panel h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    input, select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    input:focus, select:focus { border-color: var(--accent); }
+
+    /* Rate slices */
+    .rate-slices { display: flex; flex-direction: column; gap: 12px; }
+
+    .rate-slice {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 36px;
+      gap: 10px;
+      align-items: end;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .rate-slice label { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-icon {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 7px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: all 0.15s;
+    }
+
+    .btn-icon:hover { border-color: var(--red); color: var(--red); }
+
+    .slice-warning {
+      font-size: 0.8rem;
+      color: var(--yellow);
+      margin-top: 6px;
+    }
+
+    .btn-add {
+      margin-top: 10px;
+      background: none;
+      border: 1.5px dashed var(--border);
+      color: var(--muted);
+      border-radius: 9px;
+      padding: 9px 16px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      width: 100%;
+      transition: all 0.2s;
+    }
+
+    .btn-add:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Contributions */
+    .contrib-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 36px;
+      gap: 10px;
+      align-items: end;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .contrib-row label { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-calc {
+      background: linear-gradient(135deg, var(--accent), #8b83ff);
+      border: none;
+      color: #fff;
+      border-radius: 10px;
+      padding: 13px 32px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: opacity 0.2s;
+    }
+
+    .btn-calc:hover { opacity: 0.88; }
+
+    /* Results */
+    .result-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .result-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .result-card .label { font-size: 0.78rem; color: var(--muted); margin-bottom: 6px; }
+
+    .result-card .value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    .result-card .value.accent { color: var(--accent); }
+    .result-card .value.yellow { color: var(--yellow); }
+
+    /* Chart */
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      height: 320px;
+    }
+
+    canvas { border-radius: 10px; }
+
+    .chart-legend {
+      display: flex;
+      gap: 18px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* Compare layout */
+    .compare-plans {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 700px) {
+      .compare-plans { grid-template-columns: 1fr; }
+      .rate-slice, .contrib-row { grid-template-columns: 1fr 1fr 36px; }
+    }
+
+    .plan-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .plan-badge {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .compare-result-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin-top: 12px;
+    }
+
+    .compare-result-table th, .compare-result-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .compare-result-table th { color: var(--muted); font-weight: 500; }
+    .compare-result-table td:not(:first-child) { font-weight: 600; }
+    .compare-result-table .winner { color: var(--green); }
+    .compare-result-table .loser { color: var(--muted); }
+
+    .hidden { display: none; }
+
+    .no-result {
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 0;
+      font-size: 0.9rem;
+    }
+
+    /* Tooltip */
+    .chart-tooltip {
+      position: absolute;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      pointer-events: none;
+      display: none;
+      z-index: 10;
+      white-space: nowrap;
+    }
+
+    .tooltip-year { font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .tooltip-val { color: var(--muted); margin-bottom: 1px; }
+    .tooltip-val span { font-weight: 600; }
+    .tooltip-breakdown {
+      margin-top: 5px;
+      padding-top: 5px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .tooltip-breakdown .row { color: var(--muted); font-size: 0.77rem; }
+    .tooltip-breakdown .row span { font-weight: 600; }
+    .tooltip-breakdown .row.contrib span { color: #4ade80; }
+    .tooltip-breakdown .row.interest span { color: #818cf8; }
+  </style>
+</head>
+<body>
+
+<h1>Investment Simulator</h1>
+<p class="subtitle">Calculate how long it takes to reach your financial goal</p>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('single')">Single Plan</button>
+  <button class="tab-btn" onclick="switchTab('compare')">Compare Plans</button>
+</div>
+
+<!-- ======================== SINGLE TAB ======================== -->
+<div id="tab-single" class="tab-content active">
+
+  <div class="panel">
+    <h2>General</h2>
+    <div class="form-grid">
+      <label>Starting Amount ($)
+        <input type="number" id="s-start" value="10000" min="0" step="100" />
+      </label>
+      <label>Goal Amount ($)
+        <input type="number" id="s-goal" value="100000" min="0" step="1000" />
+      </label>
+      <label>Max Years to Simulate
+        <input type="number" id="s-maxyears" value="50" min="1" max="200" />
+      </label>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Interest Rate Slices <span style="color:var(--muted);font-size:0.8rem;font-weight:400">(allocations must sum to 100%)</span></h2>
+    <div class="rate-slices" id="s-slices"></div>
+    <div class="slice-warning hidden" id="s-slice-warn">Allocations sum to <span id="s-slice-sum"></span>% — must equal 100%</div>
+    <button class="btn-add" onclick="addSlice('s')">+ Add Rate Slice</button>
+  </div>
+
+  <div class="panel">
+    <h2>Regular Contributions</h2>
+    <div id="s-contribs"></div>
+    <button class="btn-add" onclick="addContrib('s')">+ Add Contribution</button>
+  </div>
+
+  <button class="btn-calc" onclick="calculate('s')">Calculate</button>
+
+  <div id="s-results" class="hidden" style="margin-top:24px">
+    <div class="result-cards" id="s-cards"></div>
+    <div class="panel">
+      <h2>Growth Over Time</h2>
+      <div class="chart-wrap">
+        <canvas id="s-canvas"></canvas>
+        <div class="chart-tooltip" id="s-tooltip">
+          <div class="tooltip-year"></div>
+          <div class="tooltip-val plan1"></div>
+          <div class="tooltip-breakdown">
+            <div class="row interest">Initial + Interest: <span class="s-interest"></span></div>
+            <div class="row contrib">Contributions: <span class="s-contrib"></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-legend" id="s-legend"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== COMPARE TAB ======================== -->
+<div id="tab-compare" class="tab-content">
+
+  <div class="compare-plans">
+    <!-- Plan A -->
+    <div>
+      <div class="panel">
+        <div class="plan-header">
+          <div class="plan-badge" style="background:#6c63ff"></div>
+          <h2 style="margin:0">Plan A</h2>
+        </div>
+        <div class="form-grid">
+          <label>Starting Amount ($)
+            <input type="number" id="a-start" value="10000" min="0" step="100" />
+          </label>
+          <label>Goal Amount ($)
+            <input type="number" id="a-goal" value="100000" min="0" step="1000" />
+          </label>
+          <label>Max Years
+            <input type="number" id="a-maxyears" value="50" min="1" max="200" />
+          </label>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Interest Rate Slices</h2>
+        <div class="rate-slices" id="a-slices"></div>
+        <div class="slice-warning hidden" id="a-slice-warn">Allocations sum to <span id="a-slice-sum"></span>%</div>
+        <button class="btn-add" onclick="addSlice('a')">+ Add Rate Slice</button>
+      </div>
+      <div class="panel">
+        <h2>Regular Contributions</h2>
+        <div id="a-contribs"></div>
+        <button class="btn-add" onclick="addContrib('a')">+ Add Contribution</button>
+      </div>
+    </div>
+
+    <!-- Plan B -->
+    <div>
+      <div class="panel">
+        <div class="plan-header">
+          <div class="plan-badge" style="background:#ff6584"></div>
+          <h2 style="margin:0">Plan B</h2>
+        </div>
+        <div class="form-grid">
+          <label>Starting Amount ($)
+            <input type="number" id="b-start" value="10000" min="0" step="100" />
+          </label>
+          <label>Goal Amount ($)
+            <input type="number" id="b-goal" value="100000" min="0" step="1000" />
+          </label>
+          <label>Max Years
+            <input type="number" id="b-maxyears" value="50" min="1" max="200" />
+          </label>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Interest Rate Slices</h2>
+        <div class="rate-slices" id="b-slices"></div>
+        <div class="slice-warning hidden" id="b-slice-warn">Allocations sum to <span id="b-slice-sum"></span>%</div>
+        <button class="btn-add" onclick="addSlice('b')">+ Add Rate Slice</button>
+      </div>
+      <div class="panel">
+        <h2>Regular Contributions</h2>
+        <div id="b-contribs"></div>
+        <button class="btn-add" onclick="addContrib('b')">+ Add Contribution</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-calc" onclick="calculateCompare()">Compare Plans</button>
+
+  <div id="c-results" class="hidden" style="margin-top:24px">
+    <div class="panel">
+      <h2>Comparison</h2>
+      <table class="compare-result-table" id="c-table"></table>
+    </div>
+    <div class="panel">
+      <h2>Growth Over Time</h2>
+      <div class="chart-wrap">
+        <canvas id="c-canvas"></canvas>
+        <div class="chart-tooltip" id="c-tooltip">
+          <div class="tooltip-year"></div>
+          <div class="tooltip-val plan1"></div>
+          <div class="tooltip-breakdown" id="c-breakdown-a">
+            <div class="row interest">Initial + Interest: <span class="c-a-interest"></span></div>
+            <div class="row contrib">Contributions: <span class="c-a-contrib"></span></div>
+          </div>
+          <div class="tooltip-val plan2" style="margin-top:6px"></div>
+          <div class="tooltip-breakdown" id="c-breakdown-b">
+            <div class="row interest">Initial + Interest: <span class="c-b-interest"></span></div>
+            <div class="row contrib">Contributions: <span class="c-b-contrib"></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-legend" id="c-legend"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+const state = {
+  s: { slices: [], contribs: [] },
+  a: { slices: [], contribs: [] },
+  b: { slices: [], contribs: [] },
+};
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+function init() {
+  ['s','a','b'].forEach(p => {
+    addSlice(p, 60, 7);
+    addSlice(p, 40, 12);
+    addContrib(p, 500, 'monthly');
+  });
+}
+
+// ─── Tab switch ───────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ─── Rate Slices ──────────────────────────────────────────────────────────────
+let sliceId = 0;
+function addSlice(prefix, alloc = 100, rate = 7) {
+  const id = sliceId++;
+  state[prefix].slices.push(id);
+  const container = document.getElementById(prefix + '-slices');
+  const div = document.createElement('div');
+  div.className = 'rate-slice';
+  div.id = 'slice-' + prefix + '-' + id;
+  div.innerHTML = `
+    <label>Allocation (%)
+      <input type="number" class="slice-alloc" value="${alloc}" min="0" max="100" step="1"
+        oninput="validateSlices('${prefix}')" />
+    </label>
+    <label>Annual Rate (%)
+      <input type="number" class="slice-rate" value="${rate}" step="0.1" min="0" max="200" />
+    </label>
+    <label>Compounding
+      <select class="slice-compound">
+        <option value="yearly">Yearly</option>
+        <option value="monthly">Monthly</option>
+        <option value="daily">Daily</option>
+      </select>
+    </label>
+    <button class="btn-icon" onclick="removeSlice('${prefix}', ${id})" title="Remove">✕</button>
+  `;
+  container.appendChild(div);
+  validateSlices(prefix);
+}
+
+function removeSlice(prefix, id) {
+  state[prefix].slices = state[prefix].slices.filter(x => x !== id);
+  document.getElementById('slice-' + prefix + '-' + id).remove();
+  validateSlices(prefix);
+}
+
+function validateSlices(prefix) {
+  const container = document.getElementById(prefix + '-slices');
+  const inputs = container.querySelectorAll('.slice-alloc');
+  const sum = Array.from(inputs).reduce((a, b) => a + parseFloat(b.value || 0), 0);
+  const warn = document.getElementById(prefix + '-slice-warn');
+  const sumEl = document.getElementById(prefix + '-slice-sum');
+  if (Math.abs(sum - 100) > 0.01) {
+    sumEl.textContent = sum.toFixed(1);
+    warn.classList.remove('hidden');
+  } else {
+    warn.classList.add('hidden');
+  }
+}
+
+function getSlices(prefix) {
+  const container = document.getElementById(prefix + '-slices');
+  return Array.from(container.querySelectorAll('.rate-slice')).map(el => ({
+    alloc: parseFloat(el.querySelector('.slice-alloc').value) / 100,
+    rate: parseFloat(el.querySelector('.slice-rate').value) / 100,
+    compound: el.querySelector('.slice-compound').value,
+  }));
+}
+
+// ─── Contributions ────────────────────────────────────────────────────────────
+let contribId = 0;
+function addContrib(prefix, amount = 200, freq = 'monthly') {
+  const id = contribId++;
+  state[prefix].contribs.push(id);
+  const container = document.getElementById(prefix + '-contribs');
+  const div = document.createElement('div');
+  div.className = 'contrib-row';
+  div.id = 'contrib-' + prefix + '-' + id;
+  div.innerHTML = `
+    <label>Amount ($)
+      <input type="number" class="contrib-amount" value="${amount}" min="0" step="10" />
+    </label>
+    <label>Frequency
+      <select class="contrib-freq">
+        <option value="weekly" ${freq==='weekly'?'selected':''}>Weekly</option>
+        <option value="biweekly" ${freq==='biweekly'?'selected':''}>Every 2 Weeks</option>
+        <option value="monthly" ${freq==='monthly'?'selected':''}>Monthly</option>
+        <option value="quarterly">Quarterly</option>
+        <option value="yearly">Yearly</option>
+      </select>
+    </label>
+    <label>Starting at Year
+      <input type="number" class="contrib-start" value="0" min="0" step="1" />
+    </label>
+    <button class="btn-icon" onclick="removeContrib('${prefix}', ${id})" title="Remove">✕</button>
+  `;
+  container.appendChild(div);
+}
+
+function removeContrib(prefix, id) {
+  state[prefix].contribs = state[prefix].contribs.filter(x => x !== id);
+  document.getElementById('contrib-' + prefix + '-' + id).remove();
+}
+
+function getContribs(prefix) {
+  const container = document.getElementById(prefix + '-contribs');
+  return Array.from(container.querySelectorAll('.contrib-row')).map(el => ({
+    amount: parseFloat(el.querySelector('.contrib-amount').value) || 0,
+    freq: el.querySelector('.contrib-freq').value,
+    startYear: parseFloat(el.querySelector('.contrib-start').value) || 0,
+  }));
+}
+
+const FREQ_PER_YEAR = { weekly: 52, biweekly: 26, monthly: 12, quarterly: 4, yearly: 1 };
+
+// ─── Simulation ───────────────────────────────────────────────────────────────
+function simulate(start, goal, slices, contribs, maxYears) {
+  // Validate slices sum
+  const sum = slices.reduce((a, s) => a + s.alloc, 0);
+  if (Math.abs(sum - 1) > 0.01) return null;
+
+  // Effective annual rate from mixed slices
+  function effectiveAnnualRate(balance) {
+    // Each slice gets its allocation of balance
+    // We compute how much the balance grows in one year
+    let totalGrowth = 0;
+    for (const s of slices) {
+      const portion = balance * s.alloc;
+      let grown;
+      if (s.compound === 'monthly') {
+        grown = portion * Math.pow(1 + s.rate / 12, 12);
+      } else if (s.compound === 'daily') {
+        grown = portion * Math.pow(1 + s.rate / 365, 365);
+      } else {
+        grown = portion * (1 + s.rate);
+      }
+      totalGrowth += grown;
+    }
+    return totalGrowth / balance - 1; // effective rate
+  }
+
+  const STEPS_PER_YEAR = 52; // weekly simulation
+  const dt = 1 / STEPS_PER_YEAR;
+
+  // Contribution lookup: amount per week
+  const weeklyContribs = contribs.map(c => ({
+    amountPerStep: c.amount / (FREQ_PER_YEAR[c.freq] / STEPS_PER_YEAR) / STEPS_PER_YEAR,
+    // easier: just how much added per step
+    amountEach: c.amount,
+    stepsPerContrib: STEPS_PER_YEAR / FREQ_PER_YEAR[c.freq],
+    startStep: Math.round(c.startYear * STEPS_PER_YEAR),
+  }));
+
+  let balance = start;
+  const yearlyData = [{ year: 0, balance, contributions: 0, interest: 0 }];
+  let totalContrib = 0;
+  let totalInterest = 0;
+  let goalYear = null;
+
+  const totalSteps = maxYears * STEPS_PER_YEAR;
+
+  for (let step = 1; step <= totalSteps; step++) {
+    // Apply interest for this step (daily compounding approximation)
+    const ear = effectiveAnnualRate(balance);
+    const stepRate = Math.pow(1 + ear, dt) - 1;
+    const interest = balance * stepRate;
+    balance += interest;
+    totalInterest += interest;
+
+    // Apply contributions
+    for (const c of weeklyContribs) {
+      if (step >= c.startStep && ((step - c.startStep) % c.stepsPerContrib < 1)) {
+        balance += c.amountEach;
+        totalContrib += c.amountEach;
+      }
+    }
+
+    if (step % STEPS_PER_YEAR === 0) {
+      const year = step / STEPS_PER_YEAR;
+      yearlyData.push({ year, balance, contributions: totalContrib, interest: totalInterest });
+    }
+
+    if (goalYear === null && balance >= goal) {
+      goalYear = step / STEPS_PER_YEAR;
+    }
+  }
+
+  return { yearlyData, goalYear, totalContrib, totalInterest, finalBalance: balance };
+}
+
+// ─── Format helpers ───────────────────────────────────────────────────────────
+function fmtMoney(v) {
+  if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return '$' + (v / 1e6).toFixed(2) + 'M';
+  return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function fmtYears(y) {
+  if (y === null) return 'Not reached';
+  const yrs = Math.floor(y);
+  const months = Math.round((y - yrs) * 12);
+  if (months === 0) return yrs + ' yrs';
+  return yrs + ' yrs ' + months + ' mo';
+}
+
+// ─── Single Calculate ─────────────────────────────────────────────────────────
+function calculate(prefix) {
+  const start = parseFloat(document.getElementById(prefix + '-start').value) || 0;
+  const goal = parseFloat(document.getElementById(prefix + '-goal').value) || 0;
+  const maxYears = parseInt(document.getElementById(prefix + '-maxyears').value) || 50;
+  const slices = getSlices(prefix);
+  const contribs = getContribs(prefix);
+
+  const result = simulate(start, goal, slices, contribs, maxYears);
+  if (!result) {
+    alert('Interest rate slices must sum to 100%');
+    return;
+  }
+
+  document.getElementById('s-results').classList.remove('hidden');
+  renderCards('s-cards', result, goal, start);
+  renderChart('s-canvas', [{ label: 'Balance', color: '#6c63ff', data: result.yearlyData }],
+    [{ label: 'Balance', color: '#6c63ff' }, { label: 'Goal', color: '#facc15' }],
+    goal, 's-tooltip', 's-legend');
+}
+
+function renderCards(containerId, result, goal, start) {
+  const c = document.getElementById(containerId);
+  const ear = result.yearlyData.length > 1
+    ? ((result.yearlyData[1].balance - start) / start * 100).toFixed(2)
+    : '—';
+
+  c.innerHTML = `
+    <div class="result-card">
+      <div class="label">Time to Goal</div>
+      <div class="value ${result.goalYear ? '' : 'yellow'}">${fmtYears(result.goalYear)}</div>
+    </div>
+    <div class="result-card">
+      <div class="label">Final Balance</div>
+      <div class="value">${fmtMoney(result.finalBalance)}</div>
+    </div>
+    <div class="result-card">
+      <div class="label">Total Contributed</div>
+      <div class="value accent">${fmtMoney(result.totalContrib)}</div>
+    </div>
+    <div class="result-card">
+      <div class="label">Total Interest</div>
+      <div class="value">${fmtMoney(result.totalInterest)}</div>
+    </div>
+  `;
+}
+
+// ─── Compare Calculate ────────────────────────────────────────────────────────
+function calculateCompare() {
+  const plans = ['a', 'b'];
+  const results = {};
+  for (const p of plans) {
+    const start = parseFloat(document.getElementById(p + '-start').value) || 0;
+    const goal = parseFloat(document.getElementById(p + '-goal').value) || 0;
+    const maxYears = parseInt(document.getElementById(p + '-maxyears').value) || 50;
+    const slices = getSlices(p);
+    const contribs = getContribs(p);
+    const r = simulate(start, goal, slices, contribs, maxYears);
+    if (!r) { alert('Plan ' + p.toUpperCase() + ': slices must sum to 100%'); return; }
+    results[p] = { ...r, goal, start };
+  }
+
+  document.getElementById('c-results').classList.remove('hidden');
+
+  // Table
+  const ra = results.a, rb = results.b;
+  const rows = [
+    ['Time to Goal', fmtYears(ra.goalYear), fmtYears(rb.goalYear),
+      ra.goalYear !== null && (rb.goalYear === null || ra.goalYear <= rb.goalYear) ? 'a' : 'b'],
+    ['Final Balance', fmtMoney(ra.finalBalance), fmtMoney(rb.finalBalance),
+      ra.finalBalance >= rb.finalBalance ? 'a' : 'b'],
+    ['Total Contributed', fmtMoney(ra.totalContrib), fmtMoney(rb.totalContrib), null],
+    ['Total Interest', fmtMoney(ra.totalInterest), fmtMoney(rb.totalInterest),
+      ra.totalInterest >= rb.totalInterest ? 'a' : 'b'],
+  ];
+
+  const table = document.getElementById('c-table');
+  table.innerHTML = `<thead><tr><th>Metric</th><th style="color:#6c63ff">Plan A</th><th style="color:#ff6584">Plan B</th></tr></thead>
+  <tbody>${rows.map(([label, va, vb, winner]) => `
+    <tr>
+      <td>${label}</td>
+      <td class="${winner === 'a' ? 'winner' : winner === 'b' ? 'loser' : ''}">${va}</td>
+      <td class="${winner === 'b' ? 'winner' : winner === 'a' ? 'loser' : ''}">${vb}</td>
+    </tr>
+  `).join('')}</tbody>`;
+
+  const maxGoal = Math.max(ra.goal, rb.goal);
+  renderChart('c-canvas', [
+    { label: 'Plan A', color: '#6c63ff', data: ra.yearlyData },
+    { label: 'Plan B', color: '#ff6584', data: rb.yearlyData },
+  ], [
+    { label: 'Plan A', color: '#6c63ff' },
+    { label: 'Plan B', color: '#ff6584' },
+    { label: 'Goal', color: '#facc15' },
+  ], maxGoal, 'c-tooltip', 'c-legend');
+}
+
+// ─── Chart ────────────────────────────────────────────────────────────────────
+function renderChart(canvasId, series, legendDefs, goal, tooltipId, legendId) {
+  const canvas = document.getElementById(canvasId);
+  const wrap = canvas.parentElement;
+  canvas.width = wrap.clientWidth || 800;
+  canvas.height = 320;
+  const ctx = canvas.getContext('2d');
+
+  const PAD = { top: 20, right: 20, bottom: 40, left: 70 };
+  const W = canvas.width - PAD.left - PAD.right;
+  const H = canvas.height - PAD.top - PAD.bottom;
+
+  // Find ranges
+  const allBalances = series.flatMap(s => s.data.map(d => d.balance));
+  const maxY = Math.max(...allBalances, goal) * 1.05;
+  const maxX = Math.max(...series.flatMap(s => s.data.map(d => d.year)));
+
+  function xp(year) { return PAD.left + (year / maxX) * W; }
+  function yp(val) { return PAD.top + H - (val / maxY) * H; }
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Grid
+  ctx.strokeStyle = '#2e3249';
+  ctx.lineWidth = 1;
+  const yTicks = 6;
+  for (let i = 0; i <= yTicks; i++) {
+    const v = (maxY / yTicks) * i;
+    const y = yp(v);
+    ctx.beginPath(); ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + W, y); ctx.stroke();
+    ctx.fillStyle = '#7c7f9a';
+    ctx.font = '11px system-ui';
+    ctx.textAlign = 'right';
+    ctx.fillText(fmtMoney(v), PAD.left - 8, y + 4);
+  }
+
+  const xTicks = Math.min(maxX, 10);
+  for (let i = 0; i <= xTicks; i++) {
+    const yr = Math.round((maxX / xTicks) * i);
+    const x = xp(yr);
+    ctx.beginPath(); ctx.moveTo(x, PAD.top); ctx.lineTo(x, PAD.top + H); ctx.stroke();
+    ctx.fillStyle = '#7c7f9a';
+    ctx.font = '11px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('Yr ' + yr, x, PAD.top + H + 18);
+  }
+
+  // Goal line
+  if (goal > 0) {
+    const gy = yp(goal);
+    ctx.save();
+    ctx.setLineDash([6, 4]);
+    ctx.strokeStyle = '#facc15';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(PAD.left, gy); ctx.lineTo(PAD.left + W, gy); ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle = '#facc15';
+    ctx.font = '11px system-ui';
+    ctx.textAlign = 'left';
+    ctx.fillText('Goal ' + fmtMoney(goal), PAD.left + 4, gy - 5);
+  }
+
+  // Contribution fill areas
+  for (const s of series) {
+    ctx.save();
+    ctx.globalAlpha = 0.08;
+    ctx.fillStyle = s.color;
+    ctx.beginPath();
+    ctx.moveTo(xp(s.data[0].year), yp(s.data[0].contributions));
+    for (const d of s.data) ctx.lineTo(xp(d.year), yp(d.contributions));
+    for (let i = s.data.length - 1; i >= 0; i--) ctx.lineTo(xp(s.data[i].year), yp(0));
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Lines
+  for (const s of series) {
+    // Gradient fill under line
+    const grad = ctx.createLinearGradient(0, PAD.top, 0, PAD.top + H);
+    grad.addColorStop(0, s.color + '33');
+    grad.addColorStop(1, s.color + '00');
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(xp(s.data[0].year), yp(s.data[0].balance));
+    for (const d of s.data) ctx.lineTo(xp(d.year), yp(d.balance));
+    ctx.lineTo(xp(s.data[s.data.length - 1].year), PAD.top + H);
+    ctx.lineTo(xp(s.data[0].year), PAD.top + H);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.restore();
+
+    ctx.beginPath();
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    s.data.forEach((d, i) => {
+      if (i === 0) ctx.moveTo(xp(d.year), yp(d.balance));
+      else ctx.lineTo(xp(d.year), yp(d.balance));
+    });
+    ctx.stroke();
+  }
+
+  // Legend
+  const legendEl = document.getElementById(legendId);
+  legendEl.innerHTML = legendDefs.map(l =>
+    `<div class="legend-item"><div class="legend-dot" style="background:${l.color}"></div>${l.label}</div>`
+  ).join('');
+
+  // Tooltip
+  const tooltip = document.getElementById(tooltipId);
+  canvas._chartMeta = { series, xp, yp, maxX, PAD, W, H, goal };
+
+  canvas.onmousemove = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const year = Math.round(((mx - PAD.left) / W) * maxX);
+    if (year < 0 || year > maxX) { tooltip.style.display = 'none'; return; }
+
+    tooltip.style.display = 'block';
+    tooltip.style.left = Math.min(mx + 12, canvas.width - 160) + 'px';
+    tooltip.style.top = '8px';
+    tooltip.querySelector('.tooltip-year').textContent = 'Year ' + year;
+
+    const valEls = tooltip.querySelectorAll('.tooltip-val');
+
+    if (series.length === 1) {
+      // Single plan mode
+      const pt = series[0].data.find(d => d.year === year);
+      if (pt) {
+        valEls[0].innerHTML = `Balance: <span>${fmtMoney(pt.balance)}</span>`;
+        const interestEl = tooltip.querySelector('.s-interest');
+        const contribEl  = tooltip.querySelector('.s-contrib');
+        if (interestEl) interestEl.textContent = fmtMoney(pt.balance - pt.contributions);
+        if (contribEl)  contribEl.textContent  = fmtMoney(pt.contributions);
+      }
+    } else {
+      // Compare mode — two series
+      const labels = ['Plan A', 'Plan B'];
+      const breakdownIds = ['c-breakdown-a', 'c-breakdown-b'];
+      const interestClasses = ['c-a-interest', 'c-b-interest'];
+      const contribClasses  = ['c-a-contrib',  'c-b-contrib'];
+
+      series.forEach((s, i) => {
+        const pt = s.data.find(d => d.year === year);
+        if (pt && valEls[i]) {
+          valEls[i].style.display = '';
+          valEls[i].innerHTML = `${labels[i]}: <span>${fmtMoney(pt.balance)}</span>`;
+          const intEl = tooltip.querySelector('.' + interestClasses[i]);
+          const ctEl  = tooltip.querySelector('.' + contribClasses[i]);
+          if (intEl) intEl.textContent = fmtMoney(pt.balance - pt.contributions);
+          if (ctEl)  ctEl.textContent  = fmtMoney(pt.contributions);
+        }
+      });
+    }
+  };
+
+  canvas.onmouseleave = () => { tooltip.style.display = 'none'; };
+}
+
+// ─── Resize ───────────────────────────────────────────────────────────────────
+window.addEventListener('resize', () => {
+  // Re-render if results are visible
+  if (!document.getElementById('s-results').classList.contains('hidden')) calculate('s');
+});
+
+init();
+</script>
+</body>
+</html>
